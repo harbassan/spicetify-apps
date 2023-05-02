@@ -30,7 +30,7 @@
 
 ### Manual Installation
 
-After copying the files add them into a folder named `stats` and place that folder into your `CustomApps` folder in the spicetify directory.
+Download the files in the [dist branch](https://github.com/harbassan/spicetify-stats/archive/refs/heads/dist.zip) and rename the folder to `stats`, and then place that folder into your `CustomApps` folder in the spicetify directory.
 
 Then run these commands to apply:
 
@@ -43,4 +43,4 @@ spicetify apply
 
 If you have any questions or issues regarding the app open an issue on this repo. Please specify your spicetify version and installation method if you do so.
 
-If you really like the theme i'd be grateful if you liked the repo ❤️.
+If you really like the app i'd be grateful if you liked the repo ❤️.
