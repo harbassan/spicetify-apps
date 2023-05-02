@@ -1,7 +1,7 @@
 {
     "name": "Statistics",
     "description": "See your top artists, tracks, genres and an analysis of your music library.",
-    "preview": "preview/top_genres.png",
+    "preview": "previews/top_genres.png",
     "readme": "README.md",
     "tags": ["stats"]
 }
