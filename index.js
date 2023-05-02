@@ -134,7 +134,7 @@ var stats = (() => {
   });
   var optionsMenu_default = OptionsMenu;
 
-  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-20668-fmJCj6BIExE9\187dae5eea51\navBar.module.css
+  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-11352-xL26BU56BtHl\187dc1300a41\navBar.module.css
   var navBar_module_default = { "topBarHeaderItem": "navBar-module__topBarHeaderItem___v29bR_stats", "topBarHeaderItemLink": "navBar-module__topBarHeaderItemLink___VeyBY_stats", "topBarActive": "navBar-module__topBarActive___-qYPu_stats", "topBarNav": "navBar-module__topBarNav___1OtdR_stats", "optionsMenuDropBox": "navBar-module__optionsMenuDropBox___tD9mA_stats" };
 
   // node_modules/spcr-navigation-bar/navBar.tsx
@@ -947,18 +947,28 @@ var stats = (() => {
       let dart = window.performance.now();
       const rootlistItems = await Spicetify.CosmosAsync.get("sp://core-playlist/v1/rootlist");
       console.log("rootlist fetch time: " + (window.performance.now() - dart) + "ms");
-      let playlists = [];
-      rootlistItems.rows.forEach((row) => {
-        if (row.type === "folder") {
-          playlists.push(...row.rows);
-        } else {
-          playlists.push(row);
-        }
-      });
+      console.log(rootlistItems.rows);
+      const flattenPlaylists = (items) => {
+        const playlists2 = [];
+        items.forEach((row) => {
+          if (row.type === "playlist") {
+            playlists2.push(row);
+          } else if (row.type === "folder") {
+            if (!row.rows)
+              return;
+            const folderPlaylists = flattenPlaylists(row.rows);
+            playlists2.push(...folderPlaylists);
+          }
+        });
+        return playlists2;
+      };
+      const playlists = flattenPlaylists(rootlistItems.rows);
       console.log(playlists);
       let playlistUris = [];
       let trackCount = 0;
       playlists.forEach((playlist) => {
+        if (playlist.totalLength === 0)
+          return;
         playlistUris.push(playlist.link);
         trackCount += playlist.totalLength;
       }, 0);
