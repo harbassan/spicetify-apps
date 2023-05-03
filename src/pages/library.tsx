@@ -24,16 +24,29 @@ const LibraryPage = () => {
         const rootlistItems = await Spicetify.CosmosAsync.get("sp://core-playlist/v1/rootlist");
         console.log("rootlist fetch time: " + (window.performance.now() - dart) + "ms");
 
-        let playlists: any[] = [];
+        console.log(rootlistItems.rows);
 
         // flatten rootlist into playlists
-        rootlistItems.rows.forEach((row: any) => {
-            if (row.type === "folder") {
-                playlists.push(...row.rows);
-            } else {
-                playlists.push(row);
-            }
-        });
+        const flattenPlaylists = (items: any[]) => {
+            const playlists: any[] = [];
+
+            items.forEach(row => {
+                if (row.type === "playlist") {
+                    // add the playlist to the result list
+                    playlists.push(row);
+                } else if (row.type === "folder") {
+                    // recursively flatten playlists in the folder
+                    if (!row.rows) return;
+                    const folderPlaylists = flattenPlaylists(row.rows);
+                    // add the flattened playlists to the result list
+                    playlists.push(...folderPlaylists);
+                }
+            });
+
+            return playlists;
+        };
+
+        const playlists = flattenPlaylists(rootlistItems.rows);
 
         console.log(playlists);
 
@@ -41,6 +54,7 @@ const LibraryPage = () => {
         let trackCount: number = 0;
 
         playlists.forEach(playlist => {
+            if (playlist.totalLength === 0) return;
             playlistUris.push(playlist.link);
             trackCount += playlist.totalLength;
         }, 0);
@@ -65,6 +79,7 @@ const LibraryPage = () => {
         playlistsMeta.forEach(playlist => {
             totalDuration += Number(playlist.duration);
             playlist.item.forEach((item: any) => {
+                if (!item.trackMetadata) return;
                 trackUids.push(item.trackMetadata.link.split(":")[2]);
                 allTracks.push(item);
                 totalObscurity += item.trackMetadata.popularity;
