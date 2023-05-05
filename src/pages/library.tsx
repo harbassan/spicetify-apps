@@ -11,6 +11,7 @@ interface LibraryProps {
     artists: any[];
     genres: [string, number][];
     playlistCount: number;
+    albums: any[];
 }
 
 const LibraryPage = () => {
@@ -72,6 +73,7 @@ const LibraryPage = () => {
         let artists: Record<string, number> = {};
         let allTracks: any[] = [];
         let totalObscurity: number = 0;
+        let albums: any[] = [];
         let explicitTracks: number = 0;
 
         // loop through all playlists, add up total duration and obscurity, seperate track ids and artists
@@ -83,6 +85,12 @@ const LibraryPage = () => {
                 allTracks.push(item);
                 if (item.trackMetadata.isExplicit) explicitTracks++;
                 totalObscurity += item.trackMetadata.popularity;
+                const index = albums.findIndex(([g]) => g.link === item.trackMetadata.album.link);
+                if (index !== -1) {
+                    albums[index][1] += 1;
+                } else {
+                    albums.push([item.trackMetadata.album, 1]);
+                }
                 item.trackMetadata.artist.forEach((artist: any) => {
                     if (!artists[artist.link.split(":")[2]]) {
                         artists[artist.link.split(":")[2]] = 1;
@@ -92,6 +100,8 @@ const LibraryPage = () => {
                 });
             });
         });
+
+        const topAlbums = albums.sort((a, b) => b[1] - a[1]).slice(0, 10);
 
         const topArtists = Object.keys(artists)
             .sort((a, b) => artists[b] - artists[a])
@@ -158,6 +168,7 @@ const LibraryPage = () => {
             artistCount: Object.keys(artists).length,
             genres: topGenres,
             playlistCount: playlists.length,
+            albums: topAlbums,
         });
 
         console.log("total fetch time: " + (window.performance.now() - start) + "ms");
@@ -238,6 +249,10 @@ const LibraryPage = () => {
             <ArtistCard name={artist.name} image={artist.images[2].url} uri={artist.uri} subtext={`Appears in ${artist.numTracks} tracks`} />
         ));
 
+    const albumCards: JSX.Element[] = library.albums.map(([album, frequency]) => {
+        return <ArtistCard name={album.name} image={album.covers.standardLink} uri={album.link} subtext={`Appears in ${frequency} tracks`} />;
+    });
+
     const scrollGrid = (event: any) => {
         const grid = event.target.parentNode.querySelector("div");
 
@@ -300,6 +315,24 @@ const LibraryPage = () => {
                                 {">"}
                             </button>
                             <div className={`main-gridContainer-gridContainer stats-gridInline`}>{artistCards}</div>
+                        </section>
+                    </section>
+                    <section className="main-shelf-shelf Shelf">
+                        <div className="main-shelf-header">
+                            <div className="main-shelf-topRow">
+                                <div className="main-shelf-titleWrapper">
+                                    <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">Most Frequent Albums</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <section className="stats-gridInlineSection">
+                            <button className="stats-scrollButton" onClick={scrollGridLeft}>
+                                {"<"}
+                            </button>
+                            <button className="stats-scrollButton" onClick={scrollGrid}>
+                                {">"}
+                            </button>
+                            <div className={`main-gridContainer-gridContainer stats-gridInline`}>{albumCards}</div>
                         </section>
                     </section>
                 </div>
