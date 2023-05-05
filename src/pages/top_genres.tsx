@@ -20,18 +20,21 @@ const GenresPage = () => {
             artist.genres.forEach((genre: string) => {
                 const index = acc.findIndex(([g]) => g === genre);
                 if (index !== -1) {
-                    acc[index][1] += 1;
+                    acc[index][1] += 1 * Math.abs(fetchedArtists.indexOf(artist) - 50);
                 } else {
-                    acc.push([genre, 1]);
+                    acc.push([genre, 1 * Math.abs(fetchedArtists.indexOf(artist) - 50)]);
                 }
             });
             return acc;
         }, []);
         let trackPopularity = 0;
+        let explicitness = 0;
         const topTracks = fetchedTracks.map((track: any) => {
             trackPopularity += track.popularity;
+            if (track.explicit) explicitness++;
             return track.id;
         });
+
         const featureData = await fetchAudioFeatures(topTracks);
         const audioFeatures = featureData.audio_features.reduce(
             (acc: { [key: string]: number }, track: any) => {
@@ -47,6 +50,8 @@ const GenresPage = () => {
                 return acc;
             },
             {
+                popularity: trackPopularity,
+                explicitness: explicitness,
                 danceability: 0,
                 energy: 0,
                 valence: 0,
@@ -56,7 +61,6 @@ const GenresPage = () => {
                 liveness: 0,
                 tempo: 0,
                 loudness: 0,
-                popularity: trackPopularity,
             }
         );
         for (let key in audioFeatures) {

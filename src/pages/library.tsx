@@ -24,8 +24,6 @@ const LibraryPage = () => {
         const rootlistItems = await Spicetify.CosmosAsync.get("sp://core-playlist/v1/rootlist");
         console.log("rootlist fetch time: " + (window.performance.now() - dart) + "ms");
 
-        console.log(rootlistItems.rows);
-
         // flatten rootlist into playlists
         const flattenPlaylists = (items: any[]) => {
             const playlists: any[] = [];
@@ -74,6 +72,7 @@ const LibraryPage = () => {
         let artists: Record<string, number> = {};
         let allTracks: any[] = [];
         let totalObscurity: number = 0;
+        let explicitTracks: number = 0;
 
         // loop through all playlists, add up total duration and obscurity, seperate track ids and artists
         playlistsMeta.forEach(playlist => {
@@ -82,6 +81,7 @@ const LibraryPage = () => {
                 if (!item.trackMetadata) return;
                 trackUids.push(item.trackMetadata.link.split(":")[2]);
                 allTracks.push(item);
+                if (item.trackMetadata.isExplicit) explicitTracks++;
                 totalObscurity += item.trackMetadata.popularity;
                 item.trackMetadata.artist.forEach((artist: any) => {
                     if (!artists[artist.link.split(":")[2]]) {
@@ -119,6 +119,8 @@ const LibraryPage = () => {
         console.log("audio features fetch time: " + (window.performance.now() - dart) + "ms");
 
         const audioFeatures: Record<string, number> = {
+            popularity: totalObscurity,
+            explicitness: explicitTracks,
             danceability: 0,
             energy: 0,
             valence: 0,
@@ -128,7 +130,6 @@ const LibraryPage = () => {
             liveness: 0,
             tempo: 0,
             loudness: 0,
-            popularity: totalObscurity,
         };
 
         for (let i = 0; i < fetchedFeatures.length; i++) {
@@ -280,7 +281,7 @@ const LibraryPage = () => {
                             <button className="stats-scrollButton" onClick={scrollGrid}>
                                 {">"}
                             </button>
-                            <div className={`main-gridContainer-gridContainer stats-gridInline`}>{statCards}</div>
+                            <div className={`main-gridContainer-gridContainer stats-gridInline stats-specialGrid`}>{statCards}</div>
                         </section>
                     </section>
                     <section className="main-shelf-shelf Shelf">

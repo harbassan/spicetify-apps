@@ -3,6 +3,10 @@
   grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
 }
 
+.stats-specialGrid {
+  grid-template-columns: repeat(11, 180px) !important;
+}
+
 .stats-gridInline {
   --grid-gap: 24px;
   grid-template-columns: repeat(10, 180px);
