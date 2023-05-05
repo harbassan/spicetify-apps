@@ -1,4 +1,4 @@
-/* ../../AppData/Local/Temp/tmp-20668-fmJCj6BIExE9/187dae5eea51/navBar.module.css */
+/* ../../AppData/Local/Temp/tmp-12704-SYYfYXmW0XTA/187eaa4f6501/navBar.module.css */
 .navBar-module__topBarHeaderItem___v29bR_stats {
   -webkit-app-region: no-drag;
   display: inline-block;
@@ -46,10 +46,13 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   padding: 0;
 }
 
-/* ../../AppData/Local/Temp/tmp-20668-fmJCj6BIExE9/187dae5ed6b0/app.css */
+/* ../../AppData/Local/Temp/tmp-12704-SYYfYXmW0XTA/187eaa4f50a0/app.css */
 .stats-grid {
   --grid-gap: 24px;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.stats-specialGrid {
+  grid-template-columns: repeat(11, 180px) !important;
 }
 .stats-gridInline {
   --grid-gap: 24px;
