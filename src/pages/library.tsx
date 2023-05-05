@@ -95,7 +95,7 @@ const LibraryPage = () => {
 
         const topArtists = Object.keys(artists)
             .sort((a, b) => artists[b] - artists[a])
-            .slice(0, 10);
+            .slice(0, 50);
 
         dart = window.performance.now();
         const artistsMeta = await Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/artists?ids=${topArtists.join(",")}`);
@@ -106,9 +106,9 @@ const LibraryPage = () => {
             artist.genres.forEach((genre: string) => {
                 const index = acc.findIndex(([g]) => g === genre);
                 if (index !== -1) {
-                    acc[index][1] += 1;
+                    acc[index][1] += artist.numTracks;
                 } else {
-                    acc.push([genre, 1]);
+                    acc.push([genre, artist.numTracks]);
                 }
             });
             return acc;
@@ -273,7 +273,7 @@ const LibraryPage = () => {
                                 </div>
                             </div>
                         </div>
-                        <GenresCard genres={library.genres} />
+                        <GenresCard genres={library.genres} total={library.trackCount} />
                         <section className="stats-gridInlineSection">
                             <button className="stats-scrollButton" onClick={scrollGridLeft}>
                                 {"<"}

@@ -123,7 +123,7 @@ const GenresPage = () => {
                 </div>
                 <div className="stats-page">
                     <section>
-                        <GenresCard genres={topGenres.genres} />
+                        <GenresCard genres={topGenres.genres} total={1275} />
                     </section>
                     <section>
                         <div className={`main-gridContainer-gridContainer stats-grid`}>{statCards}</div>
