@@ -1,4 +1,5 @@
 import React from "react";
+import DropdownMenu from "../components/dropdown";
 import StatCard from "../components/stat_card";
 import GenresCard from "../components/genres_card";
 import ArtistCard from "../components/artist_card";
@@ -17,7 +18,7 @@ interface LibraryProps {
 const LibraryPage = () => {
     const [library, setLibrary] = React.useState<LibraryProps | null>(null);
 
-    const fetchData = async () => {
+    const fetchData = async (option: string) => {
         const start = window.performance.now();
 
         // fetch all rootlist items
@@ -45,9 +46,11 @@ const LibraryPage = () => {
             return playlists;
         };
 
-        const playlists = flattenPlaylists(rootlistItems.rows);
+        let playlists = flattenPlaylists(rootlistItems.rows);
 
-        console.log(playlists);
+        if (option === "owned") {
+            playlists = playlists.filter((playlist: any) => playlist.ownedBySelf);
+        }
 
         let playlistUris: string[] = [];
         let trackCount: number = 0;
@@ -201,7 +204,7 @@ const LibraryPage = () => {
     };
 
     React.useEffect(() => {
-        fetchData();
+        fetchData("all");
     }, []);
 
     if (!library)
@@ -264,6 +267,10 @@ const LibraryPage = () => {
         grid.scrollLeft -= grid.clientWidth;
     };
 
+    const handleDropdownChange = (option: string) => {
+        fetchData(option === "My Playlists" ? "owned" : "all");
+    };
+
     return (
         <>
             <section className="contentSpacing">
@@ -271,6 +278,9 @@ const LibraryPage = () => {
                     <h1 data-encore-id="type" className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-type">
                         Library Analysis
                     </h1>
+                    <div className="collection-searchBar-searchBar">
+                        <DropdownMenu links={["Whole Library", "My Playlists"]} switchCallback={handleDropdownChange} />
+                    </div>
                 </div>
                 <div className="stats-page">
                     <section className="stats-libraryOverview">
