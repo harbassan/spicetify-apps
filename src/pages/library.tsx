@@ -1,8 +1,9 @@
 import React from "react";
-import DropdownMenu from "../components/dropdown";
+import useDropdownMenu from "../components/useDropdownMenu";
 import StatCard from "../components/stat_card";
 import GenresCard from "../components/genres_card";
 import ArtistCard from "../components/artist_card";
+import RefreshButton from "../components/refresh_button";
 
 interface LibraryProps {
     audioFeatures: Record<string, number>;
@@ -17,8 +18,16 @@ interface LibraryProps {
 
 const LibraryPage = () => {
     const [library, setLibrary] = React.useState<LibraryProps | null>(null);
+    const [dropdown, activeOption, setActiveOption] = useDropdownMenu(["owned", "all"], ["My Playlists", "All Playlists"], "library");
 
-    const fetchData = async (option: string) => {
+    const fetchData = async (option: string, force?: boolean, set: boolean = true) => {
+        if (!force) {
+            let storedData = Spicetify.LocalStorage.get(`stats:library:${option}`);
+            if (storedData) {
+                setLibrary(JSON.parse(storedData));
+                return;
+            }
+        }
         const start = window.performance.now();
 
         // fetch all rootlist items
@@ -163,16 +172,31 @@ const LibraryPage = () => {
             audioFeatures[key] /= fetchedFeatures.length;
         }
 
-        setLibrary({
-            audioFeatures: audioFeatures,
-            trackCount: trackCount,
-            totalDuration: totalDuration,
-            artists: artistsMeta.artists,
-            artistCount: Object.keys(artists).length,
-            genres: topGenres,
-            playlistCount: playlists.length,
-            albums: topAlbums,
-        });
+        if (set)
+            setLibrary({
+                audioFeatures: audioFeatures,
+                trackCount: trackCount,
+                totalDuration: totalDuration,
+                artists: artistsMeta.artists,
+                artistCount: Object.keys(artists).length,
+                genres: topGenres,
+                playlistCount: playlists.length,
+                albums: topAlbums,
+            });
+
+        Spicetify.LocalStorage.set(
+            `stats:library:${option}`,
+            JSON.stringify({
+                audioFeatures: audioFeatures,
+                trackCount: trackCount,
+                totalDuration: totalDuration,
+                artists: artistsMeta.artists,
+                artistCount: Object.keys(artists).length,
+                genres: topGenres,
+                playlistCount: playlists.length,
+                albums: topAlbums,
+            })
+        );
 
         console.log("total fetch time: " + (window.performance.now() - start) + "ms");
     };
@@ -204,8 +228,17 @@ const LibraryPage = () => {
     };
 
     React.useEffect(() => {
-        fetchData("all");
+        let cacheInfo = Spicetify.LocalStorage.get("stats:cache-info");
+        if (cacheInfo && cacheInfo[2] === "0") {
+            ["owned", "all"].filter(option => option !== activeOption).forEach(option => fetchData(option, true, false));
+            fetchData(activeOption, true);
+            Spicetify.LocalStorage.set("stats:cache-info", cacheInfo.slice(0, 3) + "1");
+        }
     }, []);
+
+    React.useEffect(() => {
+        fetchData(activeOption);
+    }, [activeOption]);
 
     if (!library)
         return (
@@ -267,10 +300,6 @@ const LibraryPage = () => {
         grid.scrollLeft -= grid.clientWidth;
     };
 
-    const handleDropdownChange = (option: string) => {
-        fetchData(option === "My Playlists" ? "owned" : "all");
-    };
-
     return (
         <>
             <section className="contentSpacing">
@@ -279,7 +308,12 @@ const LibraryPage = () => {
                         Library Analysis
                     </h1>
                     <div className="collection-searchBar-searchBar">
-                        <DropdownMenu links={["Whole Library", "My Playlists"]} switchCallback={handleDropdownChange} />
+                        <RefreshButton
+                            refreshCallback={() => {
+                                fetchData(activeOption, true);
+                            }}
+                        />
+                        {dropdown}
                     </div>
                 </div>
                 <div className="stats-page">

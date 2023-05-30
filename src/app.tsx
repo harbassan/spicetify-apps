@@ -19,10 +19,12 @@ const App = () => {
     console.log("app render");
 
     React.useEffect(() => {
-        setActiveLink("Artists");
+        setActiveLink(Spicetify.LocalStorage.get("stats:active-link") || "Artists");
     }, []);
 
-    if (!activeLink) return <></>;
+    React.useEffect(() => {
+        Spicetify.LocalStorage.set("stats:active-link", activeLink);
+    }, [activeLink]);
 
     return (
         <>

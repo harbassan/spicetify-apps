@@ -1,12 +1,9 @@
 import React from "react";
 
-interface TimeMenuItemProps extends Spicetify.ReactComponent.MenuItemProps {
-    label: string;
-}
-
 interface DropdownMenuProps {
-    links: string[];
-    switchCallback: (value: string) => void;
+    options: string[];
+    activeOption: string;
+    switchCallback: (option: string) => void;
 }
 
 const activeStyle = {
@@ -28,36 +25,23 @@ const Icon = (props: Spicetify.ReactComponent.IconComponentProps) => {
     );
 };
 
-const DropdownMenu = ({ links, switchCallback }: DropdownMenuProps) => {
-    console.log("DropdownMenu render");
+const MenuItem = ({ option, isActive, switchCallback }: { option: string; isActive: boolean; switchCallback: (option: string) => void }) => {
+    return (
+        <Spicetify.ReactComponent.MenuItem
+            trigger="click"
+            onClick={() => switchCallback(option)}
+            data-checked={isActive}
+            trailingIcon={isActive && <Icon />}
+            style={isActive ? activeStyle : undefined}
+        >
+            {option}
+        </Spicetify.ReactComponent.MenuItem>
+    );
+};
 
-    const [activeOption, setActiveOption] = React.useState<string>(links[0]);
-
-    const updateOption = React.useCallback((value: string) => {
-        return () => {
-            switchCallback(value);
-            setActiveOption(value);
-        };
-    }, []);
-
-    const MenuItem = ({ label, ...props }: TimeMenuItemProps) => {
-        const isChecked = label === activeOption;
-        return (
-            <Spicetify.ReactComponent.MenuItem
-                {...props}
-                trigger="click"
-                onClick={updateOption(label)}
-                data-checked={isChecked}
-                trailingIcon={isChecked && <Icon />}
-                style={isChecked ? activeStyle : undefined}
-            >
-                {label}
-            </Spicetify.ReactComponent.MenuItem>
-        );
-    };
-
-    const optionItems = links.map((label, index) => {
-        return <MenuItem label={label} key={index} />;
+const DropdownMenu = ({ options, activeOption, switchCallback }: DropdownMenuProps) => {
+    const optionItems = options.map(option => {
+        return <MenuItem option={option} isActive={option === activeOption} switchCallback={switchCallback} />;
     });
 
     const MenuWrapper = (props: Spicetify.ReactComponent.MenuProps) => {
@@ -98,4 +82,4 @@ const DropdownMenu = ({ links, switchCallback }: DropdownMenuProps) => {
     );
 };
 
-export default React.memo(DropdownMenu);
+export default DropdownMenu;

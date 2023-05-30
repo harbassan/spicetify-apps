@@ -3,6 +3,14 @@
   grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
 }
 
+.stats-refreshButton {
+  width: 32px;
+  height: 32px;
+}
+.collection-searchBar-searchBar {
+  display: flex;
+}
+
 .stats-specialGrid {
   grid-template-columns: repeat(11, 180px) !important;
 }

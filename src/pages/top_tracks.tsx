@@ -1,21 +1,29 @@
 import React from "react";
 import TrackRow from "../components/track_row";
-import DropdownMenu from "../components/dropdown";
+import useDropdownMenu from "../components/useDropdownMenu";
+import RefreshButton from "../components/refresh_button";
 
 const checkLiked = async (tracks: string[]) => {
     return Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/me/tracks/contains?ids=${tracks.join(",")}`);
 };
 
 const TracksPage = () => {
-    const [topTracks, setTopTracks] = React.useState<{
-        tracks: any[];
-        liked: boolean[];
-    }>({ tracks: [], liked: [] });
+    const [topTracks, setTopTracks] = React.useState<any[]>([]);
+    const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
+        ["short_term", "medium_term", "long_term"],
+        ["Past Month", "Past 6 Months", "All Time"],
+        "top-tracks"
+    );
 
-    console.log(" tracks page render");
-    console.log(topTracks);
+    const fetchTopTracks = async (time_range: string, force?: boolean, set: boolean = true) => {
+        if (!force) {
+            let storedData = Spicetify.LocalStorage.get(`stats:top-tracks:${time_range}`);
+            if (storedData) {
+                setTopTracks(JSON.parse(storedData));
+                return;
+            }
+        }
 
-    const fetchTopTracks = async (time_range: string) => {
         const start = window.performance.now();
         if (!time_range) return;
 
@@ -23,38 +31,56 @@ const TracksPage = () => {
 
         const fetchedLikedArray = await checkLiked(fetchedTracks.map((track: { id: string }) => track.id));
 
-        setTopTracks({ tracks: fetchedTracks, liked: fetchedLikedArray });
-        const end = window.performance.now();
-        console.log(end - start);
+        console.log(fetchedTracks);
+
+        const topTracksMinified = fetchedTracks.map((track: any, index: number) => {
+            return {
+                liked: fetchedLikedArray[index],
+                name: track.name,
+                image: track.album.images[2].url,
+                uri: track.uri,
+                artists: track.artists.map((artist: any) => ({ name: artist.name, uri: artist.uri })),
+                duration: track.duration_ms,
+                album: track.album.name,
+                album_uri: track.album.uri,
+                popularity: track.popularity,
+                explicit: track.explicit,
+                index: index + 1,
+            };
+        });
+
+        if (set) setTopTracks(topTracksMinified);
+
+        Spicetify.LocalStorage.set(`stats:top-tracks:${time_range}`, JSON.stringify(topTracksMinified));
+        console.log(window.performance.now() - start);
     };
 
     React.useEffect(() => {
-        fetchTopTracks("short_term");
+        let cacheInfo = Spicetify.LocalStorage.get("stats:cache-info");
+        if (cacheInfo && cacheInfo[1] === "0") {
+            ["short_term", "medium_term", "long_term"].filter(option => option !== activeOption).forEach(option => fetchTopTracks(option, true, false));
+            fetchTopTracks(activeOption, true);
+            Spicetify.LocalStorage.set("stats:cache-info", cacheInfo[0] + "1" + cacheInfo.slice(2));
+        }
     }, []);
 
-    if (!topTracks.tracks.length) return <></>;
+    React.useEffect(() => {
+        fetchTopTracks(activeOption);
+    }, [activeOption]);
+
+    if (!topTracks.length) return <></>;
 
     const createPlaylist = async () => {
         const newPlaylist = await Spicetify.CosmosAsync.post("sp://core-playlist/v1/rootlist", {
             operation: "create",
-            name: `Top Songs - ${document.querySelector(".x-sortBox-sortDropdown > span")?.innerHTML}`,
+            name: `Top Songs - ${activeOption}`,
             playlist: true,
             public: false,
-            uris: topTracks.tracks.map(track => track.uri),
+            uris: topTracks.map(track => track.uri),
         });
     };
 
-    const handleDropdownChange = (value: string) => {
-        const timePeriods: Record<string, string> = {
-            "Past 4 Weeks": "short_term",
-            "Past 6 Months": "medium_term",
-            "All Time": "long_term",
-        };
-
-        fetchTopTracks(timePeriods[value]);
-    };
-
-    const trackRows = topTracks.tracks.map((track, index) => <TrackRow index={index} liked={topTracks.liked[index]} {...track} />);
+    const trackRows = topTracks.map((track, index) => <TrackRow index={index} {...track} />);
 
     return (
         <>
@@ -70,7 +96,12 @@ const TracksPage = () => {
                     </div>
 
                     <div className="collection-searchBar-searchBar">
-                        <DropdownMenu links={["Past 4 Weeks", "Past 6 Months", "All Time"]} switchCallback={handleDropdownChange} />
+                        <RefreshButton
+                            refreshCallback={() => {
+                                fetchTopTracks(activeOption, true);
+                            }}
+                        />
+                        {dropdown}
                     </div>
                 </div>
                 <div>

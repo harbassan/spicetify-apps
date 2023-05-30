@@ -2,30 +2,21 @@ import React from "react";
 
 interface TrackArtistProps {
     uri: string;
-    id: string;
     name: string;
-    [key: string]: any;
 }
 
 interface TrackRowProps {
-    uri: string;
-    id: string;
-    name: string;
-    explicit: boolean;
-    duration_ms: number;
-    artists: TrackArtistProps[];
-    album: TrackAlbumProps;
-    index: number;
     liked?: boolean;
-    [key: string]: any;
-}
-
-interface TrackAlbumProps {
-    uri: string;
-    id: string;
     name: string;
-    images: any[];
-    [key: string]: any;
+    image: string;
+    uri: string;
+    artists: TrackArtistProps[];
+    duration: number;
+    album: string;
+    popularity: number;
+    explicit: boolean;
+    index: number;
+    album_uri: string;
 }
 
 function formatDuration(durationMs: number) {
@@ -35,13 +26,13 @@ function formatDuration(durationMs: number) {
     return `${minutes.toString().padStart(1, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
-const ArtistLink = (props: TrackArtistProps) => {
+const ArtistLink = ({ name, uri, index, length }: { name: string; uri: string; index: number; length: number }) => {
     return (
         <>
-            <a draggable="true" dir="auto" href={props.uri} tabIndex={-1}>
-                {props.name}
+            <a draggable="true" dir="auto" href={uri} tabIndex={-1}>
+                {name}
             </a>
-            {props.index === props.length ? null : ", "}
+            {index === length ? null : ", "}
         </>
     );
 };
@@ -58,8 +49,10 @@ const ExplicitBadge = React.memo(() => {
     );
 });
 
-const LikedIcon = ({ active, id }: { active: boolean; id: string }) => {
+const LikedIcon = ({ active, uri }: { active: boolean; uri: string }) => {
     const [liked, setLiked] = React.useState<boolean>(active);
+
+    let id = uri.split(":")[2];
 
     const toggleLike = () => {
         if (liked) {
@@ -104,7 +97,7 @@ const LikedIcon = ({ active, id }: { active: boolean; id: string }) => {
 
 const TrackRow = (props: TrackRowProps) => {
     const ArtistLinks = props.artists.map((artist, index) => {
-        return <ArtistLink index={index} length={props.artists.length - 1} {...artist} />;
+        return <ArtistLink index={index} length={props.artists.length - 1} name={artist.name} uri={artist.uri} />;
     });
 
     return (
@@ -114,7 +107,7 @@ const TrackRow = (props: TrackRowProps) => {
                     <div className="main-trackList-rowSectionIndex" role="gridcell" aria-colindex={1} tabIndex={-1}>
                         <div className="main-trackList-rowMarker">
                             <span className="Type__TypeElement-sc-goli3j-0 TypeElement-ballad-type main-trackList-number" data-encore-id="type">
-                                {props.index + 1}
+                                {props.index}
                             </span>
                             <button
                                 className="main-trackList-rowImagePlayButton"
@@ -141,7 +134,7 @@ const TrackRow = (props: TrackRowProps) => {
                             aria-hidden="false"
                             draggable="false"
                             loading="eager"
-                            src={props.album.images[2].url}
+                            src={props.image}
                             alt=""
                             className="main-image-image main-trackList-rowImage main-image-loaded"
                             width="40"
@@ -166,15 +159,15 @@ const TrackRow = (props: TrackRowProps) => {
                     </div>
                     <div className="main-trackList-rowSectionVariable" role="gridcell" aria-colindex={3} tabIndex={-1}>
                         <span data-encore-id="type" className="Type__TypeElement-sc-goli3j-0 TypeElement-mesto-type">
-                            <a draggable="true" className="standalone-ellipsis-one-line" dir="auto" href={props.album.uri} tabIndex={-1}>
-                                {props.album.name}
+                            <a draggable="true" className="standalone-ellipsis-one-line" dir="auto" href={props.album_uri} tabIndex={-1}>
+                                {props.album}
                             </a>
                         </span>
                     </div>
                     <div className="main-trackList-rowSectionEnd" role="gridcell" aria-colindex={5} tabIndex={-1}>
-                        {props.liked ? <LikedIcon active={props.liked} id={props.id} /> : ""}
+                        {props.liked ? <LikedIcon active={props.liked} uri={props.uri} /> : ""}
                         <div className="Type__TypeElement-sc-goli3j-0 TypeElement-mesto-textSubdued-type main-trackList-rowDuration" data-encore-id="type">
-                            {formatDuration(props.duration_ms)}
+                            {formatDuration(props.duration)}
                         </div>
                         <button
                             type="button"

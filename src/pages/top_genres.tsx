@@ -1,19 +1,37 @@
 import React from "react";
-import DropdownMenu from "../components/dropdown";
+import useDropdownMenu from "../components/useDropdownMenu";
 import StatCard from "../components/stat_card";
 import GenresCard from "../components/genres_card";
+import RefreshButton from "../components/refresh_button";
 
 const GenresPage = () => {
     const [topGenres, setTopGenres] = React.useState<{
         genres: [string, number][];
         features: any;
     }>({ genres: [], features: {} });
+    const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
+        ["short_term", "medium_term", "long_term"],
+        ["Past Month", "Past 6 Months", "All Time"],
+        "top-genres"
+    );
 
-    const fetchTopGenres = async (timeRange: string) => {
+    const fetchTopGenres = async (time_range: string, force?: boolean, set: boolean = true) => {
+        if (!force) {
+            let cacheInfo = Spicetify.LocalStorage.get("stats:cache-info") || "000";
+            if (cacheInfo[1] === "1") {
+                let storedData = Spicetify.LocalStorage.get(`stats:top-genres:${time_range}`);
+                if (storedData) {
+                    setTopGenres(JSON.parse(storedData));
+                    return;
+                }
+            } else {
+                Spicetify.LocalStorage.set("stats:cache-info", cacheInfo[0] + "1" + cacheInfo[2]);
+            }
+        }
         const start = window.performance.now();
         const [fetchedArtists, fetchedTracks] = await Promise.all([
-            Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/me/top/artists?limit=50&offset=0&time_range=${timeRange}`).then((res: any) => res.items),
-            Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/me/top/tracks?limit=50&offset=0&time_range=${timeRange}`).then((res: any) => res.items),
+            Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/me/top/artists?limit=50&offset=0&time_range=${time_range}`).then((res: any) => res.items),
+            Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/me/top/tracks?limit=50&offset=0&time_range=${time_range}`).then((res: any) => res.items),
         ]);
         console.log(fetchedArtists);
         const genres: [string, number][] = fetchedArtists.reduce((acc: [string, number][], artist: any) => {
@@ -68,7 +86,10 @@ const GenresPage = () => {
         }
         const end = window.performance.now();
         console.log(end - start);
-        setTopGenres({ genres: genres, features: audioFeatures });
+
+        if (set) setTopGenres({ genres: genres, features: audioFeatures });
+
+        Spicetify.LocalStorage.set(`stats:top-genres:${time_range}`, JSON.stringify({ genres: genres, features: audioFeatures }));
     };
 
     const fetchAudioFeatures = async (ids: string[]) => {
@@ -77,20 +98,19 @@ const GenresPage = () => {
     };
 
     React.useEffect(() => {
-        fetchTopGenres("short_term");
+        let cacheInfo = Spicetify.LocalStorage.get("stats:cache-info");
+        if (cacheInfo && cacheInfo[2] === "0") {
+            ["short_term", "medium_term", "long_term"].filter(option => option !== activeOption).forEach(option => fetchTopGenres(option, true, false));
+            fetchTopGenres(activeOption, true);
+            Spicetify.LocalStorage.set("stats:cache-info", cacheInfo.slice(0, 2) + "1" + cacheInfo[3]);
+        }
     }, []);
 
+    React.useEffect(() => {
+        fetchTopGenres(activeOption);
+    }, [activeOption]);
+
     if (!topGenres.genres.length) return <></>;
-
-    const timePeriods: Record<string, string> = {
-        "Past 4 Weeks": "short_term",
-        "Past 6 Months": "medium_term",
-        "All Time": "long_term",
-    };
-
-    const handleDropdownChange = (value: string) => {
-        fetchTopGenres(timePeriods[value]);
-    };
 
     const parseVal = (key: string) => {
         switch (key) {
@@ -118,7 +138,12 @@ const GenresPage = () => {
                         Top Genres
                     </h1>
                     <div className="collection-searchBar-searchBar">
-                        <DropdownMenu links={["Past 4 Weeks", "Past 6 Months", "All Time"]} switchCallback={handleDropdownChange} />
+                        <RefreshButton
+                            refreshCallback={() => {
+                                fetchTopGenres(activeOption, true);
+                            }}
+                        />
+                        {dropdown}
                     </div>
                 </div>
                 <div className="stats-page">
