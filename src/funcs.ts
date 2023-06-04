@@ -18,9 +18,10 @@ export const apiRequest = async (name: string, url: string, timeout = 10) => {
     try {
         let timeStart = window.performance.now();
         response = await Spicetify.CosmosAsync.get(url);
-        console.log("", name, "fetch time:", window.performance.now() - timeStart);
+        console.log("stats -", name, "fetch time:", window.performance.now() - timeStart);
     } catch (e) {
-        console.error(name, "request failed:", e);
+        console.error("stats -", name, "request failed:", e);
+        console.log(url);
         if (timeout > 0) setTimeout(() => apiRequest(name, url, --timeout), 5000);
     }
     return response;
