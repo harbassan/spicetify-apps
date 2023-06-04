@@ -122,7 +122,7 @@ var stats = (() => {
   });
   var optionsMenu_default = OptionsMenu;
 
-  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-23668-WPJK55h4JEXM\188862b88c41\navBar.module.css
+  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-19288-CUnNgMBeJddq\18888d8cb0d1\navBar.module.css
   var navBar_module_default = { "topBarHeaderItem": "navBar-module__topBarHeaderItem___v29bR_stats", "topBarHeaderItemLink": "navBar-module__topBarHeaderItemLink___VeyBY_stats", "topBarActive": "navBar-module__topBarActive___-qYPu_stats", "topBarNav": "navBar-module__topBarNav___1OtdR_stats", "optionsMenuDropBox": "navBar-module__optionsMenuDropBox___tD9mA_stats" };
 
   // node_modules/spcr-navigation-bar/navBar.tsx
@@ -1441,7 +1441,7 @@ var stats = (() => {
     fetch(LATEST_RELEASE).then((res) => res.json()).then(
       (result) => {
         try {
-          setNewUpdate(result[0].name.slice(1) === STATS_VERSION);
+          setNewUpdate(result[0].name.slice(1) !== STATS_VERSION);
         } catch (err) {
           console.log(err);
         }

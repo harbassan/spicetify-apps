@@ -1,4 +1,4 @@
-/* ../../AppData/Local/Temp/tmp-23668-WPJK55h4JEXM/188862b88c41/navBar.module.css */
+/* ../../AppData/Local/Temp/tmp-19288-CUnNgMBeJddq/18888d8cb0d1/navBar.module.css */
 .navBar-module__topBarHeaderItem___v29bR_stats {
   -webkit-app-region: no-drag;
   display: inline-block;
@@ -46,7 +46,7 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   padding: 0;
 }
 
-/* ../../AppData/Local/Temp/tmp-23668-WPJK55h4JEXM/188862b879c0/app.css */
+/* ../../AppData/Local/Temp/tmp-19288-CUnNgMBeJddq/18888d8c9df0/app.css */
 .stats-grid {
   --grid-gap: 24px;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -201,8 +201,8 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   color: var(--spice-text);
 }
 .new-update {
-  background-color: var(--spice-button);
-  color: var(--spice-main);
+  background-color: var(--spice-player);
+  color: var(--spice-text);
   border-radius: 8px;
   padding: 2px 12px;
   margin: 0 24px;
