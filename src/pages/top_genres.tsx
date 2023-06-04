@@ -3,6 +3,7 @@ import useDropdownMenu from "../components/useDropdownMenu";
 import StatCard from "../components/stat_card";
 import GenresCard from "../components/genres_card";
 import RefreshButton from "../components/refresh_button";
+import { apiRequest, updatePageCache } from "../funcs";
 
 const GenresPage = () => {
     const [topGenres, setTopGenres] = React.useState<{
@@ -17,23 +18,17 @@ const GenresPage = () => {
 
     const fetchTopGenres = async (time_range: string, force?: boolean, set: boolean = true) => {
         if (!force) {
-            let cacheInfo = Spicetify.LocalStorage.get("stats:cache-info") || "000";
-            if (cacheInfo[1] === "1") {
-                let storedData = Spicetify.LocalStorage.get(`stats:top-genres:${time_range}`);
-                if (storedData) {
-                    setTopGenres(JSON.parse(storedData));
-                    return;
-                }
-            } else {
-                Spicetify.LocalStorage.set("stats:cache-info", cacheInfo[0] + "1" + cacheInfo[2]);
+            let storedData = Spicetify.LocalStorage.get(`stats:top-genres:${time_range}`);
+            if (storedData) {
+                setTopGenres(JSON.parse(storedData));
+                return;
             }
         }
         const start = window.performance.now();
         const [fetchedArtists, fetchedTracks] = await Promise.all([
-            Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/me/top/artists?limit=50&offset=0&time_range=${time_range}`).then((res: any) => res.items),
-            Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/me/top/tracks?limit=50&offset=0&time_range=${time_range}`).then((res: any) => res.items),
+            apiRequest("topArtists", `https://api.spotify.com/v1/me/top/artists?limit=50&offset=0&time_range=${time_range}`).then((res: any) => res.items),
+            apiRequest("topTracks", `https://api.spotify.com/v1/me/top/tracks?limit=50&offset=0&time_range=${time_range}`).then((res: any) => res.items),
         ]);
-        console.log(fetchedArtists);
         const genres: [string, number][] = fetchedArtists.reduce((acc: [string, number][], artist: any) => {
             artist.genres.forEach((genre: string) => {
                 const index = acc.findIndex(([g]) => g === genre);
@@ -84,8 +79,7 @@ const GenresPage = () => {
         for (let key in audioFeatures) {
             audioFeatures[key] = audioFeatures[key] / 50;
         }
-        const end = window.performance.now();
-        console.log(end - start);
+        console.log("total genres fetch time:", window.performance.now() - start);
 
         if (set) setTopGenres({ genres: genres, features: audioFeatures });
 
@@ -93,17 +87,12 @@ const GenresPage = () => {
     };
 
     const fetchAudioFeatures = async (ids: string[]) => {
-        const data = Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/audio-features?ids=${ids.join(",")}`);
+        const data = apiRequest("audioFeatures", `https://api.spotify.com/v1/audio-features?ids=${ids.join(",")}`);
         return data;
     };
 
     React.useEffect(() => {
-        let cacheInfo = Spicetify.LocalStorage.get("stats:cache-info");
-        if (cacheInfo && cacheInfo[2] === "0") {
-            ["short_term", "medium_term", "long_term"].filter(option => option !== activeOption).forEach(option => fetchTopGenres(option, true, false));
-            fetchTopGenres(activeOption, true);
-            Spicetify.LocalStorage.set("stats:cache-info", cacheInfo.slice(0, 2) + "1" + cacheInfo[3]);
-        }
+        updatePageCache(2, fetchTopGenres, activeOption);
     }, []);
 
     React.useEffect(() => {

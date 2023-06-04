@@ -2,9 +2,10 @@ import React from "react";
 import TrackRow from "../components/track_row";
 import useDropdownMenu from "../components/useDropdownMenu";
 import RefreshButton from "../components/refresh_button";
+import { apiRequest, updatePageCache } from "../funcs";
 
 const checkLiked = async (tracks: string[]) => {
-    return Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/me/tracks/contains?ids=${tracks.join(",")}`);
+    return apiRequest("checkLiked", `https://api.spotify.com/v1/me/tracks/contains?ids=${tracks.join(",")}`);
 };
 
 const TracksPage = () => {
@@ -27,11 +28,9 @@ const TracksPage = () => {
         const start = window.performance.now();
         if (!time_range) return;
 
-        const { items: fetchedTracks } = await Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/me/top/tracks?limit=50&offset=0&time_range=${time_range}`);
+        const { items: fetchedTracks } = await apiRequest("topTracks", `https://api.spotify.com/v1/me/top/tracks?limit=50&offset=0&time_range=${time_range}`);
 
         const fetchedLikedArray = await checkLiked(fetchedTracks.map((track: { id: string }) => track.id));
-
-        console.log(fetchedTracks);
 
         const topTracksMinified = fetchedTracks.map((track: any, index: number) => {
             return {
@@ -52,16 +51,11 @@ const TracksPage = () => {
         if (set) setTopTracks(topTracksMinified);
 
         Spicetify.LocalStorage.set(`stats:top-tracks:${time_range}`, JSON.stringify(topTracksMinified));
-        console.log(window.performance.now() - start);
+        console.log("total tracks fetch time:", window.performance.now() - start);
     };
 
     React.useEffect(() => {
-        let cacheInfo = Spicetify.LocalStorage.get("stats:cache-info");
-        if (cacheInfo && cacheInfo[1] === "0") {
-            ["short_term", "medium_term", "long_term"].filter(option => option !== activeOption).forEach(option => fetchTopTracks(option, true, false));
-            fetchTopTracks(activeOption, true);
-            Spicetify.LocalStorage.set("stats:cache-info", cacheInfo[0] + "1" + cacheInfo.slice(2));
-        }
+        updatePageCache(1, fetchTopTracks, activeOption);
     }, []);
 
     React.useEffect(() => {

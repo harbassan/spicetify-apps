@@ -4,6 +4,7 @@ import StatCard from "../components/stat_card";
 import GenresCard from "../components/genres_card";
 import ArtistCard from "../components/artist_card";
 import RefreshButton from "../components/refresh_button";
+import { apiRequest, updatePageCache } from "../funcs";
 
 interface LibraryProps {
     audioFeatures: Record<string, number>;
@@ -15,6 +16,32 @@ interface LibraryProps {
     playlistCount: number;
     albums: any[];
 }
+
+const fetchAudioFeatures = async (ids: string[]) => {
+    const batchSize = 100;
+    const batches = [];
+
+    // Split ids into batches of batchSize
+    for (let i = 0; i < ids.length; i += batchSize) {
+        const batch = ids.slice(i, i + batchSize);
+        batches.push(batch);
+    }
+
+    // Send multiple simultaneous requests using Promise.all()
+    const promises = batches.map((batch, index) => {
+        const url = `https://api.spotify.com/v1/audio-features?ids=${batch.join(",")}`;
+        return apiRequest("audioFeaturesBatch" + index, url);
+    });
+
+    const responses = await Promise.all(promises);
+
+    // Merge responses from all batches into a single array
+    const data = responses.reduce((acc, response) => {
+        return acc.concat(response.audio_features);
+    }, []);
+
+    return data;
+};
 
 const LibraryPage = () => {
     const [library, setLibrary] = React.useState<LibraryProps | null>(null);
@@ -31,9 +58,7 @@ const LibraryPage = () => {
         const start = window.performance.now();
 
         // fetch all rootlist items
-        let dart = window.performance.now();
-        const rootlistItems = await Spicetify.CosmosAsync.get("sp://core-playlist/v1/rootlist");
-        console.log("rootlist fetch time: " + (window.performance.now() - dart) + "ms");
+        const rootlistItems = await apiRequest("rootlist", "sp://core-playlist/v1/rootlist");
 
         // flatten rootlist into playlists
         const flattenPlaylists = (items: any[]) => {
@@ -57,51 +82,63 @@ const LibraryPage = () => {
 
         let playlists = flattenPlaylists(rootlistItems.rows);
 
-        if (option === "owned") {
-            playlists = playlists.filter((playlist: any) => playlist.ownedBySelf);
-        }
+        playlists = playlists.sort((a, b) => (a.ownedBySelf === b.ownedBySelf ? 0 : a.ownedBySelf ? -1 : 1));
+        const indexOfFirstNotOwned = playlists.findIndex(playlist => !playlist.ownedBySelf);
 
         let playlistUris: string[] = [];
+
         let trackCount: number = 0;
+        let ownedTrackCount: number = 0;
 
         playlists.forEach(playlist => {
             if (playlist.totalLength === 0) return;
             playlistUris.push(playlist.link);
             trackCount += playlist.totalLength;
+            if (playlist.ownedBySelf) ownedTrackCount += playlist.totalLength;
         }, 0);
 
         // fetch all playlist tracks
-        dart = window.performance.now();
         const playlistsMeta = await Promise.all(
             playlistUris.map((uri: string) => {
-                return Spicetify.CosmosAsync.get(`sp://core-playlist/v1/playlist/${uri}?responseFormat=protobufJson`);
-                // return Spicetify.CosmosAsync.get(`sp://core-playlist/v1/playlist/${uri}/rows`);
+                return apiRequest("playlistsMetadata", `sp://core-playlist/v1/playlist/${uri}?responseFormat=protobufJson`);
             })
         );
-        console.log("playlist fetch time: " + (window.performance.now() - dart) + "ms");
 
         let totalDuration = 0;
         let trackUids: string[] = [];
         let artists: Record<string, number> = {};
-        let allTracks: any[] = [];
         let totalObscurity: number = 0;
         let albums: any[] = [];
         let explicitTracks: number = 0;
 
+        let ownedDuration = 0;
+        let ownedArtists: Record<string, number> = {};
+        let ownedObscurity: number = 0;
+        let ownedAlbums: any[] = [];
+        let ownedExplicitTracks: number = 0;
+
         // loop through all playlists, add up total duration and obscurity, seperate track ids and artists
-        playlistsMeta.forEach(playlist => {
+        for (let i = 0; i < playlistsMeta.length; i++) {
+            const playlist = playlistsMeta[i];
+            if (i === indexOfFirstNotOwned) {
+                ownedDuration = totalDuration;
+                ownedArtists = Object.assign({}, artists);
+                ownedObscurity = totalObscurity;
+                ownedExplicitTracks = explicitTracks;
+            }
             totalDuration += Number(playlist.duration);
             playlist.item.forEach((item: any) => {
                 if (!item.trackMetadata) return;
                 trackUids.push(item.trackMetadata.link.split(":")[2]);
-                allTracks.push(item);
                 if (item.trackMetadata.isExplicit) explicitTracks++;
                 totalObscurity += item.trackMetadata.popularity;
                 const index = albums.findIndex(([g]) => g.link === item.trackMetadata.album.link);
                 if (index !== -1) {
                     albums[index][1] += 1;
+                    if (i < indexOfFirstNotOwned) ownedAlbums[index][1] += 1;
                 } else {
                     albums.push([item.trackMetadata.album, 1]);
+                    if (i < indexOfFirstNotOwned) ownedAlbums.push([item.trackMetadata.album, 1]);
                 }
                 item.trackMetadata.artist.forEach((artist: any) => {
                     if (!artists[artist.link.split(":")[2]]) {
@@ -111,17 +148,20 @@ const LibraryPage = () => {
                     }
                 });
             });
-        });
+        }
 
         const topAlbums = albums.sort((a, b) => b[1] - a[1]).slice(0, 10);
+        const ownedTopAlbums = ownedAlbums.sort((a, b) => b[1] - a[1]).slice(0, 10);
 
         const topArtists = Object.keys(artists)
             .sort((a, b) => artists[b] - artists[a])
             .slice(0, 50);
+        const ownedTopArtists = Object.keys(ownedArtists)
+            .sort((a, b) => ownedArtists[b] - ownedArtists[a])
+            .slice(0, 50);
 
-        dart = window.performance.now();
-        const artistsMeta = await Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/artists?ids=${topArtists.join(",")}`);
-        console.log("artists fetch time: " + (window.performance.now() - dart) + "ms");
+        const artistsMeta = await apiRequest("artistsMetadata", `https://api.spotify.com/v1/artists?ids=${topArtists.join(",")}`);
+        const ownedArtistsMeta = await apiRequest("artistsMetadata", `https://api.spotify.com/v1/artists?ids=${ownedTopArtists.join(",")}`);
 
         const topGenres: [string, number][] = artistsMeta.artists.reduce((acc: [string, number][], artist: any) => {
             artist.numTracks = artists[artist.id];
@@ -136,9 +176,20 @@ const LibraryPage = () => {
             return acc;
         }, []);
 
-        dart = window.performance.now();
+        const ownedTopGenres: [string, number][] = ownedArtistsMeta.artists.reduce((acc: [string, number][], artist: any) => {
+            artist.numTracks = ownedArtists[artist.id];
+            artist.genres.forEach((genre: string) => {
+                const index = acc.findIndex(([g]) => g === genre);
+                if (index !== -1) {
+                    acc[index][1] += artist.numTracks;
+                } else {
+                    acc.push([genre, artist.numTracks]);
+                }
+            });
+            return acc;
+        }, []);
+
         const fetchedFeatures: any[] = await fetchAudioFeatures(trackUids);
-        console.log("audio features fetch time: " + (window.performance.now() - dart) + "ms");
 
         const audioFeatures: Record<string, number> = {
             popularity: totalObscurity,
@@ -154,7 +205,26 @@ const LibraryPage = () => {
             loudness: 0,
         };
 
+        const ownedAudioFeatures: Record<string, number> = {
+            popularity: ownedObscurity,
+            explicitness: ownedExplicitTracks,
+            danceability: 0,
+            energy: 0,
+            valence: 0,
+            speechiness: 0,
+            acousticness: 0,
+            instrumentalness: 0,
+            liveness: 0,
+            tempo: 0,
+            loudness: 0,
+        };
+
         for (let i = 0; i < fetchedFeatures.length; i++) {
+            if (i === ownedTrackCount) {
+                for (let key in audioFeatures) {
+                    ownedAudioFeatures[key] = audioFeatures[key];
+                }
+            }
             if (!fetchedFeatures[i]) continue;
             const track = fetchedFeatures[i];
             audioFeatures["danceability"] += track["danceability"];
@@ -172,68 +242,45 @@ const LibraryPage = () => {
             audioFeatures[key] /= fetchedFeatures.length;
         }
 
-        if (set)
-            setLibrary({
-                audioFeatures: audioFeatures,
-                trackCount: trackCount,
-                totalDuration: totalDuration,
-                artists: artistsMeta.artists,
-                artistCount: Object.keys(artists).length,
-                genres: topGenres,
-                playlistCount: playlists.length,
-                albums: topAlbums,
-            });
-
-        Spicetify.LocalStorage.set(
-            `stats:library:${option}`,
-            JSON.stringify({
-                audioFeatures: audioFeatures,
-                trackCount: trackCount,
-                totalDuration: totalDuration,
-                artists: artistsMeta.artists,
-                artistCount: Object.keys(artists).length,
-                genres: topGenres,
-                playlistCount: playlists.length,
-                albums: topAlbums,
-            })
-        );
-
-        console.log("total fetch time: " + (window.performance.now() - start) + "ms");
-    };
-
-    const fetchAudioFeatures = async (ids: string[]) => {
-        const batchSize = 100;
-        const batches = [];
-
-        // Split ids into batches of batchSize
-        for (let i = 0; i < ids.length; i += batchSize) {
-            const batch = ids.slice(i, i + batchSize);
-            batches.push(batch);
+        for (let key in ownedAudioFeatures) {
+            ownedAudioFeatures[key] /= ownedTrackCount;
         }
 
-        // Send multiple simultaneous requests using Promise.all()
-        const promises = batches.map(batch => {
-            const url = `https://api.spotify.com/v1/audio-features?ids=${batch.join(",")}`;
-            return Spicetify.CosmosAsync.get(url);
-        });
+        const ownedStats = {
+            audioFeatures: ownedAudioFeatures,
+            trackCount: ownedTrackCount,
+            totalDuration: ownedDuration,
+            artists: ownedArtistsMeta.artists,
+            artistCount: Object.keys(ownedArtists).length,
+            genres: ownedTopGenres,
+            playlistCount: indexOfFirstNotOwned,
+            albums: ownedTopAlbums,
+        };
 
-        const responses = await Promise.all(promises);
+        const allStats = {
+            audioFeatures: audioFeatures,
+            trackCount: trackCount,
+            totalDuration: totalDuration,
+            artists: artistsMeta.artists,
+            artistCount: Object.keys(artists).length,
+            genres: topGenres,
+            playlistCount: playlists.length,
+            albums: topAlbums,
+        };
 
-        // Merge responses from all batches into a single array
-        const data = responses.reduce((acc, response) => {
-            return acc.concat(response.audio_features);
-        }, []);
+        if (set) {
+            if (option === "all") setLibrary(allStats);
+            else setLibrary(ownedStats);
+        }
 
-        return data;
+        Spicetify.LocalStorage.set(`stats:library:all`, JSON.stringify(allStats));
+        Spicetify.LocalStorage.set(`stats:library:owned`, JSON.stringify(ownedStats));
+
+        console.log("total library fetch time:", window.performance.now() - start);
     };
 
     React.useEffect(() => {
-        let cacheInfo = Spicetify.LocalStorage.get("stats:cache-info");
-        if (cacheInfo && cacheInfo[2] === "0") {
-            ["owned", "all"].filter(option => option !== activeOption).forEach(option => fetchData(option, true, false));
-            fetchData(activeOption, true);
-            Spicetify.LocalStorage.set("stats:cache-info", cacheInfo.slice(0, 3) + "1");
-        }
+        updatePageCache(3, fetchData, activeOption, true);
     }, []);
 
     React.useEffect(() => {
