@@ -1,4 +1,4 @@
-/* ../../AppData/Local/Temp/tmp-12704-SYYfYXmW0XTA/187eaa4f6501/navBar.module.css */
+/* ../../AppData/Local/Temp/tmp-23668-WPJK55h4JEXM/188862b88c41/navBar.module.css */
 .navBar-module__topBarHeaderItem___v29bR_stats {
   -webkit-app-region: no-drag;
   display: inline-block;
@@ -46,10 +46,17 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   padding: 0;
 }
 
-/* ../../AppData/Local/Temp/tmp-12704-SYYfYXmW0XTA/187eaa4f50a0/app.css */
+/* ../../AppData/Local/Temp/tmp-23668-WPJK55h4JEXM/188862b879c0/app.css */
 .stats-grid {
   --grid-gap: 24px;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.stats-refreshButton {
+  width: 32px;
+  height: 32px;
+}
+.collection-searchBar-searchBar {
+  display: flex;
 }
 .stats-specialGrid {
   grid-template-columns: repeat(11, 180px) !important;
@@ -192,4 +199,12 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
 }
 .stats-cardText {
   color: var(--spice-text);
+}
+.new-update {
+  background-color: var(--spice-button);
+  color: var(--spice-main);
+  border-radius: 8px;
+  padding: 2px 12px;
+  margin: 0 24px;
+  border: 0px;
 }
