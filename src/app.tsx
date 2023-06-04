@@ -20,7 +20,7 @@ const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
         .then(
             result => {
                 try {
-                    setNewUpdate(result[0].name.slice(1) === STATS_VERSION);
+                    setNewUpdate(result[0].name.slice(1) !== STATS_VERSION);
                 } catch (err) {
                     console.log(err);
                 }
