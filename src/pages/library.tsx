@@ -21,7 +21,7 @@ const fetchAudioFeatures = async (ids: string[]) => {
     const batchSize = 100;
     const batches = [];
 
-    ids.filter(id => id.match(/^[a-zA-Z0-9]{22}$/));
+    ids = ids.filter(id => id.match(/^[a-zA-Z0-9]{22}$/));
 
     // Split ids into batches of batchSize
     for (let i = 0; i < ids.length; i += batchSize) {
