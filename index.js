@@ -122,7 +122,7 @@ var stats = (() => {
   });
   var optionsMenu_default = OptionsMenu;
 
-  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-19288-CUnNgMBeJddq\18888d8cb0d1\navBar.module.css
+  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-7084-cRXRlcrYaNP8\188a01c6c501\navBar.module.css
   var navBar_module_default = { "topBarHeaderItem": "navBar-module__topBarHeaderItem___v29bR_stats", "topBarHeaderItemLink": "navBar-module__topBarHeaderItemLink___VeyBY_stats", "topBarActive": "navBar-module__topBarActive___-qYPu_stats", "topBarNav": "navBar-module__topBarNav___1OtdR_stats", "optionsMenuDropBox": "navBar-module__optionsMenuDropBox___tD9mA_stats" };
 
   // node_modules/spcr-navigation-bar/navBar.tsx
@@ -988,6 +988,7 @@ var stats = (() => {
       Spicetify.LocalStorage.set(`stats:top-genres:${time_range}`, JSON.stringify({ genres, features: audioFeatures }));
     };
     const fetchAudioFeatures2 = async (ids) => {
+      ids.filter((id) => id.match(/^[a-zA-Z0-9]{22}$/));
       const data = apiRequest("audioFeatures", `https://api.spotify.com/v1/audio-features?ids=${ids.join(",")}`);
       return data;
     };
@@ -1047,6 +1048,7 @@ var stats = (() => {
   var fetchAudioFeatures = async (ids) => {
     const batchSize = 100;
     const batches = [];
+    ids.filter((id) => id.match(/^[a-zA-Z0-9]{22}$/));
     for (let i = 0; i < ids.length; i += batchSize) {
       const batch = ids.slice(i, i + batchSize);
       batches.push(batch);
@@ -1155,8 +1157,8 @@ var stats = (() => {
       }
       const topAlbums = albums.sort((a, b) => b[1] - a[1]).slice(0, 10);
       const ownedTopAlbums = ownedAlbums.sort((a, b) => b[1] - a[1]).slice(0, 10);
-      const topArtists = Object.keys(artists).sort((a, b) => artists[b] - artists[a]).slice(0, 50);
-      const ownedTopArtists = Object.keys(ownedArtists).sort((a, b) => ownedArtists[b] - ownedArtists[a]).slice(0, 50);
+      const topArtists = Object.keys(artists).sort((a, b) => artists[b] - artists[a]).filter((id) => id.match(/^[a-zA-Z0-9]{22}$/)).slice(0, 50);
+      const ownedTopArtists = Object.keys(ownedArtists).sort((a, b) => ownedArtists[b] - ownedArtists[a]).filter((id) => id.match(/^[a-zA-Z0-9]{22}$/)).slice(0, 50);
       const artistsMeta = await apiRequest("artistsMetadata", `https://api.spotify.com/v1/artists?ids=${topArtists.join(",")}`);
       const ownedArtistsMeta = await apiRequest("artistsMetadata", `https://api.spotify.com/v1/artists?ids=${ownedTopArtists.join(",")}`);
       const topGenres = artistsMeta.artists.reduce((acc, artist) => {
