@@ -21,6 +21,8 @@ const fetchAudioFeatures = async (ids: string[]) => {
     const batchSize = 100;
     const batches = [];
 
+    ids.filter(id => id.match(/^[a-zA-Z0-9]{22}$/));
+
     // Split ids into batches of batchSize
     for (let i = 0; i < ids.length; i += batchSize) {
         const batch = ids.slice(i, i + batchSize);
@@ -155,9 +157,11 @@ const LibraryPage = () => {
 
         const topArtists = Object.keys(artists)
             .sort((a, b) => artists[b] - artists[a])
+            .filter(id => id.match(/^[a-zA-Z0-9]{22}$/))
             .slice(0, 50);
         const ownedTopArtists = Object.keys(ownedArtists)
             .sort((a, b) => ownedArtists[b] - ownedArtists[a])
+            .filter(id => id.match(/^[a-zA-Z0-9]{22}$/))
             .slice(0, 50);
 
         const artistsMeta = await apiRequest("artistsMetadata", `https://api.spotify.com/v1/artists?ids=${topArtists.join(",")}`);

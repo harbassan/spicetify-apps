@@ -87,6 +87,7 @@ const GenresPage = () => {
     };
 
     const fetchAudioFeatures = async (ids: string[]) => {
+        ids.filter(id => id.match(/^[a-zA-Z0-9]{22}$/));
         const data = apiRequest("audioFeatures", `https://api.spotify.com/v1/audio-features?ids=${ids.join(",")}`);
         return data;
     };
