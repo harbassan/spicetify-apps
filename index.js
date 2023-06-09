@@ -122,7 +122,7 @@ var stats = (() => {
   });
   var optionsMenu_default = OptionsMenu;
 
-  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-7084-cRXRlcrYaNP8\188a01c6c501\navBar.module.css
+  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-10728-0vpWWMs5OZN4\188a28bae3a1\navBar.module.css
   var navBar_module_default = { "topBarHeaderItem": "navBar-module__topBarHeaderItem___v29bR_stats", "topBarHeaderItemLink": "navBar-module__topBarHeaderItemLink___VeyBY_stats", "topBarActive": "navBar-module__topBarActive___-qYPu_stats", "topBarNav": "navBar-module__topBarNav___1OtdR_stats", "optionsMenuDropBox": "navBar-module__optionsMenuDropBox___tD9mA_stats" };
 
   // node_modules/spcr-navigation-bar/navBar.tsx
@@ -988,7 +988,7 @@ var stats = (() => {
       Spicetify.LocalStorage.set(`stats:top-genres:${time_range}`, JSON.stringify({ genres, features: audioFeatures }));
     };
     const fetchAudioFeatures2 = async (ids) => {
-      ids.filter((id) => id.match(/^[a-zA-Z0-9]{22}$/));
+      ids = ids.filter((id) => id.match(/^[a-zA-Z0-9]{22}$/));
       const data = apiRequest("audioFeatures", `https://api.spotify.com/v1/audio-features?ids=${ids.join(",")}`);
       return data;
     };
@@ -1048,7 +1048,7 @@ var stats = (() => {
   var fetchAudioFeatures = async (ids) => {
     const batchSize = 100;
     const batches = [];
-    ids.filter((id) => id.match(/^[a-zA-Z0-9]{22}$/));
+    ids = ids.filter((id) => id.match(/^[a-zA-Z0-9]{22}$/));
     for (let i = 0; i < ids.length; i += batchSize) {
       const batch = ids.slice(i, i + batchSize);
       batches.push(batch);
