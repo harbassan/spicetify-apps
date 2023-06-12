@@ -36,7 +36,11 @@ const TracksPage = () => {
             return {
                 liked: fetchedLikedArray[index],
                 name: track.name,
-                image: track.album.images[2].url,
+                image: track.album.images[2]
+                    ? track.album.images[2].url
+                    : track.album.images[1]
+                    ? track.album.images[1].url
+                    : "https://images.squarespace-cdn.com/content/v1/55fc0004e4b069a519961e2d/1442590746571-RPGKIXWGOO671REUNMCB/image-asset.gif",
                 uri: track.uri,
                 artists: track.artists.map((artist: any) => ({ name: artist.name, uri: artist.uri })),
                 duration: track.duration_ms,

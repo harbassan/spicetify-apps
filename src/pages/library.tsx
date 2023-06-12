@@ -333,7 +333,18 @@ const LibraryPage = () => {
     const artistCards: JSX.Element[] = library.artists
         .slice(0, 10)
         .map((artist: any) => (
-            <ArtistCard name={artist.name} image={artist.images[2].url} uri={artist.uri} subtext={`Appears in ${artist.numTracks} tracks`} />
+            <ArtistCard
+                name={artist.name}
+                image={
+                    artist.images[2]
+                        ? artist.images[2].url
+                        : artist.images[1]
+                        ? artist.images[1].url
+                        : "https://images.squarespace-cdn.com/content/v1/55fc0004e4b069a519961e2d/1442590746571-RPGKIXWGOO671REUNMCB/image-asset.gif"
+                }
+                uri={artist.uri}
+                subtext={`Appears in ${artist.numTracks} tracks`}
+            />
         ));
 
     const albumCards: JSX.Element[] = library.albums.map(([album, frequency]) => {
