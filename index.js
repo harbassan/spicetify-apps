@@ -122,7 +122,7 @@ var stats = (() => {
   });
   var optionsMenu_default = OptionsMenu;
 
-  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-10728-0vpWWMs5OZN4\188a28bae3a1\navBar.module.css
+  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-2044-6PMFe7ksQ5aB\188af5b04821\navBar.module.css
   var navBar_module_default = { "topBarHeaderItem": "navBar-module__topBarHeaderItem___v29bR_stats", "topBarHeaderItemLink": "navBar-module__topBarHeaderItemLink___VeyBY_stats", "topBarActive": "navBar-module__topBarActive___-qYPu_stats", "topBarNav": "navBar-module__topBarNav___1OtdR_stats", "optionsMenuDropBox": "navBar-module__optionsMenuDropBox___tD9mA_stats" };
 
   // node_modules/spcr-navigation-bar/navBar.tsx
@@ -731,7 +731,7 @@ var stats = (() => {
         return {
           liked: fetchedLikedArray[index],
           name: track.name,
-          image: track.album.images[2].url,
+          image: track.album.images[2] ? track.album.images[2].url : track.album.images[1] ? track.album.images[1].url : "https://images.squarespace-cdn.com/content/v1/55fc0004e4b069a519961e2d/1442590746571-RPGKIXWGOO671REUNMCB/image-asset.gif",
           uri: track.uri,
           artists: track.artists.map((artist) => ({ name: artist.name, uri: artist.uri })),
           duration: track.duration_ms,
@@ -1308,7 +1308,7 @@ var stats = (() => {
     });
     const artistCards = library.artists.slice(0, 10).map((artist) => /* @__PURE__ */ import_react14.default.createElement(artist_card_default, {
       name: artist.name,
-      image: artist.images[2].url,
+      image: artist.images[2] ? artist.images[2].url : artist.images[1] ? artist.images[1].url : "https://images.squarespace-cdn.com/content/v1/55fc0004e4b069a519961e2d/1442590746571-RPGKIXWGOO671REUNMCB/image-asset.gif",
       uri: artist.uri,
       subtext: `Appears in ${artist.numTracks} tracks`
     }));
