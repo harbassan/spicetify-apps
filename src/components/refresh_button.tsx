@@ -9,7 +9,7 @@ const RefreshButton = ({ refreshCallback }: { refreshCallback: any }) => {
                     height="16"
                     width="16"
                     aria-hidden="true"
-                    className="Svg-sc-ytk21e-0 Svg-img-16-icon x-filterBox-searchIcon"
+                    className="Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small x-filterBox-searchIcon"
                     viewBox="0 0 16 16"
                     data-encore-id="icon"
                 >

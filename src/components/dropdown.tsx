@@ -14,7 +14,7 @@ const Icon = (props: Spicetify.ReactComponent.IconComponentProps) => {
     return (
         <Spicetify.ReactComponent.IconComponent
             {...props}
-            className="Svg-sc-ytk21e-0 Svg-img-16-icon"
+            className="Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small"
             data-encore-id="icon"
             viewBox="0 0 16 16"
             height="16"
@@ -62,7 +62,7 @@ const DropdownMenu = ({ options, activeOption, switchCallback }: DropdownMenuPro
                     aria-controls="sortboxlist-29ad4489-2ff4-4a03-8c0c-ffc6f90c2fed"
                     aria-expanded="false"
                 >
-                    <span className="Type__TypeElement-sc-goli3j-0 TypeElement-mesto-type cvTLPmjt6T7M85EKcB8w" data-encore-id="type">
+                    <span className="TypeElement-mesto-type" data-encore-id="type">
                         {activeOption}
                     </span>
                     <svg
@@ -70,7 +70,7 @@ const DropdownMenu = ({ options, activeOption, switchCallback }: DropdownMenuPro
                         height="16"
                         width="16"
                         aria-hidden="true"
-                        className="Svg-sc-ytk21e-0 Svg-img-16-icon SbDHY3fVADNJ4l9qOLQ2"
+                        className="Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small"
                         viewBox="0 0 16 16"
                         data-encore-id="icon"
                     >

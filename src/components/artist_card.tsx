@@ -41,9 +41,9 @@ const Card = ({ name, image, uri, subtext }: cardProps) => {
                             </div>
                             <div className="main-card-PlayButtonContainer">
                                 <div className="main-playButton-PlayButton">
-                                    <button data-encore-id="buttonPrimary" className="Button-sc-qlcn5g-0 Button-md-buttonPrimary-useBrowserDefaultFocusStyle">
-                                        <span className="ButtonInner-sc-14ud5tc-0 ButtonInner-md-iconOnly encore-bright-accent-set">
-                                            <span aria-hidden="true" className="IconWrapper__Wrapper-sc-1hf1hjl-0 Wrapper-md-24-only">
+                                    <button data-encore-id="buttonPrimary" className="Button-md-useBrowserDefaultFocusStyle Button-md-buttonPrimary-useBrowserDefaultFocusStyle Button-medium-buttonPrimary-useBrowserDefaultFocusStyle">
+                                        <span className="ButtonInner-md-iconOnly ButtonInner-medium-iconOnly encore-bright-accent-set">
+                                            <span aria-hidden="true" className="Wrapper-md-24-only Wrapper-medium-medium-only">
                                                 <svg
                                                     role="img"
                                                     height="24"
@@ -51,7 +51,7 @@ const Card = ({ name, image, uri, subtext }: cardProps) => {
                                                     aria-hidden="true"
                                                     viewBox="0 0 24 24"
                                                     data-encore-id="icon"
-                                                    className="Svg-sc-ytk21e-0 Svg-img-24-icon"
+                                                    className="Svg-img-24 Svg-img-24-icon Svg-img-icon-medium"
                                                 >
                                                     <path d="m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606z"></path>
                                                 </svg>
@@ -64,13 +64,13 @@ const Card = ({ name, image, uri, subtext }: cardProps) => {
                         <div className="main-card-cardMetadata">
                             <a draggable="false" className="main-cardHeader-link" dir="auto">
                                 <div
-                                    className="Type__TypeElement-sc-goli3j-0 TypeElement-balladBold-textBase-4px-type main-cardHeader-text"
+                                    className="TypeElement-balladBold-textBase-4px-type main-cardHeader-text"
                                     data-encore-id="type"
                                 >
                                     {name}
                                 </div>
                             </a>
-                            <div className="Type__TypeElement-sc-goli3j-0 TypeElement-mesto-textSubdued-type main-cardSubHeader-root" data-encore-id="type">
+                            <div className="TypeElement-mesto-textSubdued-type main-cardSubHeader-root" data-encore-id="type">
                                 <span>{subtext}</span>
                             </div>
                         </div>

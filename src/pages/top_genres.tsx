@@ -124,7 +124,7 @@ const GenresPage = () => {
         <>
             <section className="contentSpacing">
                 <div className={`collection-collection-header stats-header`}>
-                    <h1 data-encore-id="type" className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-type">
+                    <h1 data-encore-id="type" className="TypeElement-canon-type">
                         Top Genres
                     </h1>
                     <div className="collection-searchBar-searchBar">
