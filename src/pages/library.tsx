@@ -85,7 +85,7 @@ const LibraryPage = () => {
         let playlists = flattenPlaylists(rootlistItems.rows);
 
         playlists = playlists.sort((a, b) => (a.ownedBySelf === b.ownedBySelf ? 0 : a.ownedBySelf ? -1 : 1));
-        const indexOfFirstNotOwned = playlists.findIndex(playlist => !playlist.ownedBySelf);
+        let indexOfFirstNotOwned = -1;
 
         let playlistUris: string[] = [];
 
@@ -94,6 +94,7 @@ const LibraryPage = () => {
 
         playlists.forEach(playlist => {
             if (playlist.totalLength === 0) return;
+            if (!playlist.ownedBySelf && indexOfFirstNotOwned === -1) indexOfFirstNotOwned = playlistUris.length;
             playlistUris.push(playlist.link);
             trackCount += playlist.totalLength;
             if (playlist.ownedBySelf) ownedTrackCount += playlist.totalLength;
@@ -165,7 +166,7 @@ const LibraryPage = () => {
             .slice(0, 50);
 
         const artistsMeta = await apiRequest("artistsMetadata", `https://api.spotify.com/v1/artists?ids=${topArtists.join(",")}`);
-        const ownedArtistsMeta = await apiRequest("artistsMetadata", `https://api.spotify.com/v1/artists?ids=${ownedTopArtists.join(",")}`);
+        const ownedArtistsMeta = ownedTopArtists.length && await apiRequest("artistsMetadata", `https://api.spotify.com/v1/artists?ids=${ownedTopArtists.join(",")}`);
 
         const topGenres: [string, number][] = artistsMeta.artists.reduce((acc: [string, number][], artist: any) => {
             artist.numTracks = artists[artist.id];
@@ -180,7 +181,7 @@ const LibraryPage = () => {
             return acc;
         }, []);
 
-        const ownedTopGenres: [string, number][] = ownedArtistsMeta.artists.reduce((acc: [string, number][], artist: any) => {
+        const ownedTopGenres: [string, number][] = ownedArtistsMeta.artists?.reduce((acc: [string, number][], artist: any) => {
             artist.numTracks = ownedArtists[artist.id];
             artist.genres.forEach((genre: string) => {
                 const index = acc.findIndex(([g]) => g === genre);
@@ -254,10 +255,10 @@ const LibraryPage = () => {
             audioFeatures: ownedAudioFeatures,
             trackCount: ownedTrackCount,
             totalDuration: ownedDuration,
-            artists: ownedArtistsMeta.artists,
+            artists: ownedArtistsMeta?.artists,
             artistCount: Object.keys(ownedArtists).length,
             genres: ownedTopGenres,
-            playlistCount: indexOfFirstNotOwned,
+            playlistCount: indexOfFirstNotOwned > 0 ? indexOfFirstNotOwned : 0,
             albums: ownedTopAlbums,
         };
 
