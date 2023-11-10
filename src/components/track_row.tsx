@@ -82,7 +82,15 @@ const LikedIcon = ({ active, uri }: { active: boolean; uri: string }) => {
             }
             tabIndex={-1}
         >
-            <svg role="img" height="16" width="16" aria-hidden="true" viewBox="0 0 16 16" data-encore-id="icon" className="Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small">
+            <svg
+                role="img"
+                height="16"
+                width="16"
+                aria-hidden="true"
+                viewBox="0 0 16 16"
+                data-encore-id="icon"
+                className="Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small"
+            >
                 <path
                     d={
                         liked
@@ -108,6 +116,7 @@ const TrackRow = (props: TrackRowProps) => {
                     draggable="true"
                     role="presentation"
                     onClick={event => event.detail === 2 && Spicetify.Player.playUri(props.uri)}
+                    style={{ height: 56 }}
                 >
                     <div className="main-trackList-rowSectionIndex" role="gridcell" aria-colindex={1} tabIndex={-1}>
                         <div className="main-trackList-rowMarker">
