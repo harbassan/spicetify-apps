@@ -1,0 +1,249 @@
+import React from "react";
+import StatCard from "../components/stat_card";
+import GenresCard from "../components/genres_card";
+import ArtistCard from "../components/artist_card";
+import { apiRequest, fetchAudioFeatures, fetchTopArtists, fetchTopAlbums } from "../funcs";
+
+interface LibraryProps {
+    audioFeatures: Record<string, number>;
+    trackCount: number;
+    totalDuration: number;
+    artistCount: number;
+    genres: [string, number][];
+    genresDenominator: number;
+    years: [string, number][];
+    yearsDenominator: number;
+    artists: { name: string; uri: string; image: string; freq: number }[];
+    albums: { name: string; uri: string; image: string; freq: number }[];
+}
+
+const PlaylistPage = ({ uri }: { uri: string }) => {
+    const [library, setLibrary] = React.useState<LibraryProps | null>(null);
+
+    const fetchData = async () => {
+        const start = window.performance.now();
+
+        const playlistMeta = await apiRequest("playlistMeta", `sp://core-playlist/v1/playlist/${uri}`);
+        console.log("playlistMeta", playlistMeta);
+
+        let duration = playlistMeta.playlist.duration;
+        let trackCount = playlistMeta.playlist.length;
+        let explicitCount: number = 0;
+        let trackIDs: string[] = [];
+        let popularity: number = 0;
+        let albums: Record<string, number> = {};
+        let artists: Record<string, number> = {};
+
+        playlistMeta.items.forEach((track: any) => {
+            popularity += track.popularity;
+
+            trackIDs.push(track.link.split(":")[2]);
+
+            if (track.isExplicit) explicitCount++;
+
+            const albumID = track.album.link.split(":")[2];
+            albums[albumID] = albums[albumID] ? albums[albumID] + 1 : 1;
+
+            track.artists.forEach((artist: any) => {
+                const artistID = artist.link.split(":")[2];
+                artists[artistID] = artists[artistID] ? artists[artistID] + 1 : 1;
+            });
+        });
+
+        const [topAlbums, releaseYears, releaseYearsTotal]: any = await fetchTopAlbums(albums);
+        const [topArtists, topGenres, topGenresTotal]: any = await fetchTopArtists(artists);
+
+        const fetchedFeatures: any[] = await fetchAudioFeatures(trackIDs);
+
+        const audioFeatures: Record<string, number> = {
+            popularity: popularity,
+            explicitness: explicitCount,
+            danceability: 0,
+            energy: 0,
+            valence: 0,
+            speechiness: 0,
+            acousticness: 0,
+            instrumentalness: 0,
+            liveness: 0,
+            tempo: 0,
+            loudness: 0,
+        };
+
+        for (let i = 0; i < fetchedFeatures.length; i++) {
+            if (!fetchedFeatures[i]) continue;
+            const track = fetchedFeatures[i];
+            audioFeatures["danceability"] += track["danceability"];
+            audioFeatures["energy"] += track["energy"];
+            audioFeatures["valence"] += track["valence"];
+            audioFeatures["speechiness"] += track["speechiness"];
+            audioFeatures["acousticness"] += track["acousticness"];
+            audioFeatures["instrumentalness"] += track["instrumentalness"];
+            audioFeatures["liveness"] += track["liveness"];
+            audioFeatures["tempo"] += track["tempo"];
+            audioFeatures["loudness"] += track["loudness"];
+        }
+
+        for (let key in audioFeatures) {
+            audioFeatures[key] /= fetchedFeatures.length;
+        }
+
+        const stats = {
+            audioFeatures: audioFeatures,
+            trackCount: trackCount,
+            totalDuration: duration,
+            artistCount: Object.keys(artists).length,
+            artists: topArtists,
+            genres: topGenres,
+            genresDenominator: topGenresTotal,
+            albums: topAlbums,
+            years: releaseYears,
+            yearsDenominator: releaseYearsTotal,
+        };
+
+        setLibrary(stats);
+
+        console.log("total playlist stats fetch time:", window.performance.now() - start);
+    };
+
+    React.useEffect(() => {
+        fetchData();
+    }, []);
+
+    if (!library)
+        return (
+            <>
+                <div className="stats-loadingWrapper">
+                    <svg
+                        role="img"
+                        height="46"
+                        width="46"
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        data-encore-id="icon"
+                        className="Svg-sc-ytk21e-0 Svg-img-24-icon"
+                    >
+                        <path d="M14.5 2.134a1 1 0 0 1 1 0l6 3.464a1 1 0 0 1 .5.866V21a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1V3a1 1 0 0 1 .5-.866zM16 4.732V20h4V7.041l-4-2.309zM3 22a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1zm6 0a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1z"></path>
+                    </svg>
+                    <h1>Analysing The Playlist</h1>
+                </div>
+            </>
+        );
+
+    const parseVal = (obj: [string, number]) => {
+        switch (obj[0]) {
+            case "tempo":
+                return Math.round(obj[1]) + "bpm";
+            case "loudness":
+                return Math.round(obj[1]) + "dB";
+            case "popularity":
+                return Math.round(obj[1]) + "%";
+            default:
+                return Math.round(obj[1] * 100) + "%";
+        }
+    };
+
+    const statCards: JSX.Element[] = [];
+
+    Object.entries(library.audioFeatures).forEach(obj => {
+        statCards.push(<StatCard stat={obj[0][0].toUpperCase() + obj[0].slice(1)} value={parseVal(obj)} />);
+    });
+
+    const artistCards: JSX.Element[] = library.artists.map((artist: any) => (
+        <ArtistCard name={artist.name} image={artist.image} uri={artist.uri} subtext={`Appears in ${artist.freq} tracks`} />
+    ));
+
+    const albumCards: JSX.Element[] = library.albums.map(album => {
+        return <ArtistCard name={album.name} image={album.image} uri={album.uri} subtext={`Appears in ${album.freq} tracks`} />;
+    });
+
+    const scrollGrid = (event: any) => {
+        const grid = event.target.parentNode.querySelector("div");
+
+        grid.scrollLeft += grid.clientWidth;
+    };
+
+    const scrollGridLeft = (event: any) => {
+        const grid = event.target.parentNode.querySelector("div");
+        grid.scrollLeft -= grid.clientWidth;
+    };
+
+    return (
+        <div className="stats-page">
+            <section className="stats-libraryOverview">
+                <StatCard stat="Total Tracks" value={library.trackCount} />
+                <StatCard stat="Total Artists" value={library.artistCount} />
+                <StatCard stat="Total Minutes" value={Math.floor(library.totalDuration / 60)} />
+                <StatCard stat="Total Hours" value={(library.totalDuration / (60 * 60)).toFixed(1)} />
+            </section>
+            <section>
+                <div className="main-shelf-header">
+                    <div className="main-shelf-topRow">
+                        <div className="main-shelf-titleWrapper">
+                            <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">Most Frequent Genres</h2>
+                        </div>
+                    </div>
+                </div>
+                <GenresCard genres={library.genres} total={library.genresDenominator} />
+                <section className="stats-gridInlineSection">
+                    <button className="stats-scrollButton" onClick={scrollGridLeft}>
+                        {"<"}
+                    </button>
+                    <button className="stats-scrollButton" onClick={scrollGrid}>
+                        {">"}
+                    </button>
+                    <div className={`main-gridContainer-gridContainer stats-gridInline stats-specialGrid`}>{statCards}</div>
+                </section>
+            </section>
+            <section className="main-shelf-shelf Shelf">
+                <div className="main-shelf-header">
+                    <div className="main-shelf-topRow">
+                        <div className="main-shelf-titleWrapper">
+                            <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">Most Frequent Artists</h2>
+                        </div>
+                    </div>
+                </div>
+                <section className="stats-gridInlineSection">
+                    <button className="stats-scrollButton" onClick={scrollGridLeft}>
+                        {"<"}
+                    </button>
+                    <button className="stats-scrollButton" onClick={scrollGrid}>
+                        {">"}
+                    </button>
+                    <div className={`main-gridContainer-gridContainer stats-gridInline`}>{artistCards}</div>
+                </section>
+            </section>
+            <section className="main-shelf-shelf Shelf">
+                <div className="main-shelf-header">
+                    <div className="main-shelf-topRow">
+                        <div className="main-shelf-titleWrapper">
+                            <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">Most Frequent Albums</h2>
+                        </div>
+                    </div>
+                </div>
+                <section className="stats-gridInlineSection">
+                    <button className="stats-scrollButton" onClick={scrollGridLeft}>
+                        {"<"}
+                    </button>
+                    <button className="stats-scrollButton" onClick={scrollGrid}>
+                        {">"}
+                    </button>
+                    <div className={`main-gridContainer-gridContainer stats-gridInline`}>{albumCards}</div>
+                </section>
+            </section>
+            <section className="main-shelf-shelf Shelf">
+                <div className="main-shelf-header">
+                    <div className="main-shelf-topRow">
+                        <div className="main-shelf-titleWrapper">
+                            <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">Release Year Distribution</h2>
+                        </div>
+                    </div>
+                </div>
+                <section>
+                    <GenresCard genres={library.years} total={library.yearsDenominator} />
+                </section>
+            </section>
+        </div>
+    );
+};
+
+export default React.memo(PlaylistPage);

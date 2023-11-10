@@ -4,7 +4,7 @@ import ArtistsPage from "./pages/top_artists";
 import TracksPage from "./pages/top_tracks";
 import GenresPage from "./pages/top_genres";
 import LibraryPage from "./pages/library";
-import "./css/app.scss";
+import "./css/app.css";
 import { STATS_VERSION, LATEST_RELEASE } from "./constants";
 
 const pages: Record<string, JSX.Element> = {
@@ -34,9 +34,6 @@ const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
 const App = () => {
     const [navBar, activeLink, setActiveLink] = useNavigationBar(["Artists", "Tracks", "Genres", "Library"]);
     const [newUpdate, setNewUpdate] = React.useState(false);
-
-    console.log("app render");
-    console.log(newUpdate);
 
     React.useEffect(() => {
         setActiveLink(Spicetify.LocalStorage.get("stats:active-link") || "Artists");
