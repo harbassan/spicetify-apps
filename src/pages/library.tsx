@@ -302,7 +302,7 @@ const LibraryPage = () => {
                         aria-hidden="true"
                         viewBox="0 0 24 24"
                         data-encore-id="icon"
-                        className="Svg-sc-ytk21e-0 Svg-img-24-icon"
+                        className="Svg-img-24 Svg-img-24-icon"
                     >
                         <path d="M14.5 2.134a1 1 0 0 1 1 0l6 3.464a1 1 0 0 1 .5.866V21a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1V3a1 1 0 0 1 .5-.866zM16 4.732V20h4V7.041l-4-2.309zM3 22a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1zm6 0a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1z"></path>
                     </svg>
@@ -366,7 +366,7 @@ const LibraryPage = () => {
         <>
             <section className="contentSpacing">
                 <div className={`collection-collection-header stats-header`}>
-                    <h1 data-encore-id="type" className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-type">
+                    <h1 data-encore-id="type" className="TypeElement-canon-type">
                         Library Analysis
                     </h1>
                     <div className="collection-searchBar-searchBar">
@@ -390,7 +390,7 @@ const LibraryPage = () => {
                         <div className="main-shelf-header">
                             <div className="main-shelf-topRow">
                                 <div className="main-shelf-titleWrapper">
-                                    <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">Most Frequent Genres</h2>
+                                    <h2 className="TypeElement-canon-textBase-type main-shelf-title">Most Frequent Genres</h2>
                                 </div>
                             </div>
                         </div>
@@ -409,7 +409,7 @@ const LibraryPage = () => {
                         <div className="main-shelf-header">
                             <div className="main-shelf-topRow">
                                 <div className="main-shelf-titleWrapper">
-                                    <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">Most Frequent Artists</h2>
+                                    <h2 className="TypeElement-canon-textBase-type main-shelf-title">Most Frequent Artists</h2>
                                 </div>
                             </div>
                         </div>
@@ -427,7 +427,7 @@ const LibraryPage = () => {
                         <div className="main-shelf-header">
                             <div className="main-shelf-topRow">
                                 <div className="main-shelf-titleWrapper">
-                                    <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">Most Frequent Albums</h2>
+                                    <h2 className="TypeElement-canon-textBase-type main-shelf-title">Most Frequent Albums</h2>
                                 </div>
                             </div>
                         </div>

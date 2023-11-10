@@ -8,7 +8,7 @@ const StatCard = (props: any) => {
                     <div className="stats-cardValue">{props.value}</div>
                     <div>
                         <div
-                            className={`Type__TypeElement-sc-goli3j-0 TypeElement-balladBold-textBase-4px-type main-cardHeader-text stats-cardText`}
+                            className="TypeElement-balladBold-textBase-4px-type main-cardHeader-text stats-cardText"
                             data-encore-id="type"
                         >
                             {props.stat}

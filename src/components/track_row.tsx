@@ -40,7 +40,7 @@ const ArtistLink = ({ name, uri, index, length }: { name: string; uri: string; i
 const ExplicitBadge = React.memo(() => {
     return (
         <>
-            <span className="Type__TypeElement-sc-goli3j-0 TypeElement-ballad-textSubdued-type main-trackList-rowBadges" data-encore-id="type">
+            <span className="TypeElement-ballad-textSubdued-type main-trackList-rowBadges" data-encore-id="type">
                 <span aria-label="Explicit" className="main-tag-container" title="Explicit">
                     E
                 </span>
@@ -82,7 +82,7 @@ const LikedIcon = ({ active, uri }: { active: boolean; uri: string }) => {
             }
             tabIndex={-1}
         >
-            <svg role="img" height="16" width="16" aria-hidden="true" viewBox="0 0 16 16" data-encore-id="icon" className="Svg-sc-ytk21e-0 Svg-img-16-icon">
+            <svg role="img" height="16" width="16" aria-hidden="true" viewBox="0 0 16 16" data-encore-id="icon" className="Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small">
                 <path
                     d={
                         liked
@@ -111,12 +111,12 @@ const TrackRow = (props: TrackRowProps) => {
                 >
                     <div className="main-trackList-rowSectionIndex" role="gridcell" aria-colindex={1} tabIndex={-1}>
                         <div className="main-trackList-rowMarker">
-                            <span className="Type__TypeElement-sc-goli3j-0 TypeElement-ballad-type main-trackList-number" data-encore-id="type">
+                            <span className="TypeElement-ballad-type main-trackList-number" data-encore-id="type">
                                 {props.index}
                             </span>
                             <button
                                 className="main-trackList-rowImagePlayButton"
-                                aria-label="Play Odd Ways by MIKE, Wiki, The Alchemist"
+                                aria-label={`Play ${props.name}`}
                                 tabIndex={-1}
                                 onClick={() => Spicetify.Player.playUri(props.uri)}
                             >
@@ -125,7 +125,7 @@ const TrackRow = (props: TrackRowProps) => {
                                     height="24"
                                     width="24"
                                     aria-hidden="true"
-                                    className="Svg-sc-ytk21e-0 Svg-img-24-icon main-trackList-rowPlayPauseIcon"
+                                    className="Svg-img-24 Svg-img-24-icon main-trackList-rowPlayPauseIcon"
                                     viewBox="0 0 24 24"
                                     data-encore-id="icon"
                                 >
@@ -148,14 +148,14 @@ const TrackRow = (props: TrackRowProps) => {
                         <div className="main-trackList-rowMainContent">
                             <div
                                 dir="auto"
-                                className="Type__TypeElement-sc-goli3j-0 TypeElement-ballad-textBase-type main-trackList-rowTitle standalone-ellipsis-one-line"
+                                className="TypeElement-ballad-textBase TypeElement-ballad-textBase-type main-trackList-rowTitle standalone-ellipsis-one-line"
                                 data-encore-id="type"
                             >
                                 {props.name}
                             </div>
                             {props.explicit && <ExplicitBadge />}
                             <span
-                                className="Type__TypeElement-sc-goli3j-0 TypeElement-mesto-textSubdued-type main-trackList-rowSubTitle standalone-ellipsis-one-line"
+                                className="TypeElement-mesto-textSubdued TypeElement-mesto-textSubdued-type main-trackList-rowSubTitle standalone-ellipsis-one-line"
                                 data-encore-id="type"
                             >
                                 {ArtistLinks}
@@ -163,7 +163,7 @@ const TrackRow = (props: TrackRowProps) => {
                         </div>
                     </div>
                     <div className="main-trackList-rowSectionVariable" role="gridcell" aria-colindex={3} tabIndex={-1}>
-                        <span data-encore-id="type" className="Type__TypeElement-sc-goli3j-0 TypeElement-mesto-type">
+                        <span data-encore-id="type" className="TypeElement-mesto TypeElement-mesto-type">
                             <a draggable="true" className="standalone-ellipsis-one-line" dir="auto" href={props.album_uri} tabIndex={-1}>
                                 {props.album}
                             </a>
@@ -171,14 +171,14 @@ const TrackRow = (props: TrackRowProps) => {
                     </div>
                     <div className="main-trackList-rowSectionEnd" role="gridcell" aria-colindex={5} tabIndex={-1}>
                         {props.liked ? <LikedIcon active={props.liked} uri={props.uri} /> : ""}
-                        <div className="Type__TypeElement-sc-goli3j-0 TypeElement-mesto-textSubdued-type main-trackList-rowDuration" data-encore-id="type">
+                        <div className="TypeElement-mesto-textSubdued TypeElement-mesto-textSubdued-type main-trackList-rowDuration" data-encore-id="type">
                             {formatDuration(props.duration)}
                         </div>
                         <button
                             type="button"
                             aria-haspopup="menu"
-                            aria-label="More options for Odd Ways by MIKE, Wiki, The Alchemist"
-                            className="main-moreButton-button main-trackList-rowMoreButton"
+                            aria-label={`More options for ${props.name}`}
+                            className="main-moreButton-button Button-sm-16-buttonTertiary-iconOnly-condensed-useBrowserDefaultFocusStyle Button-small-small-buttonTertiary-iconOnly-condensed-useBrowserDefaultFocusStyle main-trackList-rowMoreButton"
                             tabIndex={-1}
                         >
                             <svg
@@ -188,7 +188,7 @@ const TrackRow = (props: TrackRowProps) => {
                                 aria-hidden="true"
                                 viewBox="0 0 16 16"
                                 data-encore-id="icon"
-                                className="Svg-sc-ytk21e-0 Svg-img-16-icon"
+                                className="Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small"
                             >
                                 <path d="M3 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm6.5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM16 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"></path>
                             </svg>

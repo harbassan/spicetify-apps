@@ -85,7 +85,7 @@ const TracksPage = () => {
             <section className="contentSpacing">
                 <div className={`collection-collection-header stats-header`}>
                     <div className="stats-trackPageTitle">
-                        <h1 data-encore-id="type" className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-type">
+                        <h1 data-encore-id="type" className="TypeElement-canon-type">
                             Top Tracks
                         </h1>
                         <button className="stats-createPlaylistButton" data-encore-id="buttonSecondary" aria-expanded="false" onClick={createPlaylist}>
@@ -112,7 +112,7 @@ const TracksPage = () => {
                                 <div className="main-trackList-rowSectionStart" role="columnheader" aria-colindex={2} aria-sort="none" tabIndex={-1}>
                                     <button className="main-trackList-column main-trackList-sortable" tabIndex={-1}>
                                         <span
-                                            className="Type__TypeElement-sc-goli3j-0 TypeElement-mesto-type standalone-ellipsis-one-line"
+                                            className="TypeElement-mesto-type standalone-ellipsis-one-line"
                                             data-encore-id="type"
                                         >
                                             Title
@@ -122,7 +122,7 @@ const TracksPage = () => {
                                 <div className="main-trackList-rowSectionVariable" role="columnheader" aria-colindex={3} aria-sort="none" tabIndex={-1}>
                                     <button className="main-trackList-column main-trackList-sortable" tabIndex={-1}>
                                         <span
-                                            className="Type__TypeElement-sc-goli3j-0 TypeElement-mesto-type standalone-ellipsis-one-line"
+                                            className="TypeElement-mesto-type standalone-ellipsis-one-line"
                                             data-encore-id="type"
                                         >
                                             Album
@@ -142,7 +142,7 @@ const TracksPage = () => {
                                             aria-hidden="true"
                                             viewBox="0 0 16 16"
                                             data-encore-id="icon"
-                                            className="Svg-sc-ytk21e-0 Svg-img-16-icon"
+                                            className="Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small"
                                         >
                                             <path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z"></path>
                                             <path d="M8 3.25a.75.75 0 0 1 .75.75v3.25H11a.75.75 0 0 1 0 1.5H7.25V4A.75.75 0 0 1 8 3.25z"></path>
