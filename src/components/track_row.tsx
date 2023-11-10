@@ -103,7 +103,12 @@ const TrackRow = (props: TrackRowProps) => {
     return (
         <>
             <div role="row" aria-rowindex={2} aria-selected="false">
-                <div className="main-trackList-trackListRow main-trackList-trackListRowGrid" draggable="true" role="presentation">
+                <div
+                    className="main-trackList-trackListRow main-trackList-trackListRowGrid"
+                    draggable="true"
+                    role="presentation"
+                    onClick={event => event.detail === 2 && Spicetify.Player.playUri(props.uri)}
+                >
                     <div className="main-trackList-rowSectionIndex" role="gridcell" aria-colindex={1} tabIndex={-1}>
                         <div className="main-trackList-rowMarker">
                             <span className="Type__TypeElement-sc-goli3j-0 TypeElement-ballad-type main-trackList-number" data-encore-id="type">
