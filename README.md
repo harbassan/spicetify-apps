@@ -1,6 +1,6 @@
 # Spicetify Stats
 
-### A custom app that shows you your top artists, tracks, genres and an analysis of your whole library.
+### A custom app that shows you your top artists, tracks, genres and an analysis of your whole library, including individual playlists.
 
 ---
 
@@ -28,9 +28,32 @@
 
 ---
 
+### Playlist Analysis
+
+![preview](previews/playlist_analysis.png)
+
+---
+
 ### Manual Installation
 
-Download the files in the [dist branch](https://github.com/harbassan/spicetify-stats/archive/refs/heads/dist.zip) and rename the folder to `stats`, and then place that folder into your `CustomApps` folder in the spicetify directory.
+Download the files in the [dist branch](https://github.com/harbassan/spicetify-stats/archive/refs/heads/dist.zip) and rename the folder to `stats`, and then place that folder into your `CustomApps` folder in the spicetify directory. It should be similair to this:
+
+```
+📦spicetify/CustomApps
+ ┣ 📂marketplace
+ ┣ etc...
+ ┗ 📂stats
+ ┃ ┣ 📜extension.css
+ ┃ ┣ 📜extension.js
+ ┃ ┣ 📜index.js
+ ┃ ┣ 📜library_analysis.png
+ ┃ ┣ 📜manifest.json
+ ┃ ┣ 📜README.md
+ ┃ ┣ 📜style.css
+ ┃ ┣ 📜top_artists.png
+ ┃ ┣ 📜top_genres.png
+ ┃ ┗ 📜top_tracks.png
+```
 
 Then run these commands to apply:
 
@@ -38,6 +61,17 @@ Then run these commands to apply:
 spicetify config custom_apps stats
 spicetify apply
 ```
+
+### Uninstallation
+
+To disable the app run these commands:
+
+```powershell
+spicetify config custom_apps stats-
+spicetify apply
+```
+
+If you want to completely remove the app just delete the `stats` folder after running the above commands.
 
 ---
 
