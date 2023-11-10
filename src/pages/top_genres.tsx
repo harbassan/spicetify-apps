@@ -9,7 +9,8 @@ const GenresPage = () => {
     const [topGenres, setTopGenres] = React.useState<{
         genres: [string, number][];
         features: any;
-    }>({ genres: [], features: {} });
+        years: [string, number][];
+    }>({ genres: [], features: {}, years: [] });
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],
         ["Past Month", "Past 6 Months", "All Time"],
@@ -42,9 +43,19 @@ const GenresPage = () => {
         }, []);
         let trackPopularity = 0;
         let explicitness = 0;
+        let releaseData: [string, number][] = [];
         const topTracks = fetchedTracks.map((track: any) => {
             trackPopularity += track.popularity;
             if (track.explicit) explicitness++;
+            if (track.album.release_date) {
+                const year = track.album.release_date.slice(0, 4);
+                const index = releaseData.findIndex(([y]) => y === year);
+                if (index !== -1) {
+                    releaseData[index][1] += 1;
+                } else {
+                    releaseData.push([year, 1]);
+                }
+            }
             return track.id;
         });
 
@@ -81,9 +92,9 @@ const GenresPage = () => {
         }
         console.log("total genres fetch time:", window.performance.now() - start);
 
-        if (set) setTopGenres({ genres: genres, features: audioFeatures });
+        if (set) setTopGenres({ genres: genres, features: audioFeatures, years: releaseData });
 
-        Spicetify.LocalStorage.set(`stats:top-genres:${time_range}`, JSON.stringify({ genres: genres, features: audioFeatures }));
+        Spicetify.LocalStorage.set(`stats:top-genres:${time_range}`, JSON.stringify({ genres: genres, features: audioFeatures, years: releaseData }));
     };
 
     const fetchAudioFeatures = async (ids: string[]) => {
@@ -120,6 +131,17 @@ const GenresPage = () => {
         statCards.push(<StatCard stat={key[0].toUpperCase() + key.slice(1)} value={parseVal(key)} />);
     }
 
+    const scrollGrid = (event: any) => {
+        const grid = event.target.parentNode.querySelector("div");
+
+        grid.scrollLeft += grid.clientWidth;
+    };
+
+    const scrollGridLeft = (event: any) => {
+        const grid = event.target.parentNode.querySelector("div");
+        grid.scrollLeft -= grid.clientWidth;
+    };
+
     return (
         <>
             <section className="contentSpacing">
@@ -139,9 +161,29 @@ const GenresPage = () => {
                 <div className="stats-page">
                     <section>
                         <GenresCard genres={topGenres.genres} total={1275} />
+                        <section className="stats-gridInlineSection">
+                            <button className="stats-scrollButton" onClick={scrollGridLeft}>
+                                {"<"}
+                            </button>
+                            <button className="stats-scrollButton" onClick={scrollGrid}>
+                                {">"}
+                            </button>
+                            <div className={`main-gridContainer-gridContainer stats-gridInline stats-specialGrid`}>{statCards}</div>
+                        </section>
                     </section>
-                    <section>
-                        <div className={`main-gridContainer-gridContainer stats-grid`}>{statCards}</div>
+                    <section className="main-shelf-shelf Shelf">
+                        <div className="main-shelf-header">
+                            <div className="main-shelf-topRow">
+                                <div className="main-shelf-titleWrapper">
+                                    <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">
+                                        Release Year Distribution
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                        <section>
+                            <GenresCard genres={topGenres.years} total={50} />
+                        </section>
                     </section>
                 </div>
             </section>

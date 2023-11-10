@@ -280,8 +280,7 @@ declare namespace Spicetify {
             body: any;
             headers: Headers;
             status: number;
-            uri: string;
-            isSuccessStatus(status: number): boolean;
+            uri?: string;
         }
 
         function head(url: string, headers?: Headers): Promise<Headers>;
@@ -460,7 +459,7 @@ declare namespace Spicetify {
      * @param isError If true, bubble will be red. Defaults to false.
      * @param msTimeout Time in milliseconds to display the bubble. Defaults to Spotify's value.
      */
-    function showNotification(text: string, isError?: boolean, msTimeout?: number): void;
+    function showNotification(message: React.ReactNode, isError?: boolean, msTimeout?: number): void;
     /**
      * Set of APIs method to parse and validate URIs.
      */
@@ -474,8 +473,10 @@ declare namespace Spicetify {
         public args?: any;
         public category?: string;
         public username?: string;
+        public track?: string;
         public artist?: string;
         public album?: string;
+        public duration?: number;
         public query?: string;
         public country?: string;
         public global?: boolean;
@@ -510,7 +511,6 @@ declare namespace Spicetify {
          * @return The URL string for the uri.
          */
         toURL(origin?: string): string;
-
 
         /**
          * Clones a given SpotifyURI instance.
@@ -622,66 +622,260 @@ declare namespace Spicetify {
          */
         static from(value: any): URI | null;
 
-        static isAd(uri: any): boolean;
-        static isAlbum(uri: any): boolean;
-        static isGenre(uri: any): boolean;
-        static isQueue(uri: any): boolean;
-        static isApplication(uri: any): boolean;
-        static isArtist(uri: any): boolean;
-        static isArtistToplist(uri: any): boolean;
-        static isArtistConcerts(uri: any): boolean;
-        static isAudioFile(uri: any): boolean;
-        static isCollection(uri: any): boolean;
-        static isCollectionAlbum(uri: any): boolean;
-        static isCollectionArtist(uri: any): boolean;
-        static isCollectionMissingAlbum(uri: any): boolean;
-        static isCollectionTrackList(uri: any): boolean;
-        static isConcert(uri: any): boolean;
-        static isContextGroup(uri: any): boolean;
-        static isDailyMix(uri: any): boolean;
-        static isEmpty(uri: any): boolean;
-        static isEpisode(uri: any): boolean;
-        static isFacebook(uri: any): boolean;
-        static isFolder(uri: any): boolean;
-        static isFollowers(uri: any): boolean;
-        static isFollowing(uri: any): boolean;
-        static isImage(uri: any): boolean;
-        static isInbox(uri: any): boolean;
-        static isInterruption(uri: any): boolean;
-        static isLibrary(uri: any): boolean;
-        static isLive(uri: any): boolean;
-        static isRoom(uri: any): boolean;
-        static isExpression(uri: any): boolean;
-        static isLocal(uri: any): boolean;
-        static isLocalTrack(uri: any): boolean;
-        static isLocalAlbum(uri: any): boolean;
-        static isLocalArtist(uri: any): boolean;
-        static isMerch(uri: any): boolean;
-        static isMosaic(uri: any): boolean;
-        static isPlaylist(uri: any): boolean;
-        static isPlaylistV2(uri: any): boolean;
-        static isPrerelease(uri: any): boolean;
-        static isProfile(uri: any): boolean;
-        static isPublishedRootlist(uri: any): boolean;
-        static isRadio(uri: any): boolean;
-        static isRootlist(uri: any): boolean;
-        static isSearch(uri: any): boolean;
-        static isShow(uri: any): boolean;
-        static isSocialSession(uri: any): boolean;
-        static isSpecial(uri: any): boolean;
-        static isStarred(uri: any): boolean;
-        static isStation(uri: any): boolean;
-        static isTempPlaylist(uri: any): boolean;
-        static isToplist(uri: any): boolean;
-        static isTrack(uri: any): boolean;
-        static isTrackset(uri: any): boolean;
-        static isUserToplist(uri: any): boolean;
-        static isUserTopTracks(uri: any): boolean;
-        static isUnknown(uri: any): boolean;
-        static isMedia(uri: any): boolean;
-        static isQuestion(uri: any): boolean;
-        static isPoll(uri: any): boolean;
-        static isPlaylistV1OrV2(uri: any): boolean;
+        /**
+        * Checks whether two URI:s refer to the same thing even though they might
+        * not necessarily be equal.
+        *
+        * These two Playlist URIs, for example, refer to the same playlist:
+        *
+        *   spotify:user:napstersean:playlist:3vxotOnOGDlZXyzJPLFnm2
+        *   spotify:playlist:3vxotOnOGDlZXyzJPLFnm2
+        *
+        * @param baseUri The first URI to compare.
+        * @param refUri The second URI to compare.
+        * @return Whether they shared idenitity
+        */
+        static isSameIdentity(baseUri: URI | string, refUri: URI | string): boolean;
+
+        /**
+         * Returns the hex representation of a Base62 encoded id.
+         *
+         * @param id The base62 encoded id.
+         * @return The hex representation of the base62 id.
+         */
+        static idToHex(id: string): string;
+
+        /**
+         * Returns the base62 representation of a hex encoded id.
+         *
+         * @param hex The hex encoded id.
+         * @return The base62 representation of the id.
+         */
+        static hexToId(hex: string): string;
+
+        /**
+         * Creates a new 'album' type URI.
+         *
+         * @param id The id of the album.
+         * @param disc The disc number of the album.
+         * @return The album URI.
+         */
+        static albumURI(id: string, disc: number): URI;
+
+        /**
+         * Creates a new 'application' type URI.
+         *
+         * @param id The id of the application.
+         * @param args An array containing the arguments to the app.
+         * @return The application URI.
+         */
+        static applicationURI(id: string, args: string[]): URI;
+
+        /**
+         * Creates a new 'artist' type URI.
+         *
+         * @param id The id of the artist.
+         * @return The artist URI.
+         */
+        static artistURI(id: string): URI;
+
+        /**
+         * Creates a new 'collection' type URI.
+         *
+         * @param username The non-canonical username of the rootlist owner.
+         * @param category The category of the collection.
+         * @return The collection URI.
+         */
+        static collectionURI(username: string, category: string): URI;
+
+        /**
+         * Creates a new 'collection-album' type URI.
+         *
+         * @param username The non-canonical username of the rootlist owner.
+         * @param id The id of the album.
+         * @return The collection album URI.
+         */
+        static collectionAlbumURI(username: string, id: string): URI;
+
+        /**
+         * Creates a new 'collection-artist' type URI.
+         *
+         * @param username The non-canonical username of the rootlist owner.
+         * @param id The id of the artist.
+         * @return The collection artist URI.
+         */
+        static collectionAlbumURI(username: string, id: string): URI;
+
+        /**
+         * Creates a new 'concert' type URI.
+         * 
+         * @param id The id of the concert.
+         * @return The concert URI.
+         */
+        static concertURI(id: string): URI;
+
+        /**
+         * Creates a new 'episode' type URI.
+         * 
+         * @param id The id of the episode.
+         * @return The episode URI.
+         */
+        static episodeURI(id: string): URI;
+
+        /**
+         * Creates a new 'folder' type URI.
+         * 
+         * @param id The id of the folder.
+         * @return The folder URI.
+         */
+        static folderURI(id: string): URI;
+
+        /**
+         * Creates a new 'local-album' type URI.
+         * 
+         * @param artist The artist of the album.
+         * @param album The name of the album.
+         * @return The local album URI.
+         */
+        static localAlbumURI(artist: string, album: string): URI;
+
+        /**
+         * Creates a new 'local-artist' type URI.
+         * 
+         * @param artist The name of the artist.
+         * @return The local artist URI.
+         */
+        static localArtistURI(artist: string): URI;
+
+        /**
+         * Creates a new 'playlist-v2' type URI.
+         *
+         * @param id The id of the playlist.
+         * @return The playlist URI.
+         */
+        static playlistV2URI(id: string): URI;
+
+        /**
+         * Creates a new 'prerelease' type URI.
+         * 
+         * @param id The id of the prerelease.
+         * @return The prerelease URI.
+         */
+        static prereleaseURI(id: string): URI;
+
+        /**
+         * Creates a new 'profile' type URI.
+         *
+         * @param username The non-canonical username of the rootlist owner.
+         * @param args A list of arguments.
+         * @return The profile URI.
+         */
+        static profileURI(username: string, args: string[]): URI;
+
+        /**
+         * Creates a new 'search' type URI.
+         *
+         * @param query The unencoded search query.
+         * @return The search URI
+         */
+        static searchURI(query: string): URI;
+
+        /**
+         * Creates a new 'show' type URI.
+         *
+         * @param id The id of the show.
+         * @return The show URI.
+         */
+        static showURI(id: string): URI;
+
+        /**
+         * Creates a new 'station' type URI.
+         *
+         * @param args An array of arguments for the station.
+         * @return The station URI.
+         */
+        static stationURI(args: string[]): URI;
+
+        /**
+         * Creates a new 'track' type URI.
+         *
+         * @param id The id of the track.
+         * @param anchor The point in the track formatted as mm:ss
+         * @param context An optional context URI
+         * @param play Toggles autoplay
+         * @return The track URI.
+         */
+        static trackURI(id: string, anchor: string, context?: string, play: boolean): URI;
+
+        /**
+         * Creates a new 'user-toplist' type URI.
+         *
+         * @param username The non-canonical username of the toplist owner.
+         * @param toplist The toplist type.
+         * @return The user-toplist URI.
+         */
+        static userToplistURI(username: string, toplist: string): URI;
+
+        static isAd(uri: URI | string): boolean;
+        static isAlbum(uri: URI | string): boolean;
+        static isGenre(uri: URI | string): boolean;
+        static isQueue(uri: URI | string): boolean;
+        static isApplication(uri: URI | string): boolean;
+        static isArtist(uri: URI | string): boolean;
+        static isArtistToplist(uri: URI | string): boolean;
+        static isArtistConcerts(uri: URI | string): boolean;
+        static isAudioFile(uri: URI | string): boolean;
+        static isCollection(uri: URI | string): boolean;
+        static isCollectionAlbum(uri: URI | string): boolean;
+        static isCollectionArtist(uri: URI | string): boolean;
+        static isCollectionMissingAlbum(uri: URI | string): boolean;
+        static isCollectionTrackList(uri: URI | string): boolean;
+        static isConcert(uri: URI | string): boolean;
+        static isContextGroup(uri: URI | string): boolean;
+        static isDailyMix(uri: URI | string): boolean;
+        static isEmpty(uri: URI | string): boolean;
+        static isEpisode(uri: URI | string): boolean;
+        static isFacebook(uri: URI | string): boolean;
+        static isFolder(uri: URI | string): boolean;
+        static isFollowers(uri: URI | string): boolean;
+        static isFollowing(uri: URI | string): boolean;
+        static isImage(uri: URI | string): boolean;
+        static isInbox(uri: URI | string): boolean;
+        static isInterruption(uri: URI | string): boolean;
+        static isLibrary(uri: URI | string): boolean;
+        static isLive(uri: URI | string): boolean;
+        static isRoom(uri: URI | string): boolean;
+        static isExpression(uri: URI | string): boolean;
+        static isLocal(uri: URI | string): boolean;
+        static isLocalTrack(uri: URI | string): boolean;
+        static isLocalAlbum(uri: URI | string): boolean;
+        static isLocalArtist(uri: URI | string): boolean;
+        static isMerch(uri: URI | string): boolean;
+        static isMosaic(uri: URI | string): boolean;
+        static isPlaylist(uri: URI | string): boolean;
+        static isPlaylistV2(uri: URI | string): boolean;
+        static isPrerelease(uri: URI | string): boolean;
+        static isProfile(uri: URI | string): boolean;
+        static isPublishedRootlist(uri: URI | string): boolean;
+        static isRadio(uri: URI | string): boolean;
+        static isRootlist(uri: URI | string): boolean;
+        static isSearch(uri: URI | string): boolean;
+        static isShow(uri: URI | string): boolean;
+        static isSocialSession(uri: URI | string): boolean;
+        static isSpecial(uri: URI | string): boolean;
+        static isStarred(uri: URI | string): boolean;
+        static isStation(uri: URI | string): boolean;
+        static isTempPlaylist(uri: URI | string): boolean;
+        static isToplist(uri: URI | string): boolean;
+        static isTrack(uri: URI | string): boolean;
+        static isTrackset(uri: URI | string): boolean;
+        static isUserToplist(uri: URI | string): boolean;
+        static isUserTopTracks(uri: URI | string): boolean;
+        static isUnknown(uri: URI | string): boolean;
+        static isMedia(uri: URI | string): boolean;
+        static isQuestion(uri: URI | string): boolean;
+        static isPoll(uri: URI | string): boolean;
+        static isPlaylistV1OrV2(uri: URI | string): boolean;
     }
 
     /**
@@ -962,6 +1156,202 @@ declare namespace Spicetify {
              */
             weight?: "book" | "bold" | "black";
         }
+        type ConfirmDialogProps = {
+            /**
+             * Boolean to determine if the dialog should be opened
+             * @default true
+             */
+            isOpen?: boolean;
+            /**
+             * Whether to allow inline HTML in component text
+             * @default false
+             */
+            allowHTML?: boolean;
+            /**
+             * Dialog title. Can be inline HTML if `allowHTML` is true
+             */
+            titleText: string;
+            /**
+             * Dialog description. Can be inline HTML if `allowHTML` is true
+             */
+            descriptionText?: string;
+            /**
+             * Confirm button text
+             */
+            confirmText?: string;
+            /**
+             * Cancel button text
+             */
+            cancelText?: string;
+            /**
+             * Confirm button aria-label
+             */
+            confirmLabel?: string;
+            /**
+             * Function to run when confirm button is clicked
+             * The dialog does not close automatically, a handler must be included.
+             * @param {React.MouseEvent<HTMLButtonElement>} event
+             */
+            onConfirm?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+            /**
+             * Function to run when cancel button is clicked.
+             * The dialog does not close automatically, a handler must be included.
+             * @param {React.MouseEvent<HTMLButtonElement>} event
+             */
+            onClose?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+            /**
+             * Function to run when dialog is clicked outside of.
+             * By default, this will run `onClose`.
+             * A handler must be included to close the dialog.
+             * @param {React.MouseEvent<HTMLButtonElement>} event
+             */
+            onOutside?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+        }
+        type PanelSkeletonProps = {
+            /**
+             * Aria label for the panel. Does not set the panel header content.
+             */
+            label?: string;
+            /**
+             * Item URI of the panel. Used as reference for Spotify's internal Event Factory.
+             */
+            itemUri?: string;
+            /**
+             * Additional class name to apply to the panel.
+             * @deprecated Spotify `1.2.12`
+             */
+            className?: string;
+            /**
+             * Additional styles to apply to the panel.
+             */
+            style?: React.CSSProperties;
+            /**
+             * Children to render inside the panel.
+             */
+            children?: React.ReactNode;
+        }
+        type PanelContentProps = {
+            /**
+             * Additional class name to apply to the panel.
+             */
+            className?: string;
+            /**
+             * Children to render inside the panel.
+             */
+            children?: React.ReactNode;
+        }
+        type PanelHeaderProps = {
+            /**
+             * Href for the header link.
+             * Can be either a URI for a path within the app, or a URL for an external link.
+             */
+            link?: string;
+            /**
+             * Title of the header.
+             */
+            title?: string;
+            /**
+             * Panel ID. Used to toggle panel open/closed state.
+             */
+            panel: number;
+            /**
+             * Whether or not the panel contains advertisements.
+             * @default false
+             */
+            isAdvert?: boolean;
+            /**
+             * Actions to render in the header.
+             */
+            actions?: React.ReactNode | React.ReactNode[];
+            /**
+             * Function to call when clicking on the close button.
+             * Called before the panel is closed.
+             */
+            onClose?: () => void;
+            /**
+             * Prevent the panel from closing when clicking on the header close button.
+             * @default false
+             */
+            preventDefaultClose?: boolean;
+            /**
+             * Function to call when clicking on the header back button.
+             * If not provided, the back button will not be rendered.
+             */
+            onBack?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+            /**
+             * Font variant for the header title.
+             * @default "balladBold"
+             */
+            titleVariant?: Variant;
+            /**
+             * Semantic color name for the header title.
+             * @default "textBase"
+             */
+            titleSemanticColor?: SemanticColor;
+        }
+        type SliderProps = {
+            /**
+             * Label for the slider.
+             */
+            labelText?: string;
+            /**
+             * The current value of the slider.
+             */
+            value: number;
+            /**
+             * The minimum value of the slider.
+             */
+            min: number;
+            /**
+             * The maximum value of the slider.
+             */
+            max: number;
+            /**
+             * The step value of the slider.
+             */
+            step: number;
+            /**
+             * Whether or not the slider is disabled/can be interacted with.
+             * @default true
+             */
+            isInteractive?: boolean;
+            /**
+             * Whether or not the active style of the slider should be shown.
+             * This is equivalent to the slider being focused/hovered.
+             * @default false
+             */
+            forceActiveStyles?: boolean;
+            /**
+             * Callback function that is called when the slider starts being dragged.
+             *
+             * @param {number} value The current value of the slider in percent.
+             */
+            onDragStart: (value: number) => void;
+            /**
+             * Callback function that is called when the slider is being dragged.
+             *
+             * @param {number} value The current value of the slider in percent.
+             */
+            onDragMove: (value: number) => void;
+            /**
+             * Callback function that is called when the slider stops being dragged.
+             *
+             * @param {number} value The current value of the slider in percent.
+             */
+            onDragEnd: (value: number) => void;
+            /**
+             * Callback function that is called when the slider incremented a step.
+             *
+             * @deprecated Use `onDrag` props instead.
+             */
+            onStepForward?: () => void;
+            /**
+             * Callback function that is called when the slider decremented a step.
+             *
+             * @deprecated Use `onDrag` props instead.
+             */
+            onStepBackward?: () => void;
+        }
         /**
          * Generic context menu provider
          *
@@ -1027,6 +1417,43 @@ declare namespace Spicetify {
          * @see Spicetify.ReactComponent.TextComponentProps
          */
         const TextComponent: any;
+        /**
+         * Component to render Spotify-style confirm dialog
+         *
+         * Props:
+         * @see Spicetify.ReactComponent.ConfirmDialogProps
+         */
+        const ConfirmDialog: any;
+        /**
+         * Component to render Spotify-style panel skeleton
+         *
+         * Props:
+         * @see Spicetify.ReactComponent.PanelSkeletonProps
+         */
+        const PanelSkeleton: any;
+        /**
+         * Component to render Spotify-style panel content
+         *
+         * Props:
+         * @see Spicetify.ReactComponent.PanelContentProps
+         */
+        const PanelContent: any;
+        /**
+         * Component to render Spotify-style panel header
+         *
+         * Props:
+         * @see Spicetify.ReactComponent.PanelHeaderProps
+         */
+        const PanelHeader: any;
+        /**
+         * Component to render Spotify slider
+         *
+         * Used in progress bar, volume slider, crossfade settings, etc.
+         *
+         * Props:
+         * @see Spicetify.ReactComponent.SliderProps
+         */
+        const Slider: any;
     }
 
     /**
@@ -1048,11 +1475,30 @@ declare namespace Spicetify {
      * Add button in player controls
      */
     namespace Playbar {
+        /**
+         * Create a button on the right side of the playbar
+         */
         class Button {
-            constructor(label: string, icon: Icon | string, onClick: (self: Button) => void, disabled?: boolean, active?: boolean, registerOnCreate?: boolean);
+            constructor(label: string, icon: Icon | string, onClick?: (self: Button) => void, disabled?: boolean, active?: boolean, registerOnCreate?: boolean);
             label: string;
             icon: string;
             onClick: (self: Button) => void;
+            disabled: boolean;
+            active: boolean;
+            element: HTMLButtonElement;
+            tippy: any;
+            register: () => void;
+            deregister: () => void;
+        }
+
+        /**
+         * Create a widget next to track info
+         */
+        class Widget {
+            constructor(label: string, icon: Icon | string, onClick?: (self: Widget) => void, disabled?: boolean, active?: boolean, registerOnCreate?: boolean);
+            label: string;
+            icon: string;
+            onClick: (self: Widget) => void;
             disabled: boolean;
             active: boolean;
             element: HTMLButtonElement;
@@ -1094,4 +1540,403 @@ declare namespace Spicetify {
      * Used to mimic Spotify's tooltip behavior
      */
     const TippyProps: any;
+
+    /**
+     * Interface for interacting with Spotify client's app title
+     */
+    namespace AppTitle {
+        /**
+         * Set default app title. This has no effect if the player is running.
+         * Will override any previous forced title.
+         * @param title Title to set
+         * @return Promise that resolves to a function to cancel forced title. This doesn't reset the title.
+         */
+        function set(title: string): Promise<{ clear: () => void }>;
+        /**
+         * Reset app title to default
+         */
+        function reset(): Promise<void>;
+        /**
+         * Get current default app title
+         * @return Current default app title
+         */
+        function get(): Promise<string>;
+        /**
+         * Subscribe to title changes.
+         * This event is not fired when the player changes app title.
+         * @param callback Callback to call when title changes
+         * @return Object with method to unsubscribe
+         */
+        function sub(callback: (title: string) => void): { clear: () => void };
+    }
+
+    /**
+     * Spicetify's QraphQL wrapper for Spotify's GraphQL API endpoints
+     */
+    namespace GraphQL {
+        /**
+         * Possible types of entities.
+         *
+         * This list is dynamic and may change in the future.
+         */
+        type Query = "decorateItemsForEnhance" | "imageURLAndSize" | "imageSources" | "audioItems" | "creator" | "extractedColors" | "extractedColorsAndImageSources" | "fetchExtractedColorAndImageForAlbumEntity" | "fetchExtractedColorAndImageForArtistEntity" | "fetchExtractedColorAndImageForEpisodeEntity" | "fetchExtractedColorAndImageForPlaylistEntity" | "fetchExtractedColorAndImageForPodcastEntity" | "fetchExtractedColorAndImageForTrackEntity" | "fetchExtractedColorForAlbumEntity" | "fetchExtractedColorForArtistEntity" | "fetchExtractedColorForEpisodeEntity" | "fetchExtractedColorForPlaylistEntity" | "fetchExtractedColorForPodcastEntity" | "fetchExtractedColorForTrackEntity" | "getAlbumNameAndTracks" | "getEpisodeName" | "getTrackName" | "queryAlbumTrackUris" | "queryTrackArtists" | "decorateContextEpisodesOrChapters" | "decorateContextTracks" | "fetchTracksForRadioStation" | "decoratePlaylists" | "playlistUser" | "FetchPlaylistMetadata" | "playlistContentsItemTrackArtist" | "playlistContentsItemTrackAlbum" | "playlistContentsItemTrack" | "playlistContentsItemLocalTrack" | "playlistContentsItemEpisodeShow" | "playlistContentsItemEpisode" | "playlistContentsItemResponse" | "playlistContentsItem" | "FetchPlaylistContents" | "episodeTrailerUri" | "podcastEpisode" | "podcastMetadataV2" | "minimalAudiobook" | "audiobookChapter" | "audiobookMetadataV2" | "fetchExtractedColors" | "queryFullscreenMode" | "queryNpvEpisode" | "queryNpvArtist" | "albumTrack" | "getAlbum" | "queryAlbumTracks" | "queryArtistOverview" | "queryArtistAppearsOn" | "discographyAlbum" | "albumMetadataReleases" | "albumMetadata" | "queryArtistDiscographyAlbums" | "queryArtistDiscographySingles" | "queryArtistDiscographyCompilations" | "queryArtistDiscographyAll" | "queryArtistDiscographyOverview" | "artistPlaylist" | "queryArtistPlaylists" | "queryArtistDiscoveredOn" | "queryArtistFeaturing" | "queryArtistRelated" | "queryArtistMinimal" | "searchModalResults" | "queryWhatsNewFeed" | "whatsNewFeedNewItems" | "SetItemsStateInWhatsNewFeed" | "browseImageURLAndSize" | "browseImageSources" | "browseAlbum" | "browseArtist" | "browseEpisode" | "browseChapter" | "browsePlaylist" | "browsePodcast" | "browseAudiobook" | "browseTrack" | "browseUser" | "browseMerch" | "browseArtistConcerts" | "browseContent" | "browseSectionContainer" | "browseClientFeature" | "browseItem" | "browseAll" | "browsePage";
+        /**
+         * Collection of GraphQL definitions.
+         */
+        const Definitions: Record<Query | string, any>;
+        /**
+         * GraphQL query definitions. Subset of `Definitions` that are used as query requests.
+         */
+        const QueryDefinitions: Record<Query | string, any>;
+        /**
+         * GraphQL mutation definitions. Subset of `Definitions` that are used as mutation requests.
+         */
+        const MutationDefinitions: Record<Query | string, any>;
+        /**
+         * GraphQL response definitions. Subset of `Definitions` that are used as response types.
+         */
+        const ResponseDefinitions: Record<Query | string, any>;
+        /**
+         * Sends a GraphQL query to Spotify.
+         * @description A preinitialized version of `Spicetify.GraphQL.Handler` using current context.
+         * @param query Query to send
+         * @param variables Variables to use
+         * @param context Context to use
+         * @return Promise that resolves to the response
+         */
+        function Request(query: typeof Definitions[Query | string], variables?: Record<string, any>, context?: Record<string, any>): Promise<any>;
+        /**
+         * Context for GraphQL queries.
+         * @description Used to set context for the handler and initialze it.
+         */
+        const Context: Record<string, any>;
+        /**
+         * Handler for GraphQL queries.
+         * @param context Context to use
+         * @return Function to handle GraphQL queries
+         */
+        function Handler(context: Record<string, any>): (query: typeof Definitions[Query | string], variables?: Record<string, any>, context?: Record<string, any>) => Promise<any>;
+    }
+
+    namespace ReactHook {
+        /**
+         * React Hook to create interactive drag-and-drop element
+         * @description Used to create a draggable element that can be dropped into Spotify's components (e.g. Playlist, Folder, Sidebar, Queue)
+         * @param uris List of URIs to be dragged
+         * @param label Label to be displayed when dragging
+         * @param contextUri Context URI of the element from which the drag originated (e.g. Playlist URI)
+         * @param sectionIndex Index of the section in which the drag originated
+         * @param dropOriginUri URI of the desired drop target. Leave empty to allow drop anywhere
+         * @return Function to handle drag event. Should be passed to `onDragStart` prop of the element. All parameters passed onto the hook will be passed onto the handler unless declared otherwise.
+         *
+         */
+        function DragHandler(
+            uris?: string[],
+            label?: string,
+            contextUri?: string,
+            sectionIndex?: number,
+            dropOriginUri?: string
+        ): (event: React.DragEvent, uris?: string[], label?: string, contextUri?: string, sectionIndex?: number) => void;
+
+        /**
+         * React Hook to use panel state
+         * @param id ID of the panel to use
+         * @return Object with methods of the panel
+         */
+        function usePanelState(id: number): { toggle: () => void, isActive: boolean };
+
+        /**
+         * React Hook to use extracted color from GraphQL
+         * 
+         * @note This is a wrapper of ReactQuery's `useQuery` hook. 
+         * The component using this hook must be wrapped in a `QueryClientProvider` component.
+         * 
+         * @see https://tanstack.com/query/v3/docs/react/reference/QueryClientProvider
+         * 
+         * @param uri URI of the Spotify image to extract color from.
+         * @param fallbackColor Fallback color to use if the image is not available. Defaults to `#535353`.
+         * @param variant Variant of the color to use. Defaults to `colorRaw`.
+         * 
+         * @return Extracted color hex code.
+         */
+        function useExtractedColor(uri: string, fallbackColor?: string, variant?: "colorRaw" | "colorLight" | "colorDark"): string;
+    }
+
+    /**
+     * An API wrapper to interact with Spotify's Panel/right sidebar.
+     */
+    namespace Panel {
+        /**
+         * Properties that are used by the `registerPanel` function.
+         */
+        type PanelProps = {
+            /**
+             * Label of the Panel.
+             */
+            label?: string;
+            /**
+             * Children to render inside the Panel.
+             * Must be a React Component.
+             * Will be passed a `panel` prop with the Panel ID.
+             */
+            children: React.ReactNode;
+            /**
+             * Determine if the children passed is a custom Panel.
+             * If true, the children will be rendered as is.
+             * Note: All passed props except `children` will be ignored if enabled.
+             *
+             * @default false
+             */
+            isCustom?: boolean;
+            /**
+             * Inline styles to apply to the Panel skeleton.
+             */
+            style?: React.CSSProperties;
+            /**
+             * Additional class name to apply to the Panel content wrapper.
+             */
+            wrapperClassname?: string;
+            /**
+             * Additional class name to apply to the Panel header.
+             */
+            headerClassname?: string;
+            /**
+             * Font variant for the Panel header title.
+             * @default "balladBold"
+             */
+            headerVariant?: Variant;
+            /**
+             * Semantic color name for the Panel header title.
+             * @default "textBase"
+             */
+            headerSemanticColor?: SemanticColor;
+            /**
+             * Href for the header link.
+             * Can be either a URI for a path within the app, or a URL for an external link.
+             */
+            headerLink?: string;
+            /**
+             * Additional actions to render in the header.
+             * Will be rendered next to the close button.
+             */
+            headerActions?: React.ReactNode | React.ReactNode[];
+            /**
+             * Function to call when clicking on the header close button.
+             * Called before the panel is closed.
+             */
+            headerOnClose?: () => void;
+            /**
+             * Prevent the panel from closing when clicking on the header close button.
+             * @default false
+             */
+            headerPreventDefaultClose?: boolean;
+            /**
+             * Function to call when clicking on the header back button.
+             * If not provided, the back button will not be rendered.
+             * @param event Event object
+             */
+            headerOnBack?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+        };
+
+        /**
+         * An object of reserved panel IDs used by Spotify.
+         */
+        const reservedPanelIds: Record<string | number, string | number>;
+        /**
+         * Collection of React Components used by Spotify in the Panel.
+         */
+        const Components: {
+            /**
+             * React Component for the Panel's skeleton.
+             *
+             * Props:
+             * @see Spicetify.ReactComponent.PanelSkeletonProps
+             */
+            PanelSkeleton: any;
+            /**
+             * React Component for the Panel's content.
+             *
+             * Props:
+             * @see Spicetify.ReactComponent.PanelContentProps
+             */
+            PanelContent: any;
+            /**
+             * React Component for the Panel's header.
+             *
+             * Props:
+             * @see Spicetify.ReactComponent.PanelHeaderProps
+             */
+            PanelHeader: any;
+        }
+        /**
+         * Check whether or not a Panel with the provided ID is registered.
+         * @param id Panel ID to check
+         * @return Whether or not a Panel with the provided ID is registered
+         */
+        function hasPanel(id: number): boolean;
+        /**
+         * Get the Panel with the provided ID.
+         * @param id Panel ID to get
+         * @return Panel with the provided ID
+         */
+        function getPanel(id: number): React.ReactNode | undefined;
+        /**
+         * Set the Panel with the provided ID.
+         * If the ID is not registered, it will be set to `0`.
+         * @param id Panel ID to set
+         */
+        function setPanel(id: number): Promise<void>;
+        /**
+         * Subscribe to Panel changes.
+         * @param callback Callback to call when Panel changes
+         */
+        function subPanelState(callback: (id: number) => void): void;
+        /**
+         * Register a new Panel.
+         * An ID will be automatically assigned to the Panel.
+         *
+         * To make it easier and convenient for developers to use the Panel API, this method by default wraps the children passed into a Panel skeleton and content wrapper.
+         *
+         * If you wish to customize the Panel, you can pass `isCustom` as `true` to disable the default wrapper.
+         *
+         * @param props Properties of the Panel
+         * @return Methods and properties of the Panel
+         */
+        function registerPanel(props: PanelProps): {
+            /**
+             * Assigned ID of the Panel.
+             */
+            id: number;
+            /**
+             * Function to toggle the Panel open/closed state.
+             */
+            toggle: () => Promise<void>;
+            /**
+             * Method to subscribe to the related Panel state.
+             * Only fires when the related Panel open/closed state changes.
+             */
+            onStateChange: (callback: (isActive: boolean) => void) => void;
+            /**
+             * Boolean to determine if the Panel is open.
+             */
+            isActive: boolean;
+        };
+        /**
+         * Function to render a Panel of the current ID.
+         * If the ID is not registered or is reserved by Spotify, the function will return `null`.
+         *
+         * Used as a hook for Spotify internal component.
+         * @return Panel of the current ID
+         */
+        function render(): React.ReactNode | null;
+        /**
+         * ID of the current Panel.
+         * @return ID of the current Panel
+         */
+        const currentPanel: number;
+    }
+
+    /**
+     * react-flip-toolkit
+     * @description A lightweight magic-move library for configurable layout transitions.
+     * @link https://github.com/aholachek/react-flip-toolkit
+     */
+    namespace ReactFlipToolkit {
+        const Flipper: any;
+        const Flipped: any;
+        const spring: any;
+    }
+
+    /**
+     * classnames
+     * @description A simple JavaScript utility for conditionally joining classNames together.
+     * @link https://github.com/JedWatson/classnames
+     */
+    function classnames(...args: any[]): string;
+
+    /**
+     * React Query v3
+     * @description A hook for fetching, caching and updating asynchronous data in React.
+     * @link https://github.com/TanStack/query/tree/v3
+     */
+    const ReactQuery: any;
+
+    /**
+     * Analyse and extract color presets from an image. Works for any valid image URL/URI.
+     * @param image Spotify URI to an image, or an image URL.
+     */
+    function extractColorPresets(image: string | string[]): Promise<{
+        colorRaw: Color;
+        colorLight: Color;
+        colorDark: Color;
+        isFallback: boolean;
+    }[]>;
+
+    interface hsl {
+        h: number;
+        s: number;
+        l: number;
+    };
+    interface hsv {
+        h: number;
+        s: number;
+        v: number;
+    };
+    interface rgb {
+        r: number;
+        g: number;
+        b: number;
+    };
+    type CSSColors = "HEX" | "HEXA" | "HSL" | "HSLA" | "RGB" | "RGBA";
+    /**
+     * Spotify's internal color class
+     */
+    class Color {
+        constructor(rgb: rgb, hsl: hsl, hsv: hsv, alpha?: number);
+
+        static BLACK: Color;
+        static WHITE: Color;
+        static CSSFormat: Record<CSSColors, number> & Record<number, CSSColors>;
+
+        a: number;
+        hsl: hsl;
+        hsv: hsv;
+        rgb: rgb;
+
+        /**
+         * Convert CSS representation to Color
+         * @param cssColor CSS representation of the color. Must not contain spaces.
+         * @param alpha Alpha value of the color. Defaults to 1.
+         * @return Color object
+         * @throws {Error} If the CSS color is invalid or unsupported
+         */
+        static fromCSS(cssColor: string, alpha?: number): Color;
+        static fromHSL(hsl: hsl, alpha?: number): Color;
+        static fromHSV(hsv: hsv, alpha?: number): Color;
+        static fromRGB(rgb: rgb, alpha?: number): Color;
+        static fromHex(hex: string, alpha?: number): Color;
+
+        /**
+         * Change the contrast of the color against another so that
+         * the contrast between them is at least `strength`.
+         */
+        contrastAdjust(against: Color, strength?: number): Color;
+
+        /**
+         * Stringify JSON result
+         */
+        stringify(): string;
+
+        /**
+         * Convert to CSS representation
+         * @param colorFormat CSS color format to convert to
+         * @return CSS representation of the color
+         */
+        toCSS(colorFormat: number): string;
+
+        /**
+         * Return RGBA representation of the color
+         */
+        toString(): string;
+    }
 }
