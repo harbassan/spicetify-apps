@@ -39,20 +39,16 @@
 Download the files in the [dist branch](https://github.com/harbassan/spicetify-stats/archive/refs/heads/dist.zip) and rename the folder to `stats`, and then place that folder into your `CustomApps` folder in the spicetify directory. It should be similair to this:
 
 ```
-📦spicetify/CustomApps
+📦spicetify\CustomApps
  ┣ 📂marketplace
  ┣ etc...
  ┗ 📂stats
- ┃ ┣ 📜extension.css
+ ┃ ┣ 📂previews
  ┃ ┣ 📜extension.js
  ┃ ┣ 📜index.js
- ┃ ┣ 📜library_analysis.png
  ┃ ┣ 📜manifest.json
  ┃ ┣ 📜README.md
- ┃ ┣ 📜style.css
- ┃ ┣ 📜top_artists.png
- ┃ ┣ 📜top_genres.png
- ┃ ┗ 📜top_tracks.png
+ ┃ ┗ 📜style.css
 ```
 
 Then run these commands to apply:
