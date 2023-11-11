@@ -9,6 +9,7 @@
 }
 .collection-searchBar-searchBar {
     display: flex;
+    gap: 8px;
 }
 
 .stats-specialGrid {
@@ -20,6 +21,17 @@
     grid-template-columns: repeat(10, 180px);
     overflow-x: hidden;
     scroll-behavior: smooth;
+    margin-top: 5px;
+}
+
+[data-scroll="both"] {
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+[data-scroll="end"] {
+    mask-image: linear-gradient(to right, transparent, black 10%);
+}
+[data-scroll="start"] {
+    mask-image: linear-gradient(to right, black 90%, transparent);
 }
 
 .stats-loadingWrapper {

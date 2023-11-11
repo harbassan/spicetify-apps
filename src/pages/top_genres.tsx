@@ -4,6 +4,7 @@ import StatCard from "../components/stat_card";
 import GenresCard from "../components/genres_card";
 import RefreshButton from "../components/refresh_button";
 import { apiRequest, updatePageCache } from "../funcs";
+import InlineGrid from "../components/inline_grid";
 
 const GenresPage = () => {
     const [topGenres, setTopGenres] = React.useState<{
@@ -131,17 +132,6 @@ const GenresPage = () => {
         statCards.push(<StatCard stat={key[0].toUpperCase() + key.slice(1)} value={parseVal(key)} />);
     }
 
-    const scrollGrid = (event: any) => {
-        const grid = event.target.parentNode.querySelector("div");
-
-        grid.scrollLeft += grid.clientWidth;
-    };
-
-    const scrollGridLeft = (event: any) => {
-        const grid = event.target.parentNode.querySelector("div");
-        grid.scrollLeft -= grid.clientWidth;
-    };
-
     return (
         <>
             <section className="contentSpacing">
@@ -161,15 +151,7 @@ const GenresPage = () => {
                 <div className="stats-page">
                     <section>
                         <GenresCard genres={topGenres.genres} total={1275} />
-                        <section className="stats-gridInlineSection">
-                            <button className="stats-scrollButton" onClick={scrollGridLeft}>
-                                {"<"}
-                            </button>
-                            <button className="stats-scrollButton" onClick={scrollGrid}>
-                                {">"}
-                            </button>
-                            <div className={`main-gridContainer-gridContainer stats-gridInline stats-specialGrid`}>{statCards}</div>
-                        </section>
+                        <InlineGrid special>{statCards}</InlineGrid>
                     </section>
                     <section className="main-shelf-shelf Shelf">
                         <div className="main-shelf-header">

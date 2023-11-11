@@ -4,6 +4,7 @@ import StatCard from "../components/stat_card";
 import GenresCard from "../components/genres_card";
 import ArtistCard from "../components/artist_card";
 import RefreshButton from "../components/refresh_button";
+import InlineGrid from "../components/inline_grid";
 import { apiRequest, updatePageCache, fetchAudioFeatures, fetchTopAlbums, fetchTopArtists } from "../funcs";
 
 interface LibraryProps {
@@ -294,17 +295,6 @@ const LibraryPage = () => {
         return <ArtistCard name={album.name} image={album.image} uri={album.uri} subtext={`Appears in ${album.freq} tracks`} />;
     });
 
-    const scrollGrid = (event: any) => {
-        const grid = event.target.parentNode.querySelector("div");
-
-        grid.scrollLeft += grid.clientWidth;
-    };
-
-    const scrollGridLeft = (event: any) => {
-        const grid = event.target.parentNode.querySelector("div");
-        grid.scrollLeft -= grid.clientWidth;
-    };
-
     return (
         <>
             <section className="contentSpacing">
@@ -338,15 +328,7 @@ const LibraryPage = () => {
                             </div>
                         </div>
                         <GenresCard genres={library.genres} total={library.genresDenominator} />
-                        <section className="stats-gridInlineSection">
-                            <button className="stats-scrollButton" onClick={scrollGridLeft}>
-                                {"<"}
-                            </button>
-                            <button className="stats-scrollButton" onClick={scrollGrid}>
-                                {">"}
-                            </button>
-                            <div className={`main-gridContainer-gridContainer stats-gridInline stats-specialGrid`}>{statCards}</div>
-                        </section>
+                        <InlineGrid special>{statCards}</InlineGrid>
                     </section>
                     <section className="main-shelf-shelf Shelf">
                         <div className="main-shelf-header">
@@ -356,15 +338,7 @@ const LibraryPage = () => {
                                 </div>
                             </div>
                         </div>
-                        <section className="stats-gridInlineSection">
-                            <button className="stats-scrollButton" onClick={scrollGridLeft}>
-                                {"<"}
-                            </button>
-                            <button className="stats-scrollButton" onClick={scrollGrid}>
-                                {">"}
-                            </button>
-                            <div className={`main-gridContainer-gridContainer stats-gridInline`}>{artistCards}</div>
-                        </section>
+                        <InlineGrid>{artistCards}</InlineGrid>
                     </section>
                     <section className="main-shelf-shelf Shelf">
                         <div className="main-shelf-header">
@@ -374,15 +348,7 @@ const LibraryPage = () => {
                                 </div>
                             </div>
                         </div>
-                        <section className="stats-gridInlineSection">
-                            <button className="stats-scrollButton" onClick={scrollGridLeft}>
-                                {"<"}
-                            </button>
-                            <button className="stats-scrollButton" onClick={scrollGrid}>
-                                {">"}
-                            </button>
-                            <div className={`main-gridContainer-gridContainer stats-gridInline`}>{albumCards}</div>
-                        </section>
+                        <InlineGrid>{albumCards}</InlineGrid>
                     </section>
                     <section className="main-shelf-shelf Shelf">
                         <div className="main-shelf-header">
