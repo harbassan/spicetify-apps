@@ -3,9 +3,10 @@ import useDropdownMenu from "../components/useDropdownMenu";
 import Card from "../components/artist_card";
 import RefreshButton from "../components/refresh_button";
 import { apiRequest, updatePageCache } from "../funcs";
+import Status from "../components/status";
 
 const ArtistsPage = () => {
-    const [topArtists, setTopArtists] = React.useState<any[]>([]);
+    const [topArtists, setTopArtists] = React.useState<any[] | false>([]);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],
         ["Past Month", "Past 6 Months", "All Time"],
@@ -23,6 +24,10 @@ const ArtistsPage = () => {
 
         const start = window.performance.now();
         const topArtists = await apiRequest("topArtists", `https://api.spotify.com/v1/me/top/artists?limit=50&offset=0&time_range=${time_range}`);
+        if (!topArtists) {
+            setTopArtists(false);
+            return;
+        }
         const topArtistsMinified = topArtists.items.map((artist: any) => {
             return {
                 id: artist.id,
@@ -48,10 +53,30 @@ const ArtistsPage = () => {
         fetchTopArtists(activeOption);
     }, [activeOption]);
 
-    const artistCards = React.useMemo(
-        () => topArtists.map((artist, index) => <Card key={artist.id} name={artist.name} image={artist.image} uri={artist.uri} subtext={"Artist"} />),
-        [topArtists]
-    );
+    if (!topArtists) {
+        return (
+            <section className="contentSpacing">
+                <div className={`collection-collection-header stats-header`}>
+                    <h1 data-encore-id="type" className="TypeElement-canon-type">
+                        Top Artists
+                    </h1>
+                    <div className="collection-searchBar-searchBar">
+                        <RefreshButton
+                            refreshCallback={() => {
+                                fetchTopArtists(activeOption, true);
+                            }}
+                        />
+                        {dropdown}
+                    </div>
+                </div>
+                <Status heading="Failed to Fetch Top Artists" subheading="Make an issue on Github" />
+            </section>
+        );
+    }
+
+    if (!topArtists.length) return <></>;
+
+    const artistCards = topArtists.map((artist, index) => <Card key={artist.id} name={artist.name} image={artist.image} uri={artist.uri} subtext={"Artist"} />);
 
     return (
         <>

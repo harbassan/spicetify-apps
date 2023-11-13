@@ -3,6 +3,7 @@ import StatCard from "../components/stat_card";
 import GenresCard from "../components/genres_card";
 import ArtistCard from "../components/artist_card";
 import { apiRequest, fetchAudioFeatures, fetchTopArtists, fetchTopAlbums } from "../funcs";
+import Status from "../components/status";
 
 interface LibraryProps {
     audioFeatures: Record<string, number>;
@@ -18,13 +19,16 @@ interface LibraryProps {
 }
 
 const PlaylistPage = ({ uri }: { uri: string }) => {
-    const [library, setLibrary] = React.useState<LibraryProps | null>(null);
+    const [library, setLibrary] = React.useState<LibraryProps | null | false>(null);
 
     const fetchData = async () => {
         const start = window.performance.now();
 
         const playlistMeta = await apiRequest("playlistMeta", `sp://core-playlist/v1/playlist/${uri}`);
-        console.log("playlistMeta", playlistMeta);
+        if (!playlistMeta) {
+            setLibrary(false);
+            return;
+        }
 
         let duration = playlistMeta.playlist.duration;
         let trackCount = playlistMeta.playlist.length;
@@ -109,23 +113,16 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
         fetchData();
     }, []);
 
+    if (library === null)
+        return (
+            <>
+                <Status heading="Analysing The Playlist" subheading="This might take a while" />
+            </>
+        );
     if (!library)
         return (
             <>
-                <div className="stats-loadingWrapper">
-                    <svg
-                        role="img"
-                        height="46"
-                        width="46"
-                        aria-hidden="true"
-                        viewBox="0 0 24 24"
-                        data-encore-id="icon"
-                        className="Svg-sc-ytk21e-0 Svg-img-24-icon"
-                    >
-                        <path d="M14.5 2.134a1 1 0 0 1 1 0l6 3.464a1 1 0 0 1 .5.866V21a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1V3a1 1 0 0 1 .5-.866zM16 4.732V20h4V7.041l-4-2.309zM3 22a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1zm6 0a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1z"></path>
-                    </svg>
-                    <h1>Analysing The Playlist</h1>
-                </div>
+                <Status heading="Failed to Fetch Playlist Stats" subheading="Make an issue on Github" />
             </>
         );
 

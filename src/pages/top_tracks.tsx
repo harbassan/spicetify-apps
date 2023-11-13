@@ -2,6 +2,7 @@ import React from "react";
 import TrackRow from "../components/track_row";
 import useDropdownMenu from "../components/useDropdownMenu";
 import RefreshButton from "../components/refresh_button";
+import Status from "../components/status";
 import { apiRequest, updatePageCache } from "../funcs";
 
 const checkLiked = async (tracks: string[]) => {
@@ -9,7 +10,7 @@ const checkLiked = async (tracks: string[]) => {
 };
 
 const TracksPage = () => {
-    const [topTracks, setTopTracks] = React.useState<any[]>([]);
+    const [topTracks, setTopTracks] = React.useState<Record<string, any>[] | false>([]);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],
         ["Past Month", "Past 6 Months", "All Time"],
@@ -31,6 +32,10 @@ const TracksPage = () => {
         const { items: fetchedTracks } = await apiRequest("topTracks", `https://api.spotify.com/v1/me/top/tracks?limit=50&offset=0&time_range=${time_range}`);
 
         const fetchedLikedArray = await checkLiked(fetchedTracks.map((track: { id: string }) => track.id));
+        if (!fetchedLikedArray) {
+            setTopTracks(false);
+            return;
+        }
 
         const topTracksMinified = fetchedTracks.map((track: any, index: number) => {
             return {
@@ -66,10 +71,37 @@ const TracksPage = () => {
         fetchTopTracks(activeOption);
     }, [activeOption]);
 
+    if (!topTracks) {
+        return (
+            <>
+                <section className="contentSpacing">
+                    <div className={`collection-collection-header stats-header`}>
+                        <div className="stats-trackPageTitle">
+                            <h1 data-encore-id="type" className="TypeElement-canon-type">
+                                Top Tracks
+                            </h1>
+                        </div>
+                        <div className="collection-searchBar-searchBar">
+                            <RefreshButton
+                                refreshCallback={() => {
+                                    fetchTopTracks(activeOption, true);
+                                }}
+                            />
+                            {dropdown}
+                        </div>
+                    </div>
+                    <Status heading="Failed to Fetch Top Tracks" subheading="Make an issue on Github" />
+                </section>
+            </>
+        );
+    }
+
     if (!topTracks.length) return <></>;
 
+    topTracks as Record<string, any>[];
+
     const createPlaylist = async () => {
-        const newPlaylist = await Spicetify.CosmosAsync.post("sp://core-playlist/v1/rootlist", {
+        await Spicetify.CosmosAsync.post("sp://core-playlist/v1/rootlist", {
             operation: "create",
             name: `Top Songs - ${activeOption}`,
             playlist: true,
@@ -111,20 +143,14 @@ const TracksPage = () => {
                                 </div>
                                 <div className="main-trackList-rowSectionStart" role="columnheader" aria-colindex={2} aria-sort="none" tabIndex={-1}>
                                     <button className="main-trackList-column main-trackList-sortable" tabIndex={-1}>
-                                        <span
-                                            className="TypeElement-mesto-type standalone-ellipsis-one-line"
-                                            data-encore-id="type"
-                                        >
+                                        <span className="TypeElement-mesto-type standalone-ellipsis-one-line" data-encore-id="type">
                                             Title
                                         </span>
                                     </button>
                                 </div>
                                 <div className="main-trackList-rowSectionVariable" role="columnheader" aria-colindex={3} aria-sort="none" tabIndex={-1}>
                                     <button className="main-trackList-column main-trackList-sortable" tabIndex={-1}>
-                                        <span
-                                            className="TypeElement-mesto-type standalone-ellipsis-one-line"
-                                            data-encore-id="type"
-                                        >
+                                        <span className="TypeElement-mesto-type standalone-ellipsis-one-line" data-encore-id="type">
                                             Album
                                         </span>
                                     </button>

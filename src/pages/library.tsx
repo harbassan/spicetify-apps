@@ -6,6 +6,7 @@ import ArtistCard from "../components/artist_card";
 import RefreshButton from "../components/refresh_button";
 import InlineGrid from "../components/inline_grid";
 import { apiRequest, updatePageCache, fetchAudioFeatures, fetchTopAlbums, fetchTopArtists } from "../funcs";
+import Status from "../components/status";
 
 interface LibraryProps {
     audioFeatures: Record<string, number>;
@@ -22,196 +23,202 @@ interface LibraryProps {
 }
 
 const LibraryPage = () => {
-    const [library, setLibrary] = React.useState<LibraryProps | null>(null);
+    const [library, setLibrary] = React.useState<LibraryProps | null | false>(null);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(["owned", "all"], ["My Playlists", "All Playlists"], "library");
 
     const fetchData = async (option: string, force?: boolean, set: boolean = true) => {
-        if (!force) {
-            let storedData = Spicetify.LocalStorage.get(`stats:library:${option}`);
-            if (storedData) {
-                setLibrary(JSON.parse(storedData));
-                return;
-            }
-        }
-        const start = window.performance.now();
-
-        // fetch all rootlist items
-        const rootlistItems = await apiRequest("rootlist", "sp://core-playlist/v1/rootlist");
-
-        // flatten rootlist into playlists
-        const flattenPlaylists = (items: any[]) => {
-            const playlists: any[] = [];
-
-            items.forEach(row => {
-                if (row.type === "playlist") {
-                    // add the playlist to the result list
-                    playlists.push(row);
-                } else if (row.type === "folder") {
-                    // recursively flatten playlists in the folder
-                    if (!row.rows) return;
-                    const folderPlaylists = flattenPlaylists(row.rows);
-                    // add the flattened playlists to the result list
-                    playlists.push(...folderPlaylists);
+        try {
+            if (!force) {
+                let storedData = Spicetify.LocalStorage.get(`stats:library:${option}`);
+                if (storedData) {
+                    setLibrary(JSON.parse(storedData));
+                    return;
                 }
-            });
-
-            return playlists;
-        };
-
-        let playlists = flattenPlaylists(rootlistItems.rows);
-
-        playlists = playlists.sort((a, b) => (a.ownedBySelf === b.ownedBySelf ? 0 : a.ownedBySelf ? -1 : 1));
-        let indexOfFirstNotOwned = -1;
-
-        let playlistUris: string[] = [];
-
-        let trackCount: number = 0;
-        let ownedTrackCount: number = 0;
-
-        playlists.forEach(playlist => {
-            if (playlist.totalLength === 0) return;
-            if (!playlist.ownedBySelf && indexOfFirstNotOwned === -1) indexOfFirstNotOwned = playlistUris.length;
-            playlistUris.push(playlist.link);
-            trackCount += playlist.totalLength;
-            if (playlist.ownedBySelf) ownedTrackCount += playlist.totalLength;
-        }, 0);
-
-        // fetch all playlist tracks
-        const playlistsMeta = await Promise.all(
-            playlistUris.map((uri: string) => {
-                return apiRequest("playlistsMetadata", `sp://core-playlist/v1/playlist/${uri}`);
-            })
-        );
-
-        let duration = 0;
-        let trackIDs: string[] = [];
-        let popularity: number = 0;
-        let albums: Record<string, number> = {};
-        let artists: Record<string, number> = {};
-        let explicitCount: number = 0;
-
-        let ownedDuration = 0;
-        let ownedArtists: Record<string, number> = {};
-        let ownedPopularity: number = 0;
-        let ownedAlbums: Record<string, number> = {};
-        let ownedExplicitCount: number = 0;
-
-        // loop through all playlists, add up total duration and obscurity, seperate track ids and artists
-        for (let i = 0; i < playlistsMeta.length; i++) {
-            const playlist = playlistsMeta[i];
-            if (i === indexOfFirstNotOwned) {
-                ownedDuration = duration;
-                ownedArtists = Object.assign({}, artists);
-                ownedPopularity = popularity;
-                ownedExplicitCount = explicitCount;
-                ownedAlbums = Object.assign({}, albums);
             }
-            duration += playlist.playlist.duration;
-            playlist.items.forEach((track: any) => {
-                if (!track) return;
+            const start = window.performance.now();
 
-                trackIDs.push(track.link.split(":")[2]);
+            // fetch all rootlist items
+            const rootlistItems = await apiRequest("rootlist", "sp://core-playlist/v1/rootlist");
 
-                if (track.isExplicit) explicitCount++;
+            // flatten rootlist into playlists
+            const flattenPlaylists = (items: any[]) => {
+                const playlists: any[] = [];
 
-                popularity += track.popularity;
-
-                const albumID = track.album.link.split(":")[2];
-                albums[albumID] = albums[albumID] ? albums[albumID] + 1 : 1;
-
-                track.artists.forEach((artist: any) => {
-                    const artistID = artist.link.split(":")[2];
-                    artists[artistID] = artists[artistID] ? artists[artistID] + 1 : 1;
+                items.forEach(row => {
+                    if (row.type === "playlist") {
+                        // add the playlist to the result list
+                        playlists.push(row);
+                    } else if (row.type === "folder") {
+                        // recursively flatten playlists in the folder
+                        if (!row.rows) return;
+                        const folderPlaylists = flattenPlaylists(row.rows);
+                        // add the flattened playlists to the result list
+                        playlists.push(...folderPlaylists);
+                    }
                 });
-            });
-        }
 
-        const [topArtists, topGenres, topGenresTotal]: any = await fetchTopArtists(artists);
-        const [ownedTopArtists, ownedTopGenres, ownedTopGenresTotal]: any = await fetchTopArtists(ownedArtists);
+                return playlists;
+            };
 
-        const [topAlbums, releaseYears, releaseYearsTotal]: any = await fetchTopAlbums(albums);
-        const [ownedTopAlbums, ownedReleaseYears, ownedReleaseYearsTotal]: any = await fetchTopAlbums(ownedAlbums);
+            let playlists = flattenPlaylists(rootlistItems?.rows);
 
-        const fetchedFeatures: any[] = await fetchAudioFeatures(trackIDs);
+            playlists = playlists.sort((a, b) => (a.ownedBySelf === b.ownedBySelf ? 0 : a.ownedBySelf ? -1 : 1));
+            let indexOfFirstNotOwned = -1;
 
-        const audioFeatures: Record<string, number> = {
-            popularity: popularity,
-            explicitness: explicitCount,
-            danceability: 0,
-            energy: 0,
-            valence: 0,
-            speechiness: 0,
-            acousticness: 0,
-            instrumentalness: 0,
-            liveness: 0,
-            tempo: 0,
-            loudness: 0,
-        };
+            let playlistUris: string[] = [];
 
-        let ownedAudioFeatures: Record<string, number> = {};
+            let trackCount: number = 0;
+            let ownedTrackCount: number = 0;
 
-        for (let i = 0; i < fetchedFeatures.length; i++) {
-            if (i === ownedTrackCount) {
-                ownedAudioFeatures = { popularity: ownedPopularity, explicitness: ownedExplicitCount, ...audioFeatures };
+            playlists.forEach(playlist => {
+                if (playlist.totalLength === 0) return;
+                if (!playlist.ownedBySelf && indexOfFirstNotOwned === -1) indexOfFirstNotOwned = playlistUris.length;
+                playlistUris.push(playlist.link);
+                trackCount += playlist.totalLength;
+                if (playlist.ownedBySelf) ownedTrackCount += playlist.totalLength;
+            }, 0);
+
+            // fetch all playlist tracks
+            const playlistsMeta = await Promise.all(
+                playlistUris.map((uri: string) => {
+                    return apiRequest("playlistsMetadata", `sp://core-playlist/v1/playlist/${uri}`, 5, false);
+                })
+            );
+
+            let duration = 0;
+            let trackIDs: string[] = [];
+            let popularity: number = 0;
+            let albums: Record<string, number> = {};
+            let artists: Record<string, number> = {};
+            let explicitCount: number = 0;
+
+            let ownedDuration = 0;
+            let ownedArtists: Record<string, number> = {};
+            let ownedPopularity: number = 0;
+            let ownedAlbums: Record<string, number> = {};
+            let ownedExplicitCount: number = 0;
+
+            // loop through all playlists, add up total duration and obscurity, seperate track ids and artists
+            for (let i = 0; i < playlistsMeta.length; i++) {
+                const playlist = playlistsMeta[i];
+                if (!playlist) continue;
+                if (i === indexOfFirstNotOwned) {
+                    ownedDuration = duration;
+                    ownedArtists = Object.assign({}, artists);
+                    ownedPopularity = popularity;
+                    ownedExplicitCount = explicitCount;
+                    ownedAlbums = Object.assign({}, albums);
+                }
+                duration += playlist.playlist.duration;
+                playlist.items.forEach((track: any) => {
+                    if (!track) return;
+
+                    trackIDs.push(track.link.split(":")[2]);
+
+                    if (track.isExplicit) explicitCount++;
+
+                    popularity += track.popularity;
+
+                    const albumID = track.album.link.split(":")[2];
+                    albums[albumID] = albums[albumID] ? albums[albumID] + 1 : 1;
+
+                    track.artists.forEach((artist: any) => {
+                        const artistID = artist.link.split(":")[2];
+                        artists[artistID] = artists[artistID] ? artists[artistID] + 1 : 1;
+                    });
+                });
             }
-            if (!fetchedFeatures[i]) continue;
-            const track = fetchedFeatures[i];
-            audioFeatures["danceability"] += track["danceability"];
-            audioFeatures["energy"] += track["energy"];
-            audioFeatures["valence"] += track["valence"];
-            audioFeatures["speechiness"] += track["speechiness"];
-            audioFeatures["acousticness"] += track["acousticness"];
-            audioFeatures["instrumentalness"] += track["instrumentalness"];
-            audioFeatures["liveness"] += track["liveness"];
-            audioFeatures["tempo"] += track["tempo"];
-            audioFeatures["loudness"] += track["loudness"];
+
+            const [topArtists, topGenres, topGenresTotal]: any = await fetchTopArtists(artists);
+            const [ownedTopArtists, ownedTopGenres, ownedTopGenresTotal]: any = await fetchTopArtists(ownedArtists);
+
+            const [topAlbums, releaseYears, releaseYearsTotal]: any = await fetchTopAlbums(albums);
+            const [ownedTopAlbums, ownedReleaseYears, ownedReleaseYearsTotal]: any = await fetchTopAlbums(ownedAlbums);
+
+            const fetchedFeatures: any[] = await fetchAudioFeatures(trackIDs);
+
+            const audioFeatures: Record<string, number> = {
+                popularity: popularity,
+                explicitness: explicitCount,
+                danceability: 0,
+                energy: 0,
+                valence: 0,
+                speechiness: 0,
+                acousticness: 0,
+                instrumentalness: 0,
+                liveness: 0,
+                tempo: 0,
+                loudness: 0,
+            };
+
+            let ownedAudioFeatures: Record<string, number> = {};
+
+            for (let i = 0; i < fetchedFeatures.length; i++) {
+                if (i === ownedTrackCount) {
+                    ownedAudioFeatures = { popularity: ownedPopularity, explicitness: ownedExplicitCount, ...audioFeatures };
+                }
+                if (!fetchedFeatures[i]) continue;
+                const track = fetchedFeatures[i];
+                audioFeatures["danceability"] += track["danceability"];
+                audioFeatures["energy"] += track["energy"];
+                audioFeatures["valence"] += track["valence"];
+                audioFeatures["speechiness"] += track["speechiness"];
+                audioFeatures["acousticness"] += track["acousticness"];
+                audioFeatures["instrumentalness"] += track["instrumentalness"];
+                audioFeatures["liveness"] += track["liveness"];
+                audioFeatures["tempo"] += track["tempo"];
+                audioFeatures["loudness"] += track["loudness"];
+            }
+
+            for (let key in audioFeatures) {
+                audioFeatures[key] /= fetchedFeatures.length;
+            }
+
+            for (let key in ownedAudioFeatures) {
+                ownedAudioFeatures[key] /= ownedTrackCount;
+            }
+
+            const ownedStats = {
+                audioFeatures: ownedAudioFeatures,
+                trackCount: ownedTrackCount,
+                totalDuration: ownedDuration,
+                artists: ownedTopArtists,
+                artistCount: Object.keys(ownedArtists).length,
+                genres: ownedTopGenres,
+                genresDenominator: ownedTopGenresTotal,
+                playlistCount: indexOfFirstNotOwned > 0 ? indexOfFirstNotOwned : 0,
+                albums: ownedTopAlbums,
+                years: ownedReleaseYears,
+                yearsDenominator: ownedReleaseYearsTotal,
+            };
+
+            const allStats = {
+                playlistCount: playlists.length,
+                audioFeatures: audioFeatures,
+                trackCount: trackCount,
+                totalDuration: duration,
+                artistCount: Object.keys(artists).length,
+                artists: topArtists,
+                genres: topGenres,
+                genresDenominator: topGenresTotal,
+                albums: topAlbums,
+                years: releaseYears,
+                yearsDenominator: releaseYearsTotal,
+            };
+
+            if (set) {
+                if (option === "all") setLibrary(allStats);
+                else setLibrary(ownedStats);
+            }
+
+            Spicetify.LocalStorage.set(`stats:library:all`, JSON.stringify(allStats));
+            Spicetify.LocalStorage.set(`stats:library:owned`, JSON.stringify(ownedStats));
+
+            console.log("total library fetch time:", window.performance.now() - start);
+        } catch (e) {
+            console.error(e);
+            setLibrary(false);
         }
-
-        for (let key in audioFeatures) {
-            audioFeatures[key] /= fetchedFeatures.length;
-        }
-
-        for (let key in ownedAudioFeatures) {
-            ownedAudioFeatures[key] /= ownedTrackCount;
-        }
-
-        const ownedStats = {
-            audioFeatures: ownedAudioFeatures,
-            trackCount: ownedTrackCount,
-            totalDuration: ownedDuration,
-            artists: ownedTopArtists,
-            artistCount: Object.keys(ownedArtists).length,
-            genres: ownedTopGenres,
-            genresDenominator: ownedTopGenresTotal,
-            playlistCount: indexOfFirstNotOwned > 0 ? indexOfFirstNotOwned : 0,
-            albums: ownedTopAlbums,
-            years: ownedReleaseYears,
-            yearsDenominator: ownedReleaseYearsTotal,
-        };
-
-        const allStats = {
-            playlistCount: playlists.length,
-            audioFeatures: audioFeatures,
-            trackCount: trackCount,
-            totalDuration: duration,
-            artistCount: Object.keys(artists).length,
-            artists: topArtists,
-            genres: topGenres,
-            genresDenominator: topGenresTotal,
-            albums: topAlbums,
-            years: releaseYears,
-            yearsDenominator: releaseYearsTotal,
-        };
-
-        if (set) {
-            if (option === "all") setLibrary(allStats);
-            else setLibrary(ownedStats);
-        }
-
-        Spicetify.LocalStorage.set(`stats:library:all`, JSON.stringify(allStats));
-        Spicetify.LocalStorage.set(`stats:library:owned`, JSON.stringify(ownedStats));
-
-        console.log("total library fetch time:", window.performance.now() - start);
     };
 
     React.useEffect(() => {
@@ -222,18 +229,10 @@ const LibraryPage = () => {
         fetchData(activeOption);
     }, [activeOption]);
 
-    if (!library || library == null)
-        return (
-            <>
-                <div className="stats-loadingWrapper">
-                    <svg role="img" height="46" width="46" aria-hidden="true" viewBox="0 0 24 24" data-encore-id="icon" className="Svg-img-24 Svg-img-24-icon">
-                        <path d="M14.5 2.134a1 1 0 0 1 1 0l6 3.464a1 1 0 0 1 .5.866V21a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1V3a1 1 0 0 1 .5-.866zM16 4.732V20h4V7.041l-4-2.309zM3 22a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1zm6 0a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1z"></path>
-                    </svg>
-                    <h1>Analysing Your Library</h1>
-                </div>
-            </>
-        );
-    if (library.trackCount === 0)
+    // Render a status page that doesnt impede the user from using the rest of the app
+    if (!library || library.trackCount === 0) {
+        const heading = library === null ? "Analysing Your Library" : !library ? "Failed To Fetch Library Stats" : "No Playlists In Your Library";
+        const subheading = library === null ? "This may take a while" : !library ? "Make an issue on Github" : "Try adding some playlists first";
         return (
             <>
                 <section className="contentSpacing">
@@ -250,23 +249,11 @@ const LibraryPage = () => {
                             {dropdown}
                         </div>
                     </div>
-                    <div className="stats-loadingWrapper">
-                        <svg
-                            role="img"
-                            height="46"
-                            width="46"
-                            aria-hidden="true"
-                            viewBox="0 0 24 24"
-                            data-encore-id="icon"
-                            className="Svg-img-24 Svg-img-24-icon"
-                        >
-                            <path d="M14.5 2.134a1 1 0 0 1 1 0l6 3.464a1 1 0 0 1 .5.866V21a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1V3a1 1 0 0 1 .5-.866zM16 4.732V20h4V7.041l-4-2.309zM3 22a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1zm6 0a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1z"></path>
-                        </svg>
-                        <h1>You Don't Have Any Playlists</h1>
-                    </div>
+                    <Status heading={heading} subheading={subheading} />
                 </section>
             </>
         );
+    }
 
     const parseVal = (obj: [string, number]) => {
         switch (obj[0]) {

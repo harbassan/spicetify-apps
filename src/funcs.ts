@@ -13,19 +13,28 @@ export const updatePageCache = (i: any, callback: Function, activeOption: string
     }
 };
 
+type ApiResponse = Record<string, any> | null;
 
-export const apiRequest = async (name: string, url: string, timeout = 10) => {
-    let response;
+export const apiRequest = async (name: string, url: string, timeout = 5, log = true): Promise<ApiResponse> => {
     try {
-        let timeStart = window.performance.now();
-        response = await Spicetify.CosmosAsync.get(url);
-        console.log("stats -", name, "fetch time:", window.performance.now() - timeStart);
+        const timeStart = window.performance.now();
+        const response = await Spicetify.CosmosAsync.get(url);
+        if (log) console.log("stats -", name, "fetch time:", window.performance.now() - timeStart);
+        return response;
     } catch (e) {
-        console.error("stats -", name, "request failed:", e);
-        console.log(url);
-        if (timeout > 0) setTimeout(() => apiRequest(name, url, --timeout), 5000);
+        if (timeout === 0) {
+            console.log("stats -", name, "all requests failed:", e);
+            console.log("stats -", name, "giving up");
+            return null;
+        } else {
+            if (timeout === 5) {
+                console.log("stats -", name, "request failed:", e);
+                console.log("stats -", name, "retrying...");
+            }
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            return apiRequest(name, url, timeout - 1);
+        }
     }
-    return response;
 };
 
 
@@ -44,13 +53,14 @@ export const fetchAudioFeatures = async (ids: string[]) => {
     // Send multiple simultaneous requests using Promise.all()
     const promises = batches.map((batch, index) => {
         const url = `https://api.spotify.com/v1/audio-features?ids=${batch.join(",")}`;
-        return apiRequest("audioFeaturesBatch" + index, url);
+        return apiRequest("audioFeaturesBatch" + index, url, 5, false);
     });
 
     const responses = await Promise.all(promises);
 
     // Merge responses from all batches into a single array
-    const data = responses.reduce((acc, response) => {
+    const data = responses.reduce((acc: Record<string, any>[], response) => {
+        if (!response?.audio_features) return acc; // Skip if response is empty
         return acc.concat(response.audio_features);
     }, []);
 
@@ -62,28 +72,35 @@ export const fetchTopAlbums = async (albums: Record<string, number>) => {
     let album_keys = Object.keys(albums)
         .filter(id => id.match(/^[a-zA-Z0-9]{22}$/))
         .sort((a, b) => albums[b] - albums[a])
+        .slice(0, 100);
     
     let release_years: Record<string, number> = {};
     let total_album_tracks = 0;
     
     let top_albums: any[] = await Promise.all(album_keys.map(async (albumID: string) => {
-        const albumMeta = await Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.getAlbum, {
-            uri: `spotify:album:${albumID}`,
-            locale: "en",
-            offset: 0,
-            limit: 50,
-        });
+        let albumMeta;
+        try {
+            albumMeta = await Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.getAlbum, {
+                uri: `spotify:album:${albumID}`,
+                locale: "en",
+                offset: 0,
+                limit: 50,
+            });
+            if (!albumMeta?.data?.albumUnion?.name) throw new Error("Invalid URI");
+        } catch (e) {
+            console.error("stats - album metadata request failed:", e);
+            return null;
+        }
     
-        if (!albumMeta.data) return null;
-    
-        const releaseYear = albumMeta.data.albumUnion.date.isoString.slice(0, 4);
+        const releaseYear: string = albumMeta.data.albumUnion.date.isoString.slice(0, 4);
+
         release_years[releaseYear] = (release_years[releaseYear] || 0) + albums[albumID];
         total_album_tracks += albums[albumID];
         
         return({
             name: albumMeta.data.albumUnion.name,
             uri: albumMeta.data.albumUnion.uri,
-            image: albumMeta.data.albumUnion.coverArt.sources[0].url,
+            image: albumMeta.data.albumUnion.coverArt.sources[0]?.url || "https://commons.wikimedia.org/wiki/File:Black_square.jpg",
             freq: albums[albumID],
         });
     }));
@@ -100,6 +117,7 @@ export const fetchTopArtists = async (artists: Record<string, number>) => {
         .filter(id => id.match(/^[a-zA-Z0-9]{22}$/))
         .sort((a, b) => artists[b] - artists[a])
         .slice(0, 50);
+
     let genres: Record<string, number> = {};
     let total_genre_tracks = 0;
 

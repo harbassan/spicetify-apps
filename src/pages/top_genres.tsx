@@ -5,13 +5,17 @@ import GenresCard from "../components/genres_card";
 import RefreshButton from "../components/refresh_button";
 import { apiRequest, updatePageCache } from "../funcs";
 import InlineGrid from "../components/inline_grid";
+import Status from "../components/status";
 
 const GenresPage = () => {
-    const [topGenres, setTopGenres] = React.useState<{
-        genres: [string, number][];
-        features: any;
-        years: [string, number][];
-    }>({ genres: [], features: {}, years: [] });
+    const [topGenres, setTopGenres] = React.useState<
+        | {
+              genres: [string, number][];
+              features: any;
+              years: [string, number][];
+          }
+        | false
+    >({ genres: [], features: {}, years: [] });
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],
         ["Past Month", "Past 6 Months", "All Time"],
@@ -61,6 +65,11 @@ const GenresPage = () => {
         });
 
         const featureData = await fetchAudioFeatures(topTracks);
+        if (!featureData) {
+            setTopGenres(false);
+            return;
+        }
+
         const audioFeatures = featureData.audio_features.reduce(
             (acc: { [key: string]: number }, track: any) => {
                 acc["danceability"] += track["danceability"];
@@ -111,6 +120,28 @@ const GenresPage = () => {
     React.useEffect(() => {
         fetchTopGenres(activeOption);
     }, [activeOption]);
+
+    if (!topGenres)
+        return (
+            <>
+                <section className="contentSpacing">
+                    <div className={`collection-collection-header stats-header`}>
+                        <h1 data-encore-id="type" className="TypeElement-canon-type">
+                            Top Genres
+                        </h1>
+                        <div className="collection-searchBar-searchBar">
+                            <RefreshButton
+                                refreshCallback={() => {
+                                    fetchTopGenres(activeOption, true);
+                                }}
+                            />
+                            {dropdown}
+                        </div>
+                    </div>
+                    <Status heading={"Failed To Fetch Top Genres"} subheading={"Make an issue on Github"} />
+                </section>
+            </>
+        );
 
     if (!topGenres.genres.length) return <></>;
 
