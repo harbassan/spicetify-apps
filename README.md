@@ -36,18 +36,16 @@
 
 ### Manual Installation
 
-Download the files in the [dist branch](https://github.com/harbassan/spicetify-stats/archive/refs/heads/dist.zip) and rename the folder to `stats`, and then place that folder into your `CustomApps` folder in the spicetify directory. It should be similair to this:
+Download the files in the [dist branch](https://github.com/harbassan/spicetify-stats/archive/refs/heads/dist.zip) and rename the unzipped folder to `stats`, and then place that folder into your `CustomApps` folder in the `spicetify` directory. It should be similair to this:
 
 ```
 📦spicetify\CustomApps
  ┣ 📂marketplace
  ┣ etc...
  ┗ 📂stats
- ┃ ┣ 📂previews
  ┃ ┣ 📜extension.js
  ┃ ┣ 📜index.js
  ┃ ┣ 📜manifest.json
- ┃ ┣ 📜README.md
  ┃ ┗ 📜style.css
 ```
 
@@ -57,6 +55,8 @@ Then run these commands to apply:
 spicetify config custom_apps stats
 spicetify apply
 ```
+
+For more help on installing visit the [Spicetify Docs](https://spicetify.app/docs/advanced-usage/custom-apps#installing).
 
 ### Uninstallation
 
