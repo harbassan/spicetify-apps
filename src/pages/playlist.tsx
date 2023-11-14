@@ -4,6 +4,7 @@ import GenresCard from "../components/genres_card";
 import ArtistCard from "../components/artist_card";
 import { apiRequest, fetchAudioFeatures, fetchTopArtists, fetchTopAlbums } from "../funcs";
 import Status from "../components/status";
+import InlineGrid from "../components/inline_grid";
 
 interface LibraryProps {
     audioFeatures: Record<string, number>;
@@ -181,15 +182,7 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
                     </div>
                 </div>
                 <GenresCard genres={library.genres} total={library.genresDenominator} />
-                <section className="stats-gridInlineSection">
-                    <button className="stats-scrollButton" onClick={scrollGridLeft}>
-                        {"<"}
-                    </button>
-                    <button className="stats-scrollButton" onClick={scrollGrid}>
-                        {">"}
-                    </button>
-                    <div className={`main-gridContainer-gridContainer stats-gridInline stats-specialGrid`}>{statCards}</div>
-                </section>
+                <InlineGrid special>{statCards}</InlineGrid>
             </section>
             <section className="main-shelf-shelf Shelf">
                 <div className="main-shelf-header">
@@ -199,15 +192,7 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
                         </div>
                     </div>
                 </div>
-                <section className="stats-gridInlineSection">
-                    <button className="stats-scrollButton" onClick={scrollGridLeft}>
-                        {"<"}
-                    </button>
-                    <button className="stats-scrollButton" onClick={scrollGrid}>
-                        {">"}
-                    </button>
-                    <div className={`main-gridContainer-gridContainer stats-gridInline`}>{artistCards}</div>
-                </section>
+                <InlineGrid>{artistCards}</InlineGrid>
             </section>
             <section className="main-shelf-shelf Shelf">
                 <div className="main-shelf-header">
@@ -217,15 +202,7 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
                         </div>
                     </div>
                 </div>
-                <section className="stats-gridInlineSection">
-                    <button className="stats-scrollButton" onClick={scrollGridLeft}>
-                        {"<"}
-                    </button>
-                    <button className="stats-scrollButton" onClick={scrollGrid}>
-                        {">"}
-                    </button>
-                    <div className={`main-gridContainer-gridContainer stats-gridInline`}>{albumCards}</div>
-                </section>
+                <InlineGrid>{albumCards}</InlineGrid>
             </section>
             <section className="main-shelf-shelf Shelf">
                 <div className="main-shelf-header">
