@@ -22,6 +22,18 @@ var stats = (() => {
     return a;
   };
   var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+  var __objRest = (source, exclude) => {
+    var target = {};
+    for (var prop in source)
+      if (__hasOwnProp.call(source, prop) && exclude.indexOf(prop) < 0)
+        target[prop] = source[prop];
+    if (source != null && __getOwnPropSymbols)
+      for (var prop of __getOwnPropSymbols(source)) {
+        if (exclude.indexOf(prop) < 0 && __propIsEnum.call(source, prop))
+          target[prop] = source[prop];
+      }
+    return target;
+  };
   var __commonJS = (cb, mod) => function __require() {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
@@ -122,7 +134,7 @@ var stats = (() => {
   });
   var optionsMenu_default = OptionsMenu;
 
-  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-10532-YtElxojn20py\18bc73494b61\navBar.module.css
+  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-13456-PqjxUa5cmX0M\18bcc608f211\navBar.module.css
   var navBar_module_default = { "topBarHeaderItem": "navBar-module__topBarHeaderItem___v29bR_stats", "topBarHeaderItemLink": "navBar-module__topBarHeaderItemLink___VeyBY_stats", "topBarActive": "navBar-module__topBarActive___-qYPu_stats", "topBarNav": "navBar-module__topBarNav___1OtdR_stats", "optionsMenuDropBox": "navBar-module__optionsMenuDropBox___tD9mA_stats" };
 
   // node_modules/spcr-navigation-bar/navBar.tsx
@@ -288,11 +300,11 @@ var stats = (() => {
         switchCallback
       });
     });
-    const MenuWrapper2 = (props) => {
+    const MenuWrapper3 = (props) => {
       return /* @__PURE__ */ import_react4.default.createElement(import_react4.default.Fragment, null, /* @__PURE__ */ import_react4.default.createElement(Spicetify.ReactComponent.Menu, __spreadValues({}, props), optionItems));
     };
     return /* @__PURE__ */ import_react4.default.createElement(import_react4.default.Fragment, null, /* @__PURE__ */ import_react4.default.createElement(Spicetify.ReactComponent.ContextMenu, {
-      menu: /* @__PURE__ */ import_react4.default.createElement(MenuWrapper2, null),
+      menu: /* @__PURE__ */ import_react4.default.createElement(MenuWrapper3, null),
       trigger: "click"
     }, /* @__PURE__ */ import_react4.default.createElement("button", {
       className: "x-sortBox-sortDropdown",
@@ -335,6 +347,15 @@ var stats = (() => {
 
   // src/components/artist_card.tsx
   var import_react6 = __toESM(require_react());
+  var DraggableComponent = (props) => {
+    var _a, _b;
+    const dragHandler = (_b = (_a = Spicetify.ReactHook).DragHandler) == null ? void 0 : _b.call(_a, [props.uri], props.title);
+    return /* @__PURE__ */ import_react6.default.createElement("div", {
+      onDragStart: dragHandler,
+      draggable: "true",
+      className: "main-card-draggable"
+    }, props.children);
+  };
   var MenuWrapper = import_react6.default.memo((props) => /* @__PURE__ */ import_react6.default.createElement(Spicetify.ReactComponent.ArtistMenu, __spreadValues({}, props)));
   var Card = ({ name, image, uri, subtext }) => {
     const goToArtist = (uriString) => {
@@ -351,9 +372,9 @@ var stats = (() => {
     }, /* @__PURE__ */ import_react6.default.createElement("div", {
       className: "main-card-card",
       onClick: () => goToArtist(uri)
-    }, /* @__PURE__ */ import_react6.default.createElement("div", {
-      draggable: "true",
-      className: "main-card-draggable"
+    }, /* @__PURE__ */ import_react6.default.createElement(DraggableComponent, {
+      uri,
+      title: name
     }, /* @__PURE__ */ import_react6.default.createElement("div", {
       className: "main-card-imageContainer"
     }, /* @__PURE__ */ import_react6.default.createElement("div", {
@@ -413,6 +434,10 @@ var stats = (() => {
       className: "x-filterBox-filterInputContainer stats-refreshButton",
       role: "search",
       "aria-expanded": "false"
+    }, /* @__PURE__ */ import_react7.default.createElement(Spicetify.ReactComponent.TooltipWrapper, {
+      label: "Refresh",
+      renderInline: true,
+      placement: "bottom"
     }, /* @__PURE__ */ import_react7.default.createElement("button", {
       className: "x-filterBox-expandButton",
       "aria-hidden": "false",
@@ -428,7 +453,7 @@ var stats = (() => {
       "data-encore-id": "icon"
     }, /* @__PURE__ */ import_react7.default.createElement("path", {
       d: "M0 4.75A3.75 3.75 0 0 1 3.75 1h8.5A3.75 3.75 0 0 1 16 4.75v5a3.75 3.75 0 0 1-3.75 3.75H9.81l1.018 1.018a.75.75 0 1 1-1.06 1.06L6.939 12.75l2.829-2.828a.75.75 0 1 1 1.06 1.06L9.811 12h2.439a2.25 2.25 0 0 0 2.25-2.25v-5a2.25 2.25 0 0 0-2.25-2.25h-8.5A2.25 2.25 0 0 0 1.5 4.75v5A2.25 2.25 0 0 0 3.75 12H5v1.5H3.75A3.75 3.75 0 0 1 0 9.75v-5z"
-    }))));
+    })))));
   };
   var refresh_button_default = RefreshButton;
 
@@ -702,7 +727,10 @@ var stats = (() => {
     import_react10.default.useEffect(() => {
       setLiked(active);
     }, [active]);
-    return /* @__PURE__ */ import_react10.default.createElement("button", {
+    return /* @__PURE__ */ import_react10.default.createElement(Spicetify.ReactComponent.TooltipWrapper, {
+      label: liked ? `Remove from Your Library` : "Save to Your Library",
+      placement: "top"
+    }, /* @__PURE__ */ import_react10.default.createElement("button", {
       type: "button",
       role: "switch",
       "aria-checked": liked,
@@ -720,8 +748,18 @@ var stats = (() => {
       className: "Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small"
     }, /* @__PURE__ */ import_react10.default.createElement("path", {
       d: liked ? "M15.724 4.22A4.313 4.313 0 0 0 12.192.814a4.269 4.269 0 0 0-3.622 1.13.837.837 0 0 1-1.14 0 4.272 4.272 0 0 0-6.21 5.855l5.916 7.05a1.128 1.128 0 0 0 1.727 0l5.916-7.05a4.228 4.228 0 0 0 .945-3.577z" : "M1.69 2A4.582 4.582 0 0 1 8 2.023 4.583 4.583 0 0 1 11.88.817h.002a4.618 4.618 0 0 1 3.782 3.65v.003a4.543 4.543 0 0 1-1.011 3.84L9.35 14.629a1.765 1.765 0 0 1-2.093.464 1.762 1.762 0 0 1-.605-.463L1.348 8.309A4.582 4.582 0 0 1 1.689 2zm3.158.252A3.082 3.082 0 0 0 2.49 7.337l.005.005L7.8 13.664a.264.264 0 0 0 .311.069.262.262 0 0 0 .09-.069l5.312-6.33a3.043 3.043 0 0 0 .68-2.573 3.118 3.118 0 0 0-2.551-2.463 3.079 3.079 0 0 0-2.612.816l-.007.007a1.501 1.501 0 0 1-2.045 0l-.009-.008a3.082 3.082 0 0 0-2.121-.861z"
-    })));
+    }))));
   };
+  var DraggableComponent2 = (_a) => {
+    var _b = _a, { uri, title } = _b, props = __objRest(_b, ["uri", "title"]);
+    var _a2, _b2;
+    const dragHandler = (_b2 = (_a2 = Spicetify.ReactHook).DragHandler) == null ? void 0 : _b2.call(_a2, [uri], title);
+    return /* @__PURE__ */ import_react10.default.createElement("div", __spreadValues({
+      onDragStart: dragHandler,
+      draggable: "true"
+    }, props), props.children);
+  };
+  var MenuWrapper2 = import_react10.default.memo((props) => /* @__PURE__ */ import_react10.default.createElement(Spicetify.ReactComponent.AlbumMenu, __spreadValues({}, props)));
   var TrackRow = (props) => {
     const ArtistLinks = props.artists.map((artist, index) => {
       return /* @__PURE__ */ import_react10.default.createElement(ArtistLink, {
@@ -731,13 +769,19 @@ var stats = (() => {
         uri: artist.uri
       });
     });
-    return /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, /* @__PURE__ */ import_react10.default.createElement("div", {
+    return /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, /* @__PURE__ */ import_react10.default.createElement(Spicetify.ReactComponent.ContextMenu, {
+      menu: /* @__PURE__ */ import_react10.default.createElement(MenuWrapper2, {
+        uri: props.uri
+      }),
+      trigger: "right-click"
+    }, /* @__PURE__ */ import_react10.default.createElement("div", {
       role: "row",
       "aria-rowindex": 2,
       "aria-selected": "false"
-    }, /* @__PURE__ */ import_react10.default.createElement("div", {
+    }, /* @__PURE__ */ import_react10.default.createElement(DraggableComponent2, {
+      uri: props.uri,
+      title: `${props.name} \u2022 ${props.artists.map((artist) => artist.name).join(", ")}`,
       className: "main-trackList-trackListRow main-trackList-trackListRowGrid",
-      draggable: "true",
       role: "presentation",
       onClick: (event) => event.detail === 2 && Spicetify.Player.playUri(props.uri),
       style: { height: 56 }
@@ -751,7 +795,10 @@ var stats = (() => {
     }, /* @__PURE__ */ import_react10.default.createElement("span", {
       className: "TypeElement-ballad-type main-trackList-number",
       "data-encore-id": "type"
-    }, props.index), /* @__PURE__ */ import_react10.default.createElement("button", {
+    }, props.index), /* @__PURE__ */ import_react10.default.createElement(Spicetify.ReactComponent.TooltipWrapper, {
+      label: `Play ${props.name} by ${props.artists.map((artist) => artist.name).join(", ")}`,
+      placement: "top"
+    }, /* @__PURE__ */ import_react10.default.createElement("button", {
       className: "main-trackList-rowImagePlayButton",
       "aria-label": `Play ${props.name}`,
       tabIndex: -1,
@@ -766,7 +813,7 @@ var stats = (() => {
       "data-encore-id": "icon"
     }, /* @__PURE__ */ import_react10.default.createElement("path", {
       d: "m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606z"
-    }))))), /* @__PURE__ */ import_react10.default.createElement("div", {
+    })))))), /* @__PURE__ */ import_react10.default.createElement("div", {
       className: "main-trackList-rowSectionStart",
       role: "gridcell",
       "aria-colindex": 2,
@@ -808,13 +855,16 @@ var stats = (() => {
       role: "gridcell",
       "aria-colindex": 5,
       tabIndex: -1
-    }, props.liked ? /* @__PURE__ */ import_react10.default.createElement(LikedIcon, {
-      active: props.liked,
+    }, /* @__PURE__ */ import_react10.default.createElement(LikedIcon, {
+      active: props.liked || false,
       uri: props.uri
-    }) : "", /* @__PURE__ */ import_react10.default.createElement("div", {
+    }), /* @__PURE__ */ import_react10.default.createElement("div", {
       className: "TypeElement-mesto-textSubdued TypeElement-mesto-textSubdued-type main-trackList-rowDuration",
       "data-encore-id": "type"
-    }, formatDuration(props.duration)), /* @__PURE__ */ import_react10.default.createElement("button", {
+    }, formatDuration(props.duration)), /* @__PURE__ */ import_react10.default.createElement(Spicetify.ReactComponent.TooltipWrapper, {
+      label: `More options for ${props.name} by ${props.artists.map((artist) => artist.name).join(", ")}`,
+      placement: "top"
+    }, /* @__PURE__ */ import_react10.default.createElement("button", {
       type: "button",
       "aria-haspopup": "menu",
       "aria-label": `More options for ${props.name}`,
@@ -830,7 +880,7 @@ var stats = (() => {
       className: "Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small"
     }, /* @__PURE__ */ import_react10.default.createElement("path", {
       d: "M3 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm6.5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM16 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"
-    })))))));
+    })))))))));
   };
   var track_row_default = import_react10.default.memo(TrackRow);
 
@@ -993,6 +1043,9 @@ var stats = (() => {
       "aria-colindex": 5,
       "aria-sort": "none",
       tabIndex: -1
+    }, /* @__PURE__ */ import_react11.default.createElement(Spicetify.ReactComponent.TooltipWrapper, {
+      label: "Duration",
+      placement: "top"
     }, /* @__PURE__ */ import_react11.default.createElement("button", {
       "aria-label": "Duration",
       className: "main-trackList-column main-trackList-durationHeader main-trackList-sortable",
@@ -1009,7 +1062,7 @@ var stats = (() => {
       d: "M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z"
     }), /* @__PURE__ */ import_react11.default.createElement("path", {
       d: "M8 3.25a.75.75 0 0 1 .75.75v3.25H11a.75.75 0 0 1 0 1.5H7.25V4A.75.75 0 0 1 8 3.25z"
-    })))))), /* @__PURE__ */ import_react11.default.createElement("div", {
+    }))))))), /* @__PURE__ */ import_react11.default.createElement("div", {
       className: "main-rootlist-wrapper",
       role: "presentation",
       style: { height: 50 * 56 }

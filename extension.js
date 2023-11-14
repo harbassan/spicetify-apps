@@ -48,10 +48,10 @@ var stats = (() => {
   });
 
   // src/extensions/extension.tsx
-  var import_react6 = __toESM(require_react());
+  var import_react7 = __toESM(require_react());
 
   // src/pages/playlist.tsx
-  var import_react5 = __toESM(require_react());
+  var import_react6 = __toESM(require_react());
 
   // src/components/stat_card.tsx
   var import_react = __toESM(require_react());
@@ -101,6 +101,15 @@ var stats = (() => {
 
   // src/components/artist_card.tsx
   var import_react3 = __toESM(require_react());
+  var DraggableComponent = (props) => {
+    var _a, _b;
+    const dragHandler = (_b = (_a = Spicetify.ReactHook).DragHandler) == null ? void 0 : _b.call(_a, [props.uri], props.title);
+    return /* @__PURE__ */ import_react3.default.createElement("div", {
+      onDragStart: dragHandler,
+      draggable: "true",
+      className: "main-card-draggable"
+    }, props.children);
+  };
   var MenuWrapper = import_react3.default.memo((props) => /* @__PURE__ */ import_react3.default.createElement(Spicetify.ReactComponent.ArtistMenu, __spreadValues({}, props)));
   var Card = ({ name, image, uri, subtext }) => {
     const goToArtist = (uriString) => {
@@ -117,9 +126,9 @@ var stats = (() => {
     }, /* @__PURE__ */ import_react3.default.createElement("div", {
       className: "main-card-card",
       onClick: () => goToArtist(uri)
-    }, /* @__PURE__ */ import_react3.default.createElement("div", {
-      draggable: "true",
-      className: "main-card-draggable"
+    }, /* @__PURE__ */ import_react3.default.createElement(DraggableComponent, {
+      uri,
+      title: name
     }, /* @__PURE__ */ import_react3.default.createElement("div", {
       className: "main-card-imageContainer"
     }, /* @__PURE__ */ import_react3.default.createElement("div", {
@@ -295,9 +304,45 @@ var stats = (() => {
   };
   var status_default = Status;
 
+  // src/components/inline_grid.tsx
+  var import_react5 = __toESM(require_react());
+  var scrollGrid = (event) => {
+    const grid = event.target.parentNode.querySelector("div");
+    grid.scrollLeft += grid.clientWidth;
+    if (grid.scrollWidth - grid.clientWidth - grid.scrollLeft <= grid.clientWidth) {
+      grid.setAttribute("data-scroll", "end");
+    } else {
+      grid.setAttribute("data-scroll", "both");
+    }
+  };
+  var scrollGridLeft = (event) => {
+    const grid = event.target.parentNode.querySelector("div");
+    grid.scrollLeft -= grid.clientWidth;
+    if (grid.scrollLeft <= grid.clientWidth) {
+      grid.setAttribute("data-scroll", "start");
+    } else {
+      grid.setAttribute("data-scroll", "both");
+    }
+  };
+  var InlineGrid = (props) => {
+    return /* @__PURE__ */ import_react5.default.createElement("section", {
+      className: "stats-gridInlineSection"
+    }, /* @__PURE__ */ import_react5.default.createElement("button", {
+      className: "stats-scrollButton",
+      onClick: scrollGridLeft
+    }, "<"), /* @__PURE__ */ import_react5.default.createElement("button", {
+      className: "stats-scrollButton",
+      onClick: scrollGrid
+    }, ">"), /* @__PURE__ */ import_react5.default.createElement("div", {
+      className: `main-gridContainer-gridContainer stats-gridInline${props.special ? " stats-specialGrid" : ""}`,
+      "data-scroll": "start"
+    }, props.children));
+  };
+  var inline_grid_default = InlineGrid;
+
   // src/pages/playlist.tsx
   var PlaylistPage = ({ uri }) => {
-    const [library, setLibrary] = import_react5.default.useState(null);
+    const [library, setLibrary] = import_react6.default.useState(null);
     const fetchData = async () => {
       const start = window.performance.now();
       const playlistMeta = await apiRequest("playlistMeta", `sp://core-playlist/v1/playlist/${uri}`);
@@ -372,16 +417,16 @@ var stats = (() => {
       setLibrary(stats2);
       console.log("total playlist stats fetch time:", window.performance.now() - start);
     };
-    import_react5.default.useEffect(() => {
+    import_react6.default.useEffect(() => {
       fetchData();
     }, []);
     if (library === null)
-      return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(status_default, {
+      return /* @__PURE__ */ import_react6.default.createElement(import_react6.default.Fragment, null, /* @__PURE__ */ import_react6.default.createElement(status_default, {
         heading: "Analysing The Playlist",
         subheading: "This might take a while"
       }));
     if (!library)
-      return /* @__PURE__ */ import_react5.default.createElement(import_react5.default.Fragment, null, /* @__PURE__ */ import_react5.default.createElement(status_default, {
+      return /* @__PURE__ */ import_react6.default.createElement(import_react6.default.Fragment, null, /* @__PURE__ */ import_react6.default.createElement(status_default, {
         heading: "Failed to Fetch Playlist Stats",
         subheading: "Make an issue on Github"
       }));
@@ -399,126 +444,98 @@ var stats = (() => {
     };
     const statCards = [];
     Object.entries(library.audioFeatures).forEach((obj) => {
-      statCards.push(/* @__PURE__ */ import_react5.default.createElement(stat_card_default, {
+      statCards.push(/* @__PURE__ */ import_react6.default.createElement(stat_card_default, {
         stat: obj[0][0].toUpperCase() + obj[0].slice(1),
         value: parseVal(obj)
       }));
     });
-    const artistCards = library.artists.map((artist) => /* @__PURE__ */ import_react5.default.createElement(artist_card_default, {
+    const artistCards = library.artists.map((artist) => /* @__PURE__ */ import_react6.default.createElement(artist_card_default, {
       name: artist.name,
       image: artist.image,
       uri: artist.uri,
       subtext: `Appears in ${artist.freq} tracks`
     }));
     const albumCards = library.albums.map((album) => {
-      return /* @__PURE__ */ import_react5.default.createElement(artist_card_default, {
+      return /* @__PURE__ */ import_react6.default.createElement(artist_card_default, {
         name: album.name,
         image: album.image,
         uri: album.uri,
         subtext: `Appears in ${album.freq} tracks`
       });
     });
-    const scrollGrid = (event) => {
+    const scrollGrid2 = (event) => {
       const grid = event.target.parentNode.querySelector("div");
       grid.scrollLeft += grid.clientWidth;
     };
-    const scrollGridLeft = (event) => {
+    const scrollGridLeft2 = (event) => {
       const grid = event.target.parentNode.querySelector("div");
       grid.scrollLeft -= grid.clientWidth;
     };
-    return /* @__PURE__ */ import_react5.default.createElement("div", {
+    return /* @__PURE__ */ import_react6.default.createElement("div", {
       className: "stats-page"
-    }, /* @__PURE__ */ import_react5.default.createElement("section", {
+    }, /* @__PURE__ */ import_react6.default.createElement("section", {
       className: "stats-libraryOverview"
-    }, /* @__PURE__ */ import_react5.default.createElement(stat_card_default, {
+    }, /* @__PURE__ */ import_react6.default.createElement(stat_card_default, {
       stat: "Total Tracks",
       value: library.trackCount
-    }), /* @__PURE__ */ import_react5.default.createElement(stat_card_default, {
+    }), /* @__PURE__ */ import_react6.default.createElement(stat_card_default, {
       stat: "Total Artists",
       value: library.artistCount
-    }), /* @__PURE__ */ import_react5.default.createElement(stat_card_default, {
+    }), /* @__PURE__ */ import_react6.default.createElement(stat_card_default, {
       stat: "Total Minutes",
       value: Math.floor(library.totalDuration / 60)
-    }), /* @__PURE__ */ import_react5.default.createElement(stat_card_default, {
+    }), /* @__PURE__ */ import_react6.default.createElement(stat_card_default, {
       stat: "Total Hours",
       value: (library.totalDuration / (60 * 60)).toFixed(1)
-    })), /* @__PURE__ */ import_react5.default.createElement("section", null, /* @__PURE__ */ import_react5.default.createElement("div", {
+    })), /* @__PURE__ */ import_react6.default.createElement("section", null, /* @__PURE__ */ import_react6.default.createElement("div", {
       className: "main-shelf-header"
-    }, /* @__PURE__ */ import_react5.default.createElement("div", {
+    }, /* @__PURE__ */ import_react6.default.createElement("div", {
       className: "main-shelf-topRow"
-    }, /* @__PURE__ */ import_react5.default.createElement("div", {
+    }, /* @__PURE__ */ import_react6.default.createElement("div", {
       className: "main-shelf-titleWrapper"
-    }, /* @__PURE__ */ import_react5.default.createElement("h2", {
+    }, /* @__PURE__ */ import_react6.default.createElement("h2", {
       className: "Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title"
-    }, "Most Frequent Genres")))), /* @__PURE__ */ import_react5.default.createElement(genres_card_default, {
+    }, "Most Frequent Genres")))), /* @__PURE__ */ import_react6.default.createElement(genres_card_default, {
       genres: library.genres,
       total: library.genresDenominator
-    }), /* @__PURE__ */ import_react5.default.createElement("section", {
-      className: "stats-gridInlineSection"
-    }, /* @__PURE__ */ import_react5.default.createElement("button", {
-      className: "stats-scrollButton",
-      onClick: scrollGridLeft
-    }, "<"), /* @__PURE__ */ import_react5.default.createElement("button", {
-      className: "stats-scrollButton",
-      onClick: scrollGrid
-    }, ">"), /* @__PURE__ */ import_react5.default.createElement("div", {
-      className: `main-gridContainer-gridContainer stats-gridInline stats-specialGrid`
-    }, statCards))), /* @__PURE__ */ import_react5.default.createElement("section", {
+    }), /* @__PURE__ */ import_react6.default.createElement(inline_grid_default, {
+      special: true
+    }, statCards)), /* @__PURE__ */ import_react6.default.createElement("section", {
       className: "main-shelf-shelf Shelf"
-    }, /* @__PURE__ */ import_react5.default.createElement("div", {
+    }, /* @__PURE__ */ import_react6.default.createElement("div", {
       className: "main-shelf-header"
-    }, /* @__PURE__ */ import_react5.default.createElement("div", {
+    }, /* @__PURE__ */ import_react6.default.createElement("div", {
       className: "main-shelf-topRow"
-    }, /* @__PURE__ */ import_react5.default.createElement("div", {
+    }, /* @__PURE__ */ import_react6.default.createElement("div", {
       className: "main-shelf-titleWrapper"
-    }, /* @__PURE__ */ import_react5.default.createElement("h2", {
+    }, /* @__PURE__ */ import_react6.default.createElement("h2", {
       className: "Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title"
-    }, "Most Frequent Artists")))), /* @__PURE__ */ import_react5.default.createElement("section", {
-      className: "stats-gridInlineSection"
-    }, /* @__PURE__ */ import_react5.default.createElement("button", {
-      className: "stats-scrollButton",
-      onClick: scrollGridLeft
-    }, "<"), /* @__PURE__ */ import_react5.default.createElement("button", {
-      className: "stats-scrollButton",
-      onClick: scrollGrid
-    }, ">"), /* @__PURE__ */ import_react5.default.createElement("div", {
-      className: `main-gridContainer-gridContainer stats-gridInline`
-    }, artistCards))), /* @__PURE__ */ import_react5.default.createElement("section", {
+    }, "Most Frequent Artists")))), /* @__PURE__ */ import_react6.default.createElement(inline_grid_default, null, artistCards)), /* @__PURE__ */ import_react6.default.createElement("section", {
       className: "main-shelf-shelf Shelf"
-    }, /* @__PURE__ */ import_react5.default.createElement("div", {
+    }, /* @__PURE__ */ import_react6.default.createElement("div", {
       className: "main-shelf-header"
-    }, /* @__PURE__ */ import_react5.default.createElement("div", {
+    }, /* @__PURE__ */ import_react6.default.createElement("div", {
       className: "main-shelf-topRow"
-    }, /* @__PURE__ */ import_react5.default.createElement("div", {
+    }, /* @__PURE__ */ import_react6.default.createElement("div", {
       className: "main-shelf-titleWrapper"
-    }, /* @__PURE__ */ import_react5.default.createElement("h2", {
+    }, /* @__PURE__ */ import_react6.default.createElement("h2", {
       className: "Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title"
-    }, "Most Frequent Albums")))), /* @__PURE__ */ import_react5.default.createElement("section", {
-      className: "stats-gridInlineSection"
-    }, /* @__PURE__ */ import_react5.default.createElement("button", {
-      className: "stats-scrollButton",
-      onClick: scrollGridLeft
-    }, "<"), /* @__PURE__ */ import_react5.default.createElement("button", {
-      className: "stats-scrollButton",
-      onClick: scrollGrid
-    }, ">"), /* @__PURE__ */ import_react5.default.createElement("div", {
-      className: `main-gridContainer-gridContainer stats-gridInline`
-    }, albumCards))), /* @__PURE__ */ import_react5.default.createElement("section", {
+    }, "Most Frequent Albums")))), /* @__PURE__ */ import_react6.default.createElement(inline_grid_default, null, albumCards)), /* @__PURE__ */ import_react6.default.createElement("section", {
       className: "main-shelf-shelf Shelf"
-    }, /* @__PURE__ */ import_react5.default.createElement("div", {
+    }, /* @__PURE__ */ import_react6.default.createElement("div", {
       className: "main-shelf-header"
-    }, /* @__PURE__ */ import_react5.default.createElement("div", {
+    }, /* @__PURE__ */ import_react6.default.createElement("div", {
       className: "main-shelf-topRow"
-    }, /* @__PURE__ */ import_react5.default.createElement("div", {
+    }, /* @__PURE__ */ import_react6.default.createElement("div", {
       className: "main-shelf-titleWrapper"
-    }, /* @__PURE__ */ import_react5.default.createElement("h2", {
+    }, /* @__PURE__ */ import_react6.default.createElement("h2", {
       className: "Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title"
-    }, "Release Year Distribution")))), /* @__PURE__ */ import_react5.default.createElement("section", null, /* @__PURE__ */ import_react5.default.createElement(genres_card_default, {
+    }, "Release Year Distribution")))), /* @__PURE__ */ import_react6.default.createElement("section", null, /* @__PURE__ */ import_react6.default.createElement(genres_card_default, {
       genres: library.years,
       total: library.yearsDenominator
     }))));
   };
-  var playlist_default = import_react5.default.memo(PlaylistPage);
+  var playlist_default = import_react6.default.memo(PlaylistPage);
 
   // src/extensions/extension.tsx
   (async function stats() {
@@ -533,7 +550,7 @@ var stats = (() => {
     document.head.appendChild(styleLink);
     const playlistEdit = new Spicetify.Topbar.Button("playlist-stats", "visualizer", () => {
       const playlistUri = `spotify:playlist:${Spicetify.Platform.History.location.pathname.split("/")[2]}`;
-      Spicetify.PopupModal.display({ title: "Playlist Stats", content: /* @__PURE__ */ import_react6.default.createElement(playlist_default, {
+      Spicetify.PopupModal.display({ title: "Playlist Stats", content: /* @__PURE__ */ import_react7.default.createElement(playlist_default, {
         uri: playlistUri
       }), isLarge: true });
     });
