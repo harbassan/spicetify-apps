@@ -12,6 +12,15 @@ interface ArtistMenuProps extends Spicetify.ReactComponent.MenuProps {
     onRemoveCallback?: (uri: string) => void;
 }
 
+const DraggableComponent = (props: { uri: string; title: string; children: any }) => {
+    const dragHandler = Spicetify.ReactHook.DragHandler?.([props.uri], props.title);
+    return (
+        <div onDragStart={dragHandler} draggable="true" className="main-card-draggable">
+            {props.children}
+        </div>
+    );
+};
+
 const MenuWrapper = React.memo((props: ArtistMenuProps) => <Spicetify.ReactComponent.ArtistMenu {...props} />);
 
 const Card = ({ name, image, uri, subtext }: cardProps) => {
@@ -26,7 +35,7 @@ const Card = ({ name, image, uri, subtext }: cardProps) => {
         <>
             <Spicetify.ReactComponent.ContextMenu menu={<MenuWrapper uri={uri} />} trigger="right-click">
                 <div className="main-card-card" onClick={() => goToArtist(uri)}>
-                    <div draggable="true" className="main-card-draggable">
+                    <DraggableComponent uri={uri} title={name}>
                         <div className="main-card-imageContainer">
                             <div className="main-cardImage-imageWrapper main-cardImage-circular">
                                 <div className="">
@@ -41,7 +50,10 @@ const Card = ({ name, image, uri, subtext }: cardProps) => {
                             </div>
                             <div className="main-card-PlayButtonContainer">
                                 <div className="main-playButton-PlayButton">
-                                    <button data-encore-id="buttonPrimary" className="Button-md-useBrowserDefaultFocusStyle Button-md-buttonPrimary-useBrowserDefaultFocusStyle Button-medium-buttonPrimary-useBrowserDefaultFocusStyle">
+                                    <button
+                                        data-encore-id="buttonPrimary"
+                                        className="Button-md-useBrowserDefaultFocusStyle Button-md-buttonPrimary-useBrowserDefaultFocusStyle Button-medium-buttonPrimary-useBrowserDefaultFocusStyle"
+                                    >
                                         <span className="ButtonInner-md-iconOnly ButtonInner-medium-iconOnly encore-bright-accent-set">
                                             <span aria-hidden="true" className="Wrapper-md-24-only Wrapper-medium-medium-only">
                                                 <svg
@@ -63,10 +75,7 @@ const Card = ({ name, image, uri, subtext }: cardProps) => {
                         </div>
                         <div className="main-card-cardMetadata">
                             <a draggable="false" className="main-cardHeader-link" dir="auto">
-                                <div
-                                    className="TypeElement-balladBold-textBase-4px-type main-cardHeader-text"
-                                    data-encore-id="type"
-                                >
+                                <div className="TypeElement-balladBold-textBase-4px-type main-cardHeader-text" data-encore-id="type">
                                     {name}
                                 </div>
                             </a>
@@ -75,7 +84,7 @@ const Card = ({ name, image, uri, subtext }: cardProps) => {
                             </div>
                         </div>
                         <div className="main-card-cardLink"></div>
-                    </div>
+                    </DraggableComponent>
                 </div>
             </Spicetify.ReactComponent.ContextMenu>
         </>
