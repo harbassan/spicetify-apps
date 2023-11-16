@@ -57,10 +57,10 @@ const LikedIcon = ({ active, uri }: { active: boolean; uri: string }) => {
     const toggleLike = () => {
         if (liked) {
             Spicetify.CosmosAsync.del("https://api.spotify.com/v1/me/tracks?ids=" + id);
-            Spicetify.showNotification("Removed from your Liked Songs");
+            Spicetify.Snackbar.enqueueSnackbar("Removed from your Liked Songs");
         } else {
             Spicetify.CosmosAsync.put("https://api.spotify.com/v1/me/tracks?ids=" + id);
-            Spicetify.showNotification("Added to your Liked Songs");
+            Spicetify.Snackbar.enqueueSnackbar("Added to your Liked Songs");
         }
 
         setLiked(!liked);
