@@ -209,10 +209,7 @@ const TrackRow = (props: TrackRowProps) => {
                                 {formatDuration(props.duration)}
                             </div>
 
-                            <Spicetify.ReactComponent.TooltipWrapper
-                                label={`More options for ${props.name} by ${props.artists.map(artist => artist.name).join(", ")}`}
-                                placement="top"
-                            >
+                            <Spicetify.ReactComponent.ContextMenu menu={<MenuWrapper uri={props.uri} />} trigger="click">
                                 <button
                                     type="button"
                                     aria-haspopup="menu"
@@ -220,19 +217,26 @@ const TrackRow = (props: TrackRowProps) => {
                                     className="main-moreButton-button Button-sm-16-buttonTertiary-iconOnly-condensed-useBrowserDefaultFocusStyle Button-small-small-buttonTertiary-iconOnly-condensed-useBrowserDefaultFocusStyle main-trackList-rowMoreButton"
                                     tabIndex={-1}
                                 >
-                                    <svg
-                                        role="img"
-                                        height="16"
-                                        width="16"
-                                        aria-hidden="true"
-                                        viewBox="0 0 16 16"
-                                        data-encore-id="icon"
-                                        className="Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small"
+                                    <Spicetify.ReactComponent.TooltipWrapper
+                                        label={`More options for ${props.name} by ${props.artists.map(artist => artist.name).join(", ")}`}
+                                        placement="top"
                                     >
-                                        <path d="M3 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm6.5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM16 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"></path>
-                                    </svg>
+                                        <span>
+                                            <svg
+                                                role="img"
+                                                height="16"
+                                                width="16"
+                                                aria-hidden="true"
+                                                viewBox="0 0 16 16"
+                                                data-encore-id="icon"
+                                                className="Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small"
+                                            >
+                                                <path d="M3 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm6.5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM16 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"></path>
+                                            </svg>
+                                        </span>
+                                    </Spicetify.ReactComponent.TooltipWrapper>
                                 </button>
-                            </Spicetify.ReactComponent.TooltipWrapper>
+                            </Spicetify.ReactComponent.ContextMenu>
                         </div>
                     </DraggableComponent>
                 </div>
