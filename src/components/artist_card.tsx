@@ -34,7 +34,7 @@ const Card = ({ name, image, uri, subtext }: cardProps) => {
     return (
         <>
             <Spicetify.ReactComponent.ContextMenu menu={<MenuWrapper uri={uri} />} trigger="right-click">
-                <div className="main-card-card" onClick={() => goToArtist(uri)}>
+                <div className="main-card-card">
                     <DraggableComponent uri={uri} title={name}>
                         <div className="main-card-imageContainer">
                             <div className="main-cardImage-imageWrapper main-cardImage-circular">
@@ -48,7 +48,7 @@ const Card = ({ name, image, uri, subtext }: cardProps) => {
                                     />
                                 </div>
                             </div>
-                            <div className="main-card-PlayButtonContainer">
+                            <div className="main-card-PlayButtonContainer" onClick={() => Spicetify.Player.playUri(uri)}>
                                 <div className="main-playButton-PlayButton">
                                     <button
                                         data-encore-id="buttonPrimary"
@@ -83,7 +83,7 @@ const Card = ({ name, image, uri, subtext }: cardProps) => {
                                 <span>{subtext}</span>
                             </div>
                         </div>
-                        <div className="main-card-cardLink"></div>
+                        <div className="main-card-cardLink" onClick={() => goToArtist(uri)}></div>
                     </DraggableComponent>
                 </div>
             </Spicetify.ReactComponent.ContextMenu>
