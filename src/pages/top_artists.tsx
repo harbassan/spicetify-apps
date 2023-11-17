@@ -5,7 +5,7 @@ import RefreshButton from "../components/refresh_button";
 import { apiRequest, updatePageCache } from "../funcs";
 import Status from "../components/status";
 
-const ArtistsPage = () => {
+const ArtistsPage = ({ config }: any) => {
     const [topArtists, setTopArtists] = React.useState<any[] | false>([]);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],

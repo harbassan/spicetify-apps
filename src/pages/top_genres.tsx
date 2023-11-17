@@ -7,7 +7,7 @@ import { apiRequest, updatePageCache } from "../funcs";
 import InlineGrid from "../components/inline_grid";
 import Status from "../components/status";
 
-const GenresPage = () => {
+const GenresPage = ({ config }: any) => {
     const [topGenres, setTopGenres] = React.useState<
         | {
               genres: [string, number][];

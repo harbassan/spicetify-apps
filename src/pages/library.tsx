@@ -22,7 +22,7 @@ interface LibraryProps {
     yearsDenominator: number;
 }
 
-const LibraryPage = () => {
+const LibraryPage = ({ config }: any) => {
     const [library, setLibrary] = React.useState<LibraryProps | null | false>(null);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(["owned", "all"], ["My Playlists", "All Playlists"], "library");
 

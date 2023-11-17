@@ -9,7 +9,7 @@ const checkLiked = async (tracks: string[]) => {
     return apiRequest("checkLiked", `https://api.spotify.com/v1/me/tracks/contains?ids=${tracks.join(",")}`);
 };
 
-const TracksPage = () => {
+const TracksPage = ({ config }: any) => {
     const [topTracks, setTopTracks] = React.useState<Record<string, any>[] | false>([]);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],

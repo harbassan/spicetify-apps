@@ -4,8 +4,11 @@ import ArtistsPage from "./pages/top_artists";
 import TracksPage from "./pages/top_tracks";
 import GenresPage from "./pages/top_genres";
 import LibraryPage from "./pages/library";
-import "./styles/app.scss";
 import { STATS_VERSION, LATEST_RELEASE } from "./constants";
+import useConfig from "./components/useConfig";
+
+import "./styles/app.scss";
+import "./styles/settings_modal.scss";
 
 const pages: Record<string, JSX.Element> = {
     ["Artists"]: <ArtistsPage />,
@@ -35,6 +38,17 @@ const App = () => {
     const [navBar, activeLink, setActiveLink] = useNavigationBar(["Artists", "Tracks", "Genres", "Library"]);
     const [newUpdate, setNewUpdate] = React.useState(false);
 
+    const config = useConfig([
+        {
+            name: "Last.fm Api Key",
+            key: "api-key",
+            type: "text",
+            def: null,
+            placeholder: "Enter API Key",
+            desc: `You can get this by visiting www.last.fm/api/account/create and simply entering any name.<br/>You'll need to make an account first, which is a plus.`,
+        },
+    ]);
+
     React.useEffect(() => {
         setActiveLink(Spicetify.LocalStorage.get("stats:active-link") || "Artists");
         checkForUpdates(setNewUpdate);
@@ -52,7 +66,7 @@ const App = () => {
                 </div>
             )}
             {navBar}
-            {pages[activeLink]}
+            {React.cloneElement(pages[activeLink], { config })}
         </>
     );
 };
