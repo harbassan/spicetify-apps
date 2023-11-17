@@ -4,7 +4,7 @@ import ArtistsPage from "./pages/top_artists";
 import TracksPage from "./pages/top_tracks";
 import GenresPage from "./pages/top_genres";
 import LibraryPage from "./pages/library";
-import "./css/app.css";
+import "./styles/app.scss";
 import { STATS_VERSION, LATEST_RELEASE } from "./constants";
 
 const pages: Record<string, JSX.Element> = {

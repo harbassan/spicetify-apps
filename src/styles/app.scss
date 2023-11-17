@@ -38,7 +38,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 75vh;
+    min-height: 60vh;
     flex-direction: column;
     gap: 16px;
 }
@@ -206,4 +206,10 @@
 }
 .GenericModal[aria-label="Playlist Stats"] .main-shelf-title {
     color: var(--spice-text);
+}
+
+.status-icon {
+    width: 40px;
+    height: 40px;
+    fill: currentColor;
 }
