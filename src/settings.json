@@ -1,6 +1,6 @@
 {
   "displayName": "Statistics",
   "nameId": "stats",
-  "icon": "css/icon_unfilled.svg",
-  "activeIcon": "css/icon_filled.svg"
+  "icon": "styles/icon_unfilled.svg",
+  "activeIcon": "styles/icon_filled.svg"
 }
