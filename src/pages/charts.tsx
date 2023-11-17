@@ -1,8 +1,8 @@
 import React from "react";
 import Status from "../components/status";
-import useDropdownMenu from "../components/useDropdownMenu";
+import useDropdownMenu from "../components/hooks/useDropdownMenu";
 import { apiRequest, updatePageCache } from "../funcs";
-import ArtistCard from "../components/artist_card";
+import ArtistCard from "../components/cards/artist_card";
 import TrackRow from "../components/track_row";
 import Tracklist from "../components/tracklist";
 import PageHeader from "../components/page_header";

@@ -6,7 +6,7 @@ import GenresPage from "./pages/top_genres";
 import LibraryPage from "./pages/library";
 import ChartsPage from "./pages/charts";
 import { STATS_VERSION, LATEST_RELEASE } from "./constants";
-import useConfig from "./components/useConfig";
+import useConfig from "./components/hooks/useConfig";
 
 import "./styles/app.scss";
 import "./styles/settings_modal.scss";

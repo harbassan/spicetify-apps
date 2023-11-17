@@ -1,6 +1,6 @@
 import React from "react";
 import TrackRow from "../components/track_row";
-import useDropdownMenu from "../components/useDropdownMenu";
+import useDropdownMenu from "../components/hooks/useDropdownMenu";
 import Status from "../components/status";
 import { apiRequest, updatePageCache } from "../funcs";
 import PageHeader from "../components/page_header";

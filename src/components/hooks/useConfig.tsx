@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import SettingsModal from "./settings_modal";
-import { Config } from "../types/stats_types";
+import SettingsModal from "../settings_modal";
+import { Config } from "../../types/stats_types";
 
 export const getLocalStorageDataFromKey = (key: string, fallback?: unknown) => {
     const data = localStorage.getItem(key);

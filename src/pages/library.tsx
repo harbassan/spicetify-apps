@@ -1,8 +1,8 @@
 import React from "react";
-import useDropdownMenu from "../components/useDropdownMenu";
-import StatCard from "../components/stat_card";
-import GenresCard from "../components/genres_card";
-import ArtistCard from "../components/artist_card";
+import useDropdownMenu from "../components/hooks/useDropdownMenu";
+import StatCard from "../components/cards/stat_card";
+import GenresCard from "../components/cards/genres_card";
+import ArtistCard from "../components/cards/artist_card";
 import InlineGrid from "../components/inline_grid";
 import { apiRequest, updatePageCache, fetchAudioFeatures, fetchTopAlbums, fetchTopArtists } from "../funcs";
 import Status from "../components/status";

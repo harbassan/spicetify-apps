@@ -1,7 +1,7 @@
 import React from "react";
-import StatCard from "../components/stat_card";
-import GenresCard from "../components/genres_card";
-import ArtistCard from "../components/artist_card";
+import StatCard from "../components/cards/stat_card";
+import GenresCard from "../components/cards/genres_card";
+import ArtistCard from "../components/cards/artist_card";
 import { apiRequest, fetchAudioFeatures, fetchTopArtists, fetchTopAlbums } from "../funcs";
 import Status from "../components/status";
 import InlineGrid from "../components/inline_grid";

@@ -1,7 +1,7 @@
 import React from "react";
-import useDropdownMenu from "../components/useDropdownMenu";
-import StatCard from "../components/stat_card";
-import GenresCard from "../components/genres_card";
+import useDropdownMenu from "../components/hooks/useDropdownMenu";
+import StatCard from "../components/cards/stat_card";
+import GenresCard from "../components/cards/genres_card";
 import { apiRequest, updatePageCache } from "../funcs";
 import InlineGrid from "../components/inline_grid";
 import Status from "../components/status";

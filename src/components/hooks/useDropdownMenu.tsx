@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import DropdownMenu from "./dropdown";
+import DropdownMenu from "../dropdown";
 
 const useDropdownMenu = (options: string[], displayOptions: string[], storageVariable: string): [JSX.Element, string, (link: string) => void] => {
     const initialOption = Spicetify.LocalStorage.get(`stats:${storageVariable}:active-option`);

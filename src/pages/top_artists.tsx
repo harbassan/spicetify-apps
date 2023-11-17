@@ -1,6 +1,6 @@
 import React from "react";
-import useDropdownMenu from "../components/useDropdownMenu";
-import Card from "../components/artist_card";
+import useDropdownMenu from "../components/hooks/useDropdownMenu";
+import Card from "../components/cards/artist_card";
 import { apiRequest, updatePageCache } from "../funcs";
 import Status from "../components/status";
 import PageHeader from "../components/page_header";

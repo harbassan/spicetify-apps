@@ -1,6 +1,6 @@
 import React from "react";
-import RefreshButton from "./refresh_button";
-import SettingsButton from "./settings_button";
+import RefreshButton from "./buttons/refresh_button";
+import SettingsButton from "./buttons/settings_button";
 
 interface PageHeaderProps {
     title: string;
