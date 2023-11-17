@@ -134,7 +134,7 @@ var stats = (() => {
   });
   var optionsMenu_default = OptionsMenu;
 
-  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-13456-PqjxUa5cmX0M\18bcc608f211\navBar.module.css
+  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-25056-5z7ohgriAEFy\18bdb338cdf1\navBar.module.css
   var navBar_module_default = { "topBarHeaderItem": "navBar-module__topBarHeaderItem___v29bR_stats", "topBarHeaderItemLink": "navBar-module__topBarHeaderItemLink___VeyBY_stats", "topBarActive": "navBar-module__topBarActive___-qYPu_stats", "topBarNav": "navBar-module__topBarNav___1OtdR_stats", "optionsMenuDropBox": "navBar-module__optionsMenuDropBox___tD9mA_stats" };
 
   // node_modules/spcr-navigation-bar/navBar.tsx
@@ -1409,7 +1409,9 @@ var stats = (() => {
           }
           duration += playlist.playlist.duration;
           playlist.items.forEach((track) => {
-            if (!track)
+            if (!(track == null ? void 0 : track.album))
+              return;
+            if (track.link.includes("local"))
               return;
             trackIDs.push(track.link.split(":")[2]);
             if (track.isExplicit)
