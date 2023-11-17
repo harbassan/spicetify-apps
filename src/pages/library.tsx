@@ -111,7 +111,8 @@ const LibraryPage = ({ config }: any) => {
                 }
                 duration += playlist.playlist.duration;
                 playlist.items.forEach((track: any) => {
-                    if (!track) return;
+                    if (!track?.album) return;
+                    if (track.link.includes("local")) return;
 
                     trackIDs.push(track.link.split(":")[2]);
 
