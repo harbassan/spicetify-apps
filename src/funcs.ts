@@ -1,4 +1,4 @@
-export const updatePageCache = (i: any, callback: Function, activeOption: string, lib = false) => {
+export const updatePageCache = (i: any, callback: Function, activeOption: string, lib: any = false) => {
     let cacheInfo = Spicetify.LocalStorage.get("stats:cache-info");
     if (!cacheInfo) return;
 
@@ -6,6 +6,8 @@ export const updatePageCache = (i: any, callback: Function, activeOption: string
     if (!cacheInfoArray[i]) {
         if (!lib) {
             ["short_term", "medium_term", "long_term"].filter(option => option !== activeOption).forEach(option => callback(option, true, false));
+        } if (lib === "charts") {
+            ["artists", "tracks"].filter(option => option !== activeOption).forEach(option => callback(option, true, false));
         }
         callback(activeOption, true);
         cacheInfoArray[i] = true;

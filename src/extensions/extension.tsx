@@ -7,7 +7,7 @@ import PlaylistPage from "../pages/playlist";
         return;
     }
 
-    Spicetify.LocalStorage.set("stats:cache-info", JSON.stringify([0, 0, 0, 0]));
+    Spicetify.LocalStorage.set("stats:cache-info", JSON.stringify([0, 0, 0, 0, 0]));
 
     const styleLink = document.createElement("link");
     styleLink.rel = "stylesheet";
@@ -16,6 +16,7 @@ import PlaylistPage from "../pages/playlist";
 
     const playlistEdit = new Spicetify.Topbar.Button("playlist-stats", "visualizer", () => {
         const playlistUri = `spotify:playlist:${Spicetify.Platform.History.location.pathname.split("/")[2]}`;
+        // @ts-ignore
         Spicetify.PopupModal.display({ title: "Playlist Stats", content: <PlaylistPage uri={playlistUri} />, isLarge: true });
     });
     playlistEdit.element.classList.toggle("hidden", true);

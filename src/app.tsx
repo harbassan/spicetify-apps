@@ -4,6 +4,7 @@ import ArtistsPage from "./pages/top_artists";
 import TracksPage from "./pages/top_tracks";
 import GenresPage from "./pages/top_genres";
 import LibraryPage from "./pages/library";
+import ChartsPage from "./pages/charts";
 import { STATS_VERSION, LATEST_RELEASE } from "./constants";
 import useConfig from "./components/useConfig";
 
@@ -15,6 +16,7 @@ const pages: Record<string, JSX.Element> = {
     ["Tracks"]: <TracksPage />,
     ["Genres"]: <GenresPage />,
     ["Library"]: <LibraryPage />,
+    ["Charts"]: <ChartsPage />,
 };
 
 const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
@@ -35,7 +37,7 @@ const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
 };
 
 const App = () => {
-    const [navBar, activeLink, setActiveLink] = useNavigationBar(["Artists", "Tracks", "Genres", "Library"]);
+    const [navBar, activeLink, setActiveLink] = useNavigationBar(["Artists", "Tracks", "Genres", "Library", "Charts"]);
     const [newUpdate, setNewUpdate] = React.useState(false);
 
     const config = useConfig([
