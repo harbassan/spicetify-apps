@@ -117,13 +117,13 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
     if (library === null)
         return (
             <>
-                <Status heading="Analysing The Playlist" subheading="This might take a while" />
+                <Status icon="library" heading="Analysing The Playlist" subheading="This might take a while" />
             </>
         );
     if (!library)
         return (
             <>
-                <Status heading="Failed to Fetch Playlist Stats" subheading="Make an issue on Github" />
+                <Status icon="error" heading="Failed to Fetch Playlist Stats" subheading="Make an issue on Github" />
             </>
         );
 
@@ -153,17 +153,6 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
     const albumCards: JSX.Element[] = library.albums.map(album => {
         return <ArtistCard name={album.name} image={album.image} uri={album.uri} subtext={`Appears in ${album.freq} tracks`} />;
     });
-
-    const scrollGrid = (event: any) => {
-        const grid = event.target.parentNode.querySelector("div");
-
-        grid.scrollLeft += grid.clientWidth;
-    };
-
-    const scrollGridLeft = (event: any) => {
-        const grid = event.target.parentNode.querySelector("div");
-        grid.scrollLeft -= grid.clientWidth;
-    };
 
     return (
         <div className="stats-page">

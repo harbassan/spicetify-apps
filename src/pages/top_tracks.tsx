@@ -85,7 +85,7 @@ const TracksPage = ({ config }: any) => {
         return (
             <>
                 <PageHeader title="Top Tracks" {...props}>
-                    <Status heading="Failed to Fetch Top Tracks" subheading="Make an issue on Github" />
+                    <Status icon="error" heading="Failed to Fetch Top Tracks" subheading="Make an issue on Github" />
                 </PageHeader>
             </>
         );

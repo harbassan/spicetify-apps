@@ -130,7 +130,7 @@ const GenresPage = ({ config }: any) => {
     if (!topGenres)
         return (
             <PageHeader title="Top Artists" {...props}>
-                    <Status heading={"Failed To Fetch Top Genres"} subheading={"Make an issue on Github"} />
+                <Status icon="error" heading="Failed to Fetch Top Artists" subheading="Make an issue on Github" />
             </PageHeader>
         );
 

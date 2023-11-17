@@ -62,7 +62,7 @@ const ArtistsPage = ({ config }: any) => {
     if (!topArtists) {
         return (
             <PageHeader title="Top Artists" {...props}>
-                <Status heading="Failed to Fetch Top Artists" subheading="Make an issue on Github" />
+                <Status icon="error" heading="Failed to Fetch Top Artists" subheading="Make an issue on Github" />
             </PageHeader>
         );
     }

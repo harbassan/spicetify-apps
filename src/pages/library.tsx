@@ -242,7 +242,7 @@ const LibraryPage = ({ config }: any) => {
         return (
             <>
                 <PageHeader title="Library Analysis" {...props}>
-                    <Status heading={heading} subheading={subheading} />
+                    <Status icon="error" heading={heading} subheading={subheading} />
                 </PageHeader>
             </>
         );
