@@ -21,8 +21,6 @@ const DraggableComponent = (props: { uri: string; title: string; children: any }
     );
 };
 
-const MenuWrapper = React.memo((props: ArtistMenuProps) => <Spicetify.ReactComponent.ArtistMenu {...props} />);
-
 const Card = ({ name, image, uri, subtext }: cardProps) => {
     const goToArtist = (uriString: string) => {
         const uriObj = Spicetify.URI.fromString(uriString);
@@ -31,20 +29,26 @@ const Card = ({ name, image, uri, subtext }: cardProps) => {
         Spicetify.Platform.History.goForward();
     };
 
+    const isArtist = uri.includes("artist");
+
+    const MenuWrapper = React.memo((props: ArtistMenuProps) => {
+        return isArtist ? <Spicetify.ReactComponent.ArtistMenu {...props} /> : <Spicetify.ReactComponent.AlbumMenu {...props} />;
+    });
+
     return (
         <>
             <Spicetify.ReactComponent.ContextMenu menu={<MenuWrapper uri={uri} />} trigger="right-click">
                 <div className="main-card-card">
                     <DraggableComponent uri={uri} title={name}>
                         <div className="main-card-imageContainer">
-                            <div className="main-cardImage-imageWrapper main-cardImage-circular">
+                            <div className={`main-cardImage-imageWrapper ${isArtist ? `main-cardImage-circular` : ""}`}>
                                 <div className="">
                                     <img
                                         aria-hidden="false"
                                         draggable="false"
                                         loading="lazy"
                                         src={image}
-                                        className="main-image-image main-cardImage-image main-cardImage-circular main-image-loaded"
+                                        className={`main-image-image main-cardImage-image ${isArtist ? `main-cardImage-circular` : ""} main-image-loaded`}
                                     />
                                 </div>
                             </div>
