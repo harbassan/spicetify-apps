@@ -11,6 +11,10 @@ function filterLink(str: string): string {
     return str.replace(/[^a-zA-Z0-9\-._~:/?#[\]@!$&()*+,;= ]/g, "").replace(/ /g, "+");
 }
 
+const checkLiked = async (tracks: string[]) => {
+    return apiRequest("checkLiked", `https://api.spotify.com/v1/me/tracks/contains?ids=${tracks.join(",")}`);
+};
+
 const ChartsPage = ({ config }: any) => {
     const [chartData, setChartData] = React.useState<Record<string, any>[] | 100 | 200 | 500>(100);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(["artists", "tracks"], ["Top Artists", "Top Tracks"], "charts");
@@ -72,6 +76,7 @@ const ChartsPage = ({ config }: any) => {
                         name: item.name,
                         image: spotifyItem.album.images[0].url,
                         uri: spotifyItem.uri,
+                        id: spotifyItem.id,
                         artists: spotifyItem.artists.map((artist: any) => ({ name: artist.name, uri: artist.uri })),
                         duration: spotifyItem.duration_ms,
                         album: spotifyItem.album.name,
@@ -82,6 +87,17 @@ const ChartsPage = ({ config }: any) => {
                 }
             })
         );
+
+        if (type === "tracks" && cardData[0].id) {
+            const fetchedLikedArray = await checkLiked(cardData.map((track: { id: string }) => track.id));
+            if (!fetchedLikedArray) {
+                setChartData(200);
+                return;
+            }
+            cardData.forEach((track: any, index: number) => {
+                track.liked = fetchedLikedArray[index];
+            });
+        }
 
         if (set) setChartData(cardData);
 
@@ -133,7 +149,7 @@ const ChartsPage = ({ config }: any) => {
             </PageHeader>
         );
     } else {
-        if (!chartData[0].album) setChartData(100);
+        if (!chartData[0]?.album) setChartData(100);
         const trackRows = chartData.map((track: any, index) => <TrackRow index={index + 1} {...track} />);
         return (
             <PageHeader title="Charts - Top Tracks" {...props}>
