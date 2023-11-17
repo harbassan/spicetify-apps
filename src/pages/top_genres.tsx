@@ -2,10 +2,10 @@ import React from "react";
 import useDropdownMenu from "../components/useDropdownMenu";
 import StatCard from "../components/stat_card";
 import GenresCard from "../components/genres_card";
-import RefreshButton from "../components/refresh_button";
 import { apiRequest, updatePageCache } from "../funcs";
 import InlineGrid from "../components/inline_grid";
 import Status from "../components/status";
+import PageHeader from "../components/page_header";
 
 const GenresPage = ({ config }: any) => {
     const [topGenres, setTopGenres] = React.useState<
@@ -121,26 +121,17 @@ const GenresPage = ({ config }: any) => {
         fetchTopGenres(activeOption);
     }, [activeOption]);
 
+    const props = {
+        callback: () => fetchTopGenres(activeOption, true),
+        config: config,
+        dropdown: dropdown,
+    };
+
     if (!topGenres)
         return (
-            <>
-                <section className="contentSpacing">
-                    <div className={`collection-collection-header stats-header`}>
-                        <h1 data-encore-id="type" className="TypeElement-canon-type">
-                            Top Genres
-                        </h1>
-                        <div className="collection-searchBar-searchBar">
-                            <RefreshButton
-                                refreshCallback={() => {
-                                    fetchTopGenres(activeOption, true);
-                                }}
-                            />
-                            {dropdown}
-                        </div>
-                    </div>
+            <PageHeader title="Top Artists" {...props}>
                     <Status heading={"Failed To Fetch Top Genres"} subheading={"Make an issue on Github"} />
-                </section>
-            </>
+            </PageHeader>
         );
 
     if (!topGenres.genres.length) return <></>;
@@ -165,41 +156,24 @@ const GenresPage = ({ config }: any) => {
 
     return (
         <>
-            <section className="contentSpacing">
-                <div className={`collection-collection-header stats-header`}>
-                    <h1 data-encore-id="type" className="TypeElement-canon-type">
-                        Top Genres
-                    </h1>
-                    <div className="collection-searchBar-searchBar">
-                        <RefreshButton
-                            refreshCallback={() => {
-                                fetchTopGenres(activeOption, true);
-                            }}
-                        />
-                        {dropdown}
-                    </div>
-                </div>
-                <div className="stats-page">
-                    <section>
-                        <GenresCard genres={topGenres.genres} total={1275} />
-                        <InlineGrid special>{statCards}</InlineGrid>
-                    </section>
-                    <section className="main-shelf-shelf Shelf">
-                        <div className="main-shelf-header">
-                            <div className="main-shelf-topRow">
-                                <div className="main-shelf-titleWrapper">
-                                    <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">
-                                        Release Year Distribution
-                                    </h2>
-                                </div>
+            <PageHeader title="Top Genres" {...props}>
+                <section>
+                    <GenresCard genres={topGenres.genres} total={1275} />
+                    <InlineGrid special>{statCards}</InlineGrid>
+                </section>
+                <section className="main-shelf-shelf Shelf">
+                    <div className="main-shelf-header">
+                        <div className="main-shelf-topRow">
+                            <div className="main-shelf-titleWrapper">
+                                <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">Release Year Distribution</h2>
                             </div>
                         </div>
-                        <section>
-                            <GenresCard genres={topGenres.years} total={50} />
-                        </section>
+                    </div>
+                    <section>
+                        <GenresCard genres={topGenres.years} total={50} />
                     </section>
-                </div>
-            </section>
+                </section>
+            </PageHeader>
         </>
     );
 };

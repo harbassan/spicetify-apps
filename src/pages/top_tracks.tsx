@@ -1,9 +1,9 @@
 import React from "react";
 import TrackRow from "../components/track_row";
 import useDropdownMenu from "../components/useDropdownMenu";
-import RefreshButton from "../components/refresh_button";
 import Status from "../components/status";
 import { apiRequest, updatePageCache } from "../funcs";
+import PageHeader from "../components/page_header";
 import Tracklist from "../components/tracklist";
 
 const checkLiked = async (tracks: string[]) => {
@@ -75,27 +75,18 @@ const TracksPage = ({ config }: any) => {
         fetchTopTracks(activeOption);
     }, [activeOption]);
 
+    const props = {
+        callback: () => fetchTopTracks(activeOption, true),
+        config: config,
+        dropdown: dropdown,
+    };
+
     if (!topTracks) {
         return (
             <>
-                <section className="contentSpacing">
-                    <div className={`collection-collection-header stats-header`}>
-                        <div className="stats-trackPageTitle">
-                            <h1 data-encore-id="type" className="TypeElement-canon-type">
-                                Top Tracks
-                            </h1>
-                        </div>
-                        <div className="collection-searchBar-searchBar">
-                            <RefreshButton
-                                refreshCallback={() => {
-                                    fetchTopTracks(activeOption, true);
-                                }}
-                            />
-                            {dropdown}
-                        </div>
-                    </div>
+                <PageHeader title="Top Tracks" {...props}>
                     <Status heading="Failed to Fetch Top Tracks" subheading="Make an issue on Github" />
-                </section>
+                </PageHeader>
             </>
         );
     }
@@ -114,34 +105,17 @@ const TracksPage = ({ config }: any) => {
         });
     };
 
-    const trackRows = topTracks.map((track, index) => <TrackRow index={index} {...track} />);
+    const trackRows = topTracks.map((track: any, index) => <TrackRow index={index} {...track} />);
+
+    // <button className="stats-createPlaylistButton" data-encore-id="buttonSecondary" aria-expanded="false" onClick={createPlaylist}>
+    //     Turn Into Playlist
+    // </button>;
 
     return (
         <>
-            <section className="contentSpacing">
-                <div className={`collection-collection-header stats-header`}>
-                    <div className="stats-trackPageTitle">
-                        <h1 data-encore-id="type" className="TypeElement-canon-type">
-                            Top Tracks
-                        </h1>
-                        <button className="stats-createPlaylistButton" data-encore-id="buttonSecondary" aria-expanded="false" onClick={createPlaylist}>
-                            Turn Into Playlist
-                        </button>
-                    </div>
-
-                    <div className="collection-searchBar-searchBar">
-                        <RefreshButton
-                            refreshCallback={() => {
-                                fetchTopTracks(activeOption, true);
-                            }}
-                        />
-                        {dropdown}
-                    </div>
-                </div>
-                <div>
-                    <Tracklist>{trackRows}</Tracklist>
-                </div>
-            </section>
+            <PageHeader title="Top Tracks" {...props}>
+                <Tracklist>{trackRows}</Tracklist>
+            </PageHeader>
         </>
     );
 };

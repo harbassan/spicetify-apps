@@ -1,9 +1,9 @@
 import React from "react";
 import useDropdownMenu from "../components/useDropdownMenu";
 import Card from "../components/artist_card";
-import RefreshButton from "../components/refresh_button";
 import { apiRequest, updatePageCache } from "../funcs";
 import Status from "../components/status";
+import PageHeader from "../components/page_header";
 
 const ArtistsPage = ({ config }: any) => {
     const [topArtists, setTopArtists] = React.useState<any[] | false>([]);
@@ -53,24 +53,17 @@ const ArtistsPage = ({ config }: any) => {
         fetchTopArtists(activeOption);
     }, [activeOption]);
 
+    const props = {
+        callback: () => fetchTopArtists(activeOption, true),
+        config: config,
+        dropdown: dropdown,
+    };
+
     if (!topArtists) {
         return (
-            <section className="contentSpacing">
-                <div className={`collection-collection-header stats-header`}>
-                    <h1 data-encore-id="type" className="TypeElement-canon-type">
-                        Top Artists
-                    </h1>
-                    <div className="collection-searchBar-searchBar">
-                        <RefreshButton
-                            refreshCallback={() => {
-                                fetchTopArtists(activeOption, true);
-                            }}
-                        />
-                        {dropdown}
-                    </div>
-                </div>
+            <PageHeader title="Top Artists" {...props}>
                 <Status heading="Failed to Fetch Top Artists" subheading="Make an issue on Github" />
-            </section>
+            </PageHeader>
         );
     }
 
@@ -80,24 +73,9 @@ const ArtistsPage = ({ config }: any) => {
 
     return (
         <>
-            <section className="contentSpacing">
-                <div className={`collection-collection-header stats-header`}>
-                    <h1 data-encore-id="type" className="TypeElement-canon-type">
-                        Top Artists
-                    </h1>
-                    <div className="collection-searchBar-searchBar">
-                        <RefreshButton
-                            refreshCallback={() => {
-                                fetchTopArtists(activeOption, true);
-                            }}
-                        />
-                        {dropdown}
-                    </div>
-                </div>
-                <div>
-                    <div className={`main-gridContainer-gridContainer stats-grid`}>{artistCards}</div>
-                </div>
-            </section>
+            <PageHeader title="Top Artists" {...props}>
+                <div className={`main-gridContainer-gridContainer stats-grid`}>{artistCards}</div>
+            </PageHeader>
         </>
     );
 };

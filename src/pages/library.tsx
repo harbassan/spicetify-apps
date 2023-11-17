@@ -3,10 +3,10 @@ import useDropdownMenu from "../components/useDropdownMenu";
 import StatCard from "../components/stat_card";
 import GenresCard from "../components/genres_card";
 import ArtistCard from "../components/artist_card";
-import RefreshButton from "../components/refresh_button";
 import InlineGrid from "../components/inline_grid";
 import { apiRequest, updatePageCache, fetchAudioFeatures, fetchTopAlbums, fetchTopArtists } from "../funcs";
 import Status from "../components/status";
+import PageHeader from "../components/page_header";
 
 interface LibraryProps {
     audioFeatures: Record<string, number>;
@@ -229,28 +229,21 @@ const LibraryPage = ({ config }: any) => {
         fetchData(activeOption);
     }, [activeOption]);
 
+    const props = {
+        callback: () => fetchData(activeOption),
+        config: config,
+        dropdown: dropdown,
+    };
+
     // Render a status page that doesnt impede the user from using the rest of the app
     if (!library || library.trackCount === 0) {
         const heading = library === null ? "Analysing Your Library" : !library ? "Failed To Fetch Library Stats" : "No Playlists In Your Library";
         const subheading = library === null ? "This may take a while" : !library ? "Make an issue on Github" : "Try adding some playlists first";
         return (
             <>
-                <section className="contentSpacing">
-                    <div className={`collection-collection-header stats-header`}>
-                        <h1 data-encore-id="type" className="TypeElement-canon-type">
-                            Library Analysis
-                        </h1>
-                        <div className="collection-searchBar-searchBar">
-                            <RefreshButton
-                                refreshCallback={() => {
-                                    fetchData(activeOption, true);
-                                }}
-                            />
-                            {dropdown}
-                        </div>
-                    </div>
+                <PageHeader title="Library Analysis" {...props}>
                     <Status heading={heading} subheading={subheading} />
-                </section>
+                </PageHeader>
             </>
         );
     }
@@ -284,75 +277,58 @@ const LibraryPage = ({ config }: any) => {
 
     return (
         <>
-            <section className="contentSpacing">
-                <div className={`collection-collection-header stats-header`}>
-                    <h1 data-encore-id="type" className="TypeElement-canon-type">
-                        Library Analysis
-                    </h1>
-                    <div className="collection-searchBar-searchBar">
-                        <RefreshButton
-                            refreshCallback={() => {
-                                fetchData(activeOption, true);
-                            }}
-                        />
-                        {dropdown}
+            <PageHeader title="Library Analysis" {...props}>
+                <section className="stats-libraryOverview">
+                    <StatCard stat="Total Playlists" value={library.playlistCount} />
+                    <StatCard stat="Total Tracks" value={library.trackCount} />
+                    <StatCard stat="Total Artists" value={library.artistCount} />
+                    <StatCard stat="Total Minutes" value={Math.floor(library.totalDuration / 60)} />
+                    <StatCard stat="Total Hours" value={(library.totalDuration / (60 * 60)).toFixed(1)} />
+                </section>
+                <section>
+                    <div className="main-shelf-header">
+                        <div className="main-shelf-topRow">
+                            <div className="main-shelf-titleWrapper">
+                                <h2 className="TypeElement-canon-textBase-type main-shelf-title">Most Frequent Genres</h2>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div className="stats-page">
-                    <section className="stats-libraryOverview">
-                        <StatCard stat="Total Playlists" value={library.playlistCount} />
-                        <StatCard stat="Total Tracks" value={library.trackCount} />
-                        <StatCard stat="Total Artists" value={library.artistCount} />
-                        <StatCard stat="Total Minutes" value={Math.floor(library.totalDuration / 60)} />
-                        <StatCard stat="Total Hours" value={(library.totalDuration / (60 * 60)).toFixed(1)} />
-                    </section>
+                    <GenresCard genres={library.genres} total={library.genresDenominator} />
+                    <InlineGrid special>{statCards}</InlineGrid>
+                </section>
+                <section className="main-shelf-shelf Shelf">
+                    <div className="main-shelf-header">
+                        <div className="main-shelf-topRow">
+                            <div className="main-shelf-titleWrapper">
+                                <h2 className="TypeElement-canon-textBase-type main-shelf-title">Most Frequent Artists</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <InlineGrid>{artistCards}</InlineGrid>
+                </section>
+                <section className="main-shelf-shelf Shelf">
+                    <div className="main-shelf-header">
+                        <div className="main-shelf-topRow">
+                            <div className="main-shelf-titleWrapper">
+                                <h2 className="TypeElement-canon-textBase-type main-shelf-title">Most Frequent Albums</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <InlineGrid>{albumCards}</InlineGrid>
+                </section>
+                <section className="main-shelf-shelf Shelf">
+                    <div className="main-shelf-header">
+                        <div className="main-shelf-topRow">
+                            <div className="main-shelf-titleWrapper">
+                                <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">Release Year Distribution</h2>
+                            </div>
+                        </div>
+                    </div>
                     <section>
-                        <div className="main-shelf-header">
-                            <div className="main-shelf-topRow">
-                                <div className="main-shelf-titleWrapper">
-                                    <h2 className="TypeElement-canon-textBase-type main-shelf-title">Most Frequent Genres</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <GenresCard genres={library.genres} total={library.genresDenominator} />
-                        <InlineGrid special>{statCards}</InlineGrid>
+                        <GenresCard genres={library.years} total={library.yearsDenominator} />
                     </section>
-                    <section className="main-shelf-shelf Shelf">
-                        <div className="main-shelf-header">
-                            <div className="main-shelf-topRow">
-                                <div className="main-shelf-titleWrapper">
-                                    <h2 className="TypeElement-canon-textBase-type main-shelf-title">Most Frequent Artists</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <InlineGrid>{artistCards}</InlineGrid>
-                    </section>
-                    <section className="main-shelf-shelf Shelf">
-                        <div className="main-shelf-header">
-                            <div className="main-shelf-topRow">
-                                <div className="main-shelf-titleWrapper">
-                                    <h2 className="TypeElement-canon-textBase-type main-shelf-title">Most Frequent Albums</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <InlineGrid>{albumCards}</InlineGrid>
-                    </section>
-                    <section className="main-shelf-shelf Shelf">
-                        <div className="main-shelf-header">
-                            <div className="main-shelf-topRow">
-                                <div className="main-shelf-titleWrapper">
-                                    <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">
-                                        Release Year Distribution
-                                    </h2>
-                                </div>
-                            </div>
-                        </div>
-                        <section>
-                            <GenresCard genres={library.years} total={library.yearsDenominator} />
-                        </section>
-                    </section>
-                </div>
-            </section>
+                </section>
+            </PageHeader>
         </>
     );
 };

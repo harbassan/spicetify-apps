@@ -1,6 +1,6 @@
 import React from "react";
 
-const RefreshButton = ({ refreshCallback }: { refreshCallback: any }) => {
+const RefreshButton = ({ refreshCallback }: { refreshCallback: () => void }) => {
     return (
         <div className="x-filterBox-filterInputContainer stats-refreshButton" role="search" aria-expanded="false">
             <Spicetify.ReactComponent.TooltipWrapper label={"Refresh"} renderInline={true} placement="bottom">
