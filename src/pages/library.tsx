@@ -139,8 +139,6 @@ const LibraryPage = ({ config }: any) => {
             const fetchedFeatures: any[] = await fetchAudioFeatures(trackIDs);
 
             const audioFeatures: Record<string, number> = {
-                popularity: popularity,
-                explicitness: explicitCount,
                 danceability: 0,
                 energy: 0,
                 valence: 0,
@@ -160,19 +158,15 @@ const LibraryPage = ({ config }: any) => {
                 }
                 if (!fetchedFeatures[i]) continue;
                 const track = fetchedFeatures[i];
-                audioFeatures["danceability"] += track["danceability"];
-                audioFeatures["energy"] += track["energy"];
-                audioFeatures["valence"] += track["valence"];
-                audioFeatures["speechiness"] += track["speechiness"];
-                audioFeatures["acousticness"] += track["acousticness"];
-                audioFeatures["instrumentalness"] += track["instrumentalness"];
-                audioFeatures["liveness"] += track["liveness"];
-                audioFeatures["tempo"] += track["tempo"];
-                audioFeatures["loudness"] += track["loudness"];
+                Object.keys(audioFeatures).forEach(feature => {
+                    audioFeatures[feature] += track[feature];
+                });
             }
 
-            for (let key in audioFeatures) {
-                audioFeatures[key] /= fetchedFeatures.length;
+            const allAudioFeatures: Record<string, any> = { popularity, explicitness: explicitCount, ...audioFeatures };
+
+            for (let key in allAudioFeatures) {
+                allAudioFeatures[key] /= fetchedFeatures.length;
             }
 
             for (let key in ownedAudioFeatures) {
@@ -195,7 +189,7 @@ const LibraryPage = ({ config }: any) => {
 
             const allStats = {
                 playlistCount: playlists.length,
-                audioFeatures: audioFeatures,
+                audioFeatures: allAudioFeatures,
                 trackCount: trackCount,
                 totalDuration: duration,
                 artistCount: Object.keys(artists).length,
