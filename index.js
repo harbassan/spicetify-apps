@@ -134,7 +134,7 @@ var stats = (() => {
   });
   var optionsMenu_default = OptionsMenu;
 
-  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-25056-5z7ohgriAEFy\18bdb338cdf1\navBar.module.css
+  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-12884-5bSUhQM1EDZD\18beb834b991\navBar.module.css
   var navBar_module_default = { "topBarHeaderItem": "navBar-module__topBarHeaderItem___v29bR_stats", "topBarHeaderItemLink": "navBar-module__topBarHeaderItemLink___VeyBY_stats", "topBarActive": "navBar-module__topBarActive___-qYPu_stats", "topBarNav": "navBar-module__topBarNav___1OtdR_stats", "optionsMenuDropBox": "navBar-module__optionsMenuDropBox___tD9mA_stats" };
 
   // node_modules/spcr-navigation-bar/navBar.tsx
@@ -1431,8 +1431,6 @@ var stats = (() => {
         const [ownedTopAlbums, ownedReleaseYears, ownedReleaseYearsTotal] = await fetchTopAlbums(ownedAlbums);
         const fetchedFeatures = await fetchAudioFeatures(trackIDs);
         const audioFeatures = {
-          popularity,
-          explicitness: explicitCount,
           danceability: 0,
           energy: 0,
           valence: 0,
@@ -1451,18 +1449,13 @@ var stats = (() => {
           if (!fetchedFeatures[i])
             continue;
           const track = fetchedFeatures[i];
-          audioFeatures["danceability"] += track["danceability"];
-          audioFeatures["energy"] += track["energy"];
-          audioFeatures["valence"] += track["valence"];
-          audioFeatures["speechiness"] += track["speechiness"];
-          audioFeatures["acousticness"] += track["acousticness"];
-          audioFeatures["instrumentalness"] += track["instrumentalness"];
-          audioFeatures["liveness"] += track["liveness"];
-          audioFeatures["tempo"] += track["tempo"];
-          audioFeatures["loudness"] += track["loudness"];
+          Object.keys(audioFeatures).forEach((feature) => {
+            audioFeatures[feature] += track[feature];
+          });
         }
-        for (let key in audioFeatures) {
-          audioFeatures[key] /= fetchedFeatures.length;
+        const allAudioFeatures = __spreadValues({ popularity, explicitness: explicitCount }, audioFeatures);
+        for (let key in allAudioFeatures) {
+          allAudioFeatures[key] /= fetchedFeatures.length;
         }
         for (let key in ownedAudioFeatures) {
           ownedAudioFeatures[key] /= ownedTrackCount;
@@ -1482,7 +1475,7 @@ var stats = (() => {
         };
         const allStats = {
           playlistCount: playlists.length,
-          audioFeatures,
+          audioFeatures: allAudioFeatures,
           trackCount,
           totalDuration: duration,
           artistCount: Object.keys(artists).length,
