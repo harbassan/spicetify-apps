@@ -49,6 +49,14 @@ const App = () => {
             placeholder: "Enter API Key",
             desc: `You can get this by visiting www.last.fm/api/account/create and simply entering any name.<br/>You'll need to make an account first, which is a plus.`,
         },
+        {
+            name: "Last.fm Username",
+            key: "lastfm-user",
+            type: "text",
+            def: null,
+            placeholder: "Enter Username",
+        },
+        { name: "Use Last.fm for Stats", key: "use-lastfm", type: "toggle", def: false },
     ]);
 
     React.useEffect(() => {

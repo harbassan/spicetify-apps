@@ -145,3 +145,67 @@ export const fetchTopArtists = async (artists: Record<string, number>) => {
     const top_genres = Object.entries(genres).sort((a, b) => b[1] - a[1]).slice(0, 10);
     return [top_artists, top_genres, total_genre_tracks];
 };
+
+function filterLink(str: string): string {
+    const normalizedStr = str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return normalizedStr.replace(/[^a-zA-Z0-9\-._~:/?#[\]@!$&()*+,;= ]/g, "").replace(/ /g, "+");
+}
+
+export const convertToSpotify = async (data: any[], type: "artist" | "track") => {
+    return await Promise.all(
+        data.map(async (item: any) => {
+            if (type === "artist") {
+                const spotifyItem = await Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/search?q=${filterLink(item.name)}&type=artist`).then(
+                    (res: any) => res.artists?.items[0]
+                );
+                if (!spotifyItem) {
+                    console.log(`https://api.spotify.com/v1/search?q=track:${filterLink(item.name)}+artist:${filterLink(item.artist.name)}&type=track`);
+                return {
+                    name: item.name,
+                    image: item.image[0]["#text"],
+                    uri: item.url,
+                    id: "N/A",
+                };
+                };
+                return {
+                    name: item.name,
+                    image: spotifyItem.images[0].url,
+                    uri: spotifyItem.uri,
+                    id: spotifyItem.id,
+                };
+            }
+
+            // type === "track"
+            const spotifyItem = await Spicetify.CosmosAsync.get(
+                `https://api.spotify.com/v1/search?q=track:${filterLink(item.name)}+artist:${filterLink(item.artist.name)}&type=track`
+            ).then((res: any) => res.tracks?.items[0]);
+            if (!spotifyItem) {
+                console.log(`https://api.spotify.com/v1/search?q=track:${filterLink(item.name)}+artist:${filterLink(item.artist.name)}&type=track`);
+                return {
+                    name: item.name,
+                    image: item.image[0]["#text"],
+                    uri: item.url,
+                    artists: [{ name: item.artist.name, uri: item.artist.url }],
+                    duration: 0,
+                    album: "N/A",
+                    popularity: 0,
+                    explicit: false,
+                    album_uri: "N/A",
+                };
+            }
+            return {
+                name: item.name,
+                image: spotifyItem.album.images[0].url,
+                uri: spotifyItem.uri,
+                id: spotifyItem.id,
+                artists: spotifyItem.artists.map((artist: any) => ({ name: artist.name, uri: artist.uri })),
+                duration: spotifyItem.duration_ms,
+                album: spotifyItem.album.name,
+                popularity: spotifyItem.popularity,
+                explicit: spotifyItem.explicit,
+                album_uri: spotifyItem.album.uri,
+            };
+        })
+    );
+}
+

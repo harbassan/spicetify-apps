@@ -1,7 +1,7 @@
 import React from "react";
 import useDropdownMenu from "../components/hooks/useDropdownMenu";
 import Card from "../components/cards/artist_card";
-import { apiRequest, updatePageCache } from "../funcs";
+import { apiRequest, updatePageCache, convertToSpotify } from "../funcs";
 import Status from "../components/status";
 import PageHeader from "../components/page_header";
 
@@ -23,25 +23,59 @@ const ArtistsPage = ({ config }: any) => {
         }
 
         const start = window.performance.now();
-        const topArtists = await apiRequest("topArtists", `https://api.spotify.com/v1/me/top/artists?limit=50&offset=0&time_range=${time_range}`);
-        if (!topArtists) {
-            setTopArtists(false);
-            return;
-        }
-        const topArtistsMinified = topArtists.items.map((artist: any) => {
-            return {
-                id: artist.id,
-                name: artist.name,
-                image: artist.images[2]
-                    ? artist.images[2].url
-                    : artist.images[1]
-                    ? artist.images[1].url
-                    : "https://images.squarespace-cdn.com/content/v1/55fc0004e4b069a519961e2d/1442590746571-RPGKIXWGOO671REUNMCB/image-asset.gif",
-                uri: artist.uri,
+        let topArtists;
+
+        if (config.CONFIG["use-lastfm"] === true) {
+            if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) {
+                setTopArtists(false);
+                return;
+            }
+
+            const lastfmperiods: Record<string, string> = {
+                short_term: "1month",
+                medium_term: "6month",
+                long_term: "overall",
             };
-        });
-        if (set) setTopArtists(topArtistsMinified);
-        Spicetify.LocalStorage.set(`stats:top-artists:${time_range}`, JSON.stringify(topArtistsMinified));
+
+            const lastfmData = await apiRequest(
+                "lastfm",
+                `https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${config.CONFIG["lastfm-user"]}&api_key=${config.CONFIG["api-key"]}&format=json&period=${lastfmperiods[time_range]}`
+            );
+
+            if (!lastfmData) {
+                setTopArtists(false);
+                return;
+            }
+
+            const data = lastfmData.topartists.artist;
+            const spotifyData = await convertToSpotify(data, "artist");
+
+            topArtists = spotifyData;
+        } else {
+            topArtists = await apiRequest("topArtists", `https://api.spotify.com/v1/me/top/artists?limit=50&offset=0&time_range=${time_range}`);
+
+            if (!topArtists) {
+                setTopArtists(false);
+                return;
+            }
+            const topArtistsMinified = topArtists.items.map((artist: any) => {
+                return {
+                    id: artist.id,
+                    name: artist.name,
+                    image: artist.images[2]
+                        ? artist.images[2].url
+                        : artist.images[1]
+                        ? artist.images[1].url
+                        : "https://images.squarespace-cdn.com/content/v1/55fc0004e4b069a519961e2d/1442590746571-RPGKIXWGOO671REUNMCB/image-asset.gif",
+                    uri: artist.uri,
+                };
+            });
+
+            topArtists = topArtistsMinified;
+        }
+
+        if (set) setTopArtists(topArtists);
+        Spicetify.LocalStorage.set(`stats:top-artists:${time_range}`, JSON.stringify(topArtists));
         console.log("total artists fetch time:", window.performance.now() - start);
     };
 
