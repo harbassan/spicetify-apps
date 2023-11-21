@@ -23,7 +23,7 @@ interface LibraryProps {
 }
 
 const LibraryPage = ({ config }: any) => {
-    const [library, setLibrary] = React.useState<LibraryProps | null | false>(null);
+    const [library, setLibrary] = React.useState<LibraryProps | 100 | 200 | 300>(100);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(["owned", "all"], ["My Playlists", "All Playlists"], "library");
 
     const fetchData = async (option: string, force?: boolean, set: boolean = true) => {
@@ -202,8 +202,9 @@ const LibraryPage = ({ config }: any) => {
             };
 
             if (set) {
-                if (option === "all") setLibrary(allStats);
-                else setLibrary(ownedStats);
+                if (option === "all" && allStats.playlistCount) setLibrary(allStats);
+                else if (option === "owned" && ownedStats.playlistCount) setLibrary(ownedStats);
+                else return setLibrary(300);
             }
 
             Spicetify.LocalStorage.set(`stats:library:all`, JSON.stringify(allStats));
@@ -212,7 +213,7 @@ const LibraryPage = ({ config }: any) => {
             console.log("total library fetch time:", window.performance.now() - start);
         } catch (e) {
             console.error(e);
-            setLibrary(false);
+            setLibrary(200);
         }
     };
 
@@ -230,17 +231,25 @@ const LibraryPage = ({ config }: any) => {
         dropdown: dropdown,
     };
 
-    // Render a status page that doesnt impede the user from using the rest of the app
-    if (!library || library.trackCount === 0) {
-        const heading = library === null ? "Analysing Your Library" : !library ? "Failed To Fetch Library Stats" : "No Playlists In Your Library";
-        const subheading = library === null ? "This may take a while" : !library ? "Make an issue on Github" : "Try adding some playlists first";
-        return (
-            <>
-                <PageHeader title="Library Analysis" {...props}>
-                    <Status icon="error" heading={heading} subheading={subheading} />
+    switch (library) {
+        case 300:
+            return (
+                <PageHeader title={`Library Analysis`} {...props}>
+                    <Status icon="error" heading="No Playlists In Your Library" subheading="Try adding some playlists first" />
                 </PageHeader>
-            </>
-        );
+            );
+        case 200:
+            return (
+                <PageHeader title={`Library Analysis`} {...props}>
+                    <Status icon="error" heading="Failed to Fetch Stats" subheading="Make an issue on Github" />
+                </PageHeader>
+            );
+        case 100:
+            return (
+                <PageHeader title={`Library Analysis`} {...props}>
+                    <Status icon="library" heading="Analysing your Library" subheading="This may take a while" />
+                </PageHeader>
+            );
     }
 
     const parseVal = (obj: [string, number]) => {

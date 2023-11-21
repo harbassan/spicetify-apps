@@ -14,7 +14,9 @@ const GenresPage = ({ config }: any) => {
               features: any;
               years: [string, number][];
           }
-        | false
+        | 100
+        | 200
+        | 300
     >({ genres: [], features: {}, years: [] });
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],
@@ -66,7 +68,7 @@ const GenresPage = ({ config }: any) => {
 
         const featureData = await fetchAudioFeatures(topTracks);
         if (!featureData) {
-            setTopGenres(false);
+            setTopGenres(200);
             return;
         }
 
@@ -127,14 +129,26 @@ const GenresPage = ({ config }: any) => {
         dropdown: dropdown,
     };
 
-    if (!topGenres)
-        return (
-            <PageHeader title="Top Artists" {...props}>
-                <Status icon="error" heading="Failed to Fetch Top Artists" subheading="Make an issue on Github" />
-            </PageHeader>
-        );
-
-    if (!topGenres.genres.length) return <></>;
+    switch (topGenres) {
+        case 300:
+            return (
+                <PageHeader title={`Top Genres`} {...props}>
+                    <Status icon="error" heading="No API Key or Username" subheading="Please enter these in the settings menu" />
+                </PageHeader>
+            );
+        case 200:
+            return (
+                <PageHeader title="Top Genres" {...props}>
+                    <Status icon="error" heading="Failed to Fetch Top Genres" subheading="An error occurred while fetching the data" />
+                </PageHeader>
+            );
+        case 100:
+            return (
+                <PageHeader title={`Top Genres`} {...props}>
+                    <Status icon="library" heading="Loading" subheading="Fetching data..." />
+                </PageHeader>
+            );
+    }
 
     const parseVal = (key: string) => {
         switch (key) {

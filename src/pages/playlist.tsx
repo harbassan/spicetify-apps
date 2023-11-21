@@ -20,14 +20,14 @@ interface LibraryProps {
 }
 
 const PlaylistPage = ({ uri }: { uri: string }) => {
-    const [library, setLibrary] = React.useState<LibraryProps | null | false>(null);
+    const [library, setLibrary] = React.useState<LibraryProps | 100 | 200>(100);
 
     const fetchData = async () => {
         const start = window.performance.now();
 
         const playlistMeta = await apiRequest("playlistMeta", `sp://core-playlist/v1/playlist/${uri}`);
         if (!playlistMeta) {
-            setLibrary(false);
+            setLibrary(200);
             return;
         }
 
@@ -114,18 +114,12 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
         fetchData();
     }, []);
 
-    if (library === null)
-        return (
-            <>
-                <Status icon="library" heading="Analysing The Playlist" subheading="This might take a while" />
-            </>
-        );
-    if (!library)
-        return (
-            <>
-                <Status icon="error" heading="Failed to Fetch Playlist Stats" subheading="Make an issue on Github" />
-            </>
-        );
+    switch (library) {
+        case 200:
+            return <Status icon="error" heading="Failed to Fetch Stats" subheading="Make an issue on Github" />;
+        case 100:
+            return <Status icon="library" heading="Analysing the Playlist" subheading="This may take a while" />;
+    }
 
     const parseVal = (obj: [string, number]) => {
         switch (obj[0]) {

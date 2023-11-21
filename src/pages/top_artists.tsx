@@ -6,7 +6,7 @@ import Status from "../components/status";
 import PageHeader from "../components/page_header";
 
 const ArtistsPage = ({ config }: any) => {
-    const [topArtists, setTopArtists] = React.useState<any[] | false>([]);
+    const [topArtists, setTopArtists] = React.useState<any[] | 100 | 200 | 300>([]);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],
         ["Past Month", "Past 6 Months", "All Time"],
@@ -27,7 +27,7 @@ const ArtistsPage = ({ config }: any) => {
 
         if (config.CONFIG["use-lastfm"] === true) {
             if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) {
-                setTopArtists(false);
+                setTopArtists(300);
                 return;
             }
 
@@ -43,7 +43,7 @@ const ArtistsPage = ({ config }: any) => {
             );
 
             if (!lastfmData) {
-                setTopArtists(false);
+                setTopArtists(200);
                 return;
             }
 
@@ -55,7 +55,7 @@ const ArtistsPage = ({ config }: any) => {
             topArtists = await apiRequest("topArtists", `https://api.spotify.com/v1/me/top/artists?limit=50&offset=0&time_range=${time_range}`);
 
             if (!topArtists) {
-                setTopArtists(false);
+                setTopArtists(200);
                 return;
             }
             const topArtistsMinified = topArtists.items.map((artist: any) => {
@@ -93,15 +93,26 @@ const ArtistsPage = ({ config }: any) => {
         dropdown: dropdown,
     };
 
-    if (!topArtists) {
-        return (
-            <PageHeader title="Top Artists" {...props}>
-                <Status icon="error" heading="Failed to Fetch Top Artists" subheading="Make an issue on Github" />
-            </PageHeader>
-        );
+    switch (topArtists) {
+        case 300:
+            return (
+                <PageHeader title={`Top Artists`} {...props}>
+                    <Status icon="error" heading="No API Key or Username" subheading="Please enter these in the settings menu" />
+                </PageHeader>
+            );
+        case 200:
+            return (
+                <PageHeader title={`Top Artists`} {...props}>
+                    <Status icon="error" heading="Failed to Fetch Top Artists" subheading="An error occurred while fetching the data" />
+                </PageHeader>
+            );
+        case 100:
+            return (
+                <PageHeader title={`Top Artists`} {...props}>
+                    <Status icon="library" heading="Loading" subheading="Fetching data..." />
+                </PageHeader>
+            );
     }
-
-    if (!topArtists.length) return <></>;
 
     const artistCards = topArtists.map((artist, index) => <Card key={artist.id} name={artist.name} image={artist.image} uri={artist.uri} subtext={"Artist"} />);
 

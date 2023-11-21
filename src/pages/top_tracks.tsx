@@ -11,7 +11,7 @@ const checkLiked = async (tracks: string[]) => {
 };
 
 const TracksPage = ({ config }: any) => {
-    const [topTracks, setTopTracks] = React.useState<Record<string, any>[] | false>([]);
+    const [topTracks, setTopTracks] = React.useState<Record<string, any>[] | 100 | 200 | 300>([]);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],
         ["Past Month", "Past 6 Months", "All Time"],
@@ -34,7 +34,7 @@ const TracksPage = ({ config }: any) => {
 
         if (config.CONFIG["use-lastfm"] === true) {
             if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) {
-                setTopTracks(false);
+                setTopTracks(300);
                 return;
             }
 
@@ -50,7 +50,7 @@ const TracksPage = ({ config }: any) => {
             );
 
             if (!lastfmData) {
-                setTopTracks(false);
+                setTopTracks(200);
                 return;
             }
 
@@ -60,7 +60,7 @@ const TracksPage = ({ config }: any) => {
             if (spotifyData[0].id) {
                 const fetchedLikedArray = await checkLiked(spotifyData.map(track => track.id));
                 if (!fetchedLikedArray) {
-                    setTopTracks(false);
+                    setTopTracks(200);
                     return;
                 }
                 spotifyData.forEach((track: any, index: number) => {
@@ -77,7 +77,7 @@ const TracksPage = ({ config }: any) => {
 
             const fetchedLikedArray = await checkLiked(fetchedTracks.map((track: { id: string }) => track.id));
             if (!fetchedLikedArray) {
-                setTopTracks(false);
+                setTopTracks(200);
                 return;
             }
 
@@ -122,17 +122,26 @@ const TracksPage = ({ config }: any) => {
         dropdown: dropdown,
     };
 
-    if (!topTracks) {
-        return (
-            <>
-                <PageHeader title="Top Tracks" {...props}>
-                    <Status icon="error" heading="Failed to Fetch Top Tracks" subheading="Make an issue on Github" />
+    switch (topTracks) {
+        case 300:
+            return (
+                <PageHeader title={`Top Tracks`} {...props}>
+                    <Status icon="error" heading="No API Key or Username" subheading="Please enter these in the settings menu" />
                 </PageHeader>
-            </>
-        );
+            );
+        case 200:
+            return (
+                <PageHeader title={`TopTracks`} {...props}>
+                    <Status icon="error" heading="Failed to Fetch Top Tracks" subheading="An error occurred while fetching the data" />
+                </PageHeader>
+            );
+        case 100:
+            return (
+                <PageHeader title={`Top Tracks`} {...props}>
+                    <Status icon="library" heading="Loading" subheading="Fetching data..." />
+                </PageHeader>
+            );
     }
-
-    if (!topTracks.length) return <></>;
 
     topTracks as Record<string, any>[];
 
