@@ -38,6 +38,7 @@ const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
 
 const App = () => {
     const [navBar, activeLink, setActiveLink] = useNavigationBar(["Artists", "Tracks", "Genres", "Library", "Charts"]);
+    const [hasPageSwitched, setHasPageSwitched] = React.useState(false); // TODO: edit spcr-navigation-bar to include initial active link
     const [newUpdate, setNewUpdate] = React.useState(false);
 
     const config = useConfig([
@@ -56,17 +57,28 @@ const App = () => {
             def: null,
             placeholder: "Enter Username",
         },
-        { name: "Use Last.fm for Stats", key: "use-lastfm", type: "toggle", def: false },
+        {
+            name: "Use Last.fm for Stats",
+            key: "use-lastfm",
+            type: "toggle",
+            def: false,
+            desc: `Last.fm charts your stats purely based on streaming count, whereas Spotify uses an algorithm`,
+        },
     ]);
 
     React.useEffect(() => {
         setActiveLink(Spicetify.LocalStorage.get("stats:active-link") || "Artists");
         checkForUpdates(setNewUpdate);
+        setHasPageSwitched(true);
     }, []);
 
     React.useEffect(() => {
         Spicetify.LocalStorage.set("stats:active-link", activeLink);
     }, [activeLink]);
+
+    if (!hasPageSwitched) {
+        return <></>;
+    }
 
     return (
         <>

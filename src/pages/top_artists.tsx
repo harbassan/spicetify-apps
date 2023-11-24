@@ -5,8 +5,52 @@ import { apiRequest, updatePageCache, convertToSpotify } from "../funcs";
 import Status from "../components/status";
 import PageHeader from "../components/page_header";
 
+export const topArtistsReq = async (time_range: string, config: any) => {
+    if (config.CONFIG["use-lastfm"] === true) {
+        if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) {
+            return 300;
+        }
+
+        const lastfmperiods: Record<string, string> = {
+            short_term: "1month",
+            medium_term: "6month",
+            long_term: "overall",
+        };
+
+        const response = await apiRequest(
+            "lastfm",
+            `https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${config.CONFIG["lastfm-user"]}&api_key=${config.CONFIG["api-key"]}&format=json&period=${lastfmperiods[time_range]}`
+        );
+
+        if (!response) {
+            return 200;
+        }
+
+        return await convertToSpotify(response.topartists.artist, "artists");
+    } else {
+        const response = await apiRequest("topArtists", `https://api.spotify.com/v1/me/top/artists?limit=50&offset=0&time_range=${time_range}`);
+
+        if (!response) {
+            return 200;
+        }
+        return response.items.map((artist: any) => {
+            return {
+                id: artist.id,
+                name: artist.name,
+                image: artist.images[2]
+                    ? artist.images[2].url
+                    : artist.images[1]
+                    ? artist.images[1].url
+                    : "https://images.squarespace-cdn.com/content/v1/55fc0004e4b069a519961e2d/1442590746571-RPGKIXWGOO671REUNMCB/image-asset.gif",
+                uri: artist.uri,
+                genres: artist.genres,
+            };
+        });
+    }
+};
+
 const ArtistsPage = ({ config }: any) => {
-    const [topArtists, setTopArtists] = React.useState<any[] | 100 | 200 | 300>([]);
+    const [topArtists, setTopArtists] = React.useState<any[] | 100 | 200 | 300>(100);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],
         ["Past Month", "Past 6 Months", "All Time"],
@@ -23,56 +67,7 @@ const ArtistsPage = ({ config }: any) => {
         }
 
         const start = window.performance.now();
-        let topArtists;
-
-        if (config.CONFIG["use-lastfm"] === true) {
-            if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) {
-                setTopArtists(300);
-                return;
-            }
-
-            const lastfmperiods: Record<string, string> = {
-                short_term: "1month",
-                medium_term: "6month",
-                long_term: "overall",
-            };
-
-            const lastfmData = await apiRequest(
-                "lastfm",
-                `https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${config.CONFIG["lastfm-user"]}&api_key=${config.CONFIG["api-key"]}&format=json&period=${lastfmperiods[time_range]}`
-            );
-
-            if (!lastfmData) {
-                setTopArtists(200);
-                return;
-            }
-
-            const data = lastfmData.topartists.artist;
-            const spotifyData = await convertToSpotify(data, "artist");
-
-            topArtists = spotifyData;
-        } else {
-            topArtists = await apiRequest("topArtists", `https://api.spotify.com/v1/me/top/artists?limit=50&offset=0&time_range=${time_range}`);
-
-            if (!topArtists) {
-                setTopArtists(200);
-                return;
-            }
-            const topArtistsMinified = topArtists.items.map((artist: any) => {
-                return {
-                    id: artist.id,
-                    name: artist.name,
-                    image: artist.images[2]
-                        ? artist.images[2].url
-                        : artist.images[1]
-                        ? artist.images[1].url
-                        : "https://images.squarespace-cdn.com/content/v1/55fc0004e4b069a519961e2d/1442590746571-RPGKIXWGOO671REUNMCB/image-asset.gif",
-                    uri: artist.uri,
-                };
-            });
-
-            topArtists = topArtistsMinified;
-        }
+        const topArtists = await topArtistsReq(time_range, config);
 
         if (set) setTopArtists(topArtists);
         Spicetify.LocalStorage.set(`stats:top-artists:${time_range}`, JSON.stringify(topArtists));

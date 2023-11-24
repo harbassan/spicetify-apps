@@ -151,27 +151,28 @@ function filterLink(str: string): string {
     return normalizedStr.replace(/[^a-zA-Z0-9\-._~:/?#[\]@!$&()*+,;= ]/g, "").replace(/ /g, "+");
 }
 
-export const convertToSpotify = async (data: any[], type: "artist" | "track") => {
+export const convertToSpotify = async (data: any[], type: string) => {
     return await Promise.all(
         data.map(async (item: any) => {
-            if (type === "artist") {
+            if (type === "artists") {
                 const spotifyItem = await Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/search?q=${filterLink(item.name)}&type=artist`).then(
                     (res: any) => res.artists?.items[0]
                 );
                 if (!spotifyItem) {
                     console.log(`https://api.spotify.com/v1/search?q=track:${filterLink(item.name)}+artist:${filterLink(item.artist.name)}&type=track`);
-                return {
-                    name: item.name,
-                    image: item.image[0]["#text"],
-                    uri: item.url,
-                    id: "N/A",
-                };
+                    return {
+                        name: item.name,
+                        image: item.image[0]["#text"],
+                        uri: item.url,
+                        id: "N/A",
+                    };
                 };
                 return {
                     name: item.name,
                     image: spotifyItem.images[0].url,
                     uri: spotifyItem.uri,
                     id: spotifyItem.id,
+                    genres: spotifyItem.genres,
                 };
             }
 
@@ -204,8 +205,35 @@ export const convertToSpotify = async (data: any[], type: "artist" | "track") =>
                 popularity: spotifyItem.popularity,
                 explicit: spotifyItem.explicit,
                 album_uri: spotifyItem.album.uri,
+                release_year: spotifyItem.album.release_date.slice(0, 4),
             };
         })
     );
 }
 
+export const checkLiked = async (tracks: string[]) => {
+    const nullIndexes: number[] = [];
+    tracks.forEach((track, index) => {
+        if (track === null) {
+            nullIndexes.push(index);
+        }
+    });
+
+    const apiResponse = (await apiRequest("checkLiked", `https://api.spotify.com/v1/me/tracks/contains?ids=${tracks.filter(e => e).join(",")}`)) as any;
+
+    const response = [];
+    let nullIndexesIndex = 0;
+
+    for (let i = 0; i < tracks.length; i++) {
+        if (nullIndexes.includes(i)) {
+            // Insert false value at the original position of null
+            response.push(false);
+        } else {
+            // Copy the value from the API response
+            response.push(apiResponse[nullIndexesIndex]);
+            nullIndexesIndex++;
+        }
+    }
+
+    return response;
+};

@@ -1,19 +1,11 @@
 import React from "react";
 import Status from "../components/status";
 import useDropdownMenu from "../components/hooks/useDropdownMenu";
-import { apiRequest, updatePageCache } from "../funcs";
+import { apiRequest, checkLiked, convertToSpotify, updatePageCache } from "../funcs";
 import ArtistCard from "../components/cards/artist_card";
 import TrackRow from "../components/track_row";
 import Tracklist from "../components/tracklist";
 import PageHeader from "../components/page_header";
-
-function filterLink(str: string): string {
-    return str.replace(/[^a-zA-Z0-9\-._~:/?#[\]@!$&()*+,;= ]/g, "").replace(/ /g, "+");
-}
-
-const checkLiked = async (tracks: string[]) => {
-    return apiRequest("checkLiked", `https://api.spotify.com/v1/me/tracks/contains?ids=${tracks.join(",")}`);
-};
 
 const ChartsPage = ({ config }: any) => {
     const [chartData, setChartData] = React.useState<Record<string, any>[] | 100 | 200 | 500>(100);
@@ -39,57 +31,11 @@ const ChartsPage = ({ config }: any) => {
             setChartData(500);
             return;
         }
-        console.log(response);
         const data = response[type].track || response[type].artist;
-        const cardData = await Promise.all(
-            data.map(async (item: any) => {
-                if (type === "artists") {
-                    const spotifyItem = await Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/search?q=${filterLink(item.name)}&type=artist`).then(
-                        (res: any) => res.artists.items[0]
-                    );
-                    return {
-                        name: item.name,
-                        image: spotifyItem.images[0].url,
-                        uri: spotifyItem.uri,
-                        id: spotifyItem.id,
-                        subtext: item.playcount,
-                    };
-                } else {
-                    const spotifyItem = await Spicetify.CosmosAsync.get(
-                        `https://api.spotify.com/v1/search?q=track:${filterLink(item.name)}+artist:${filterLink(item.artist.name)}&type=track`
-                    ).then((res: any) => res.tracks?.items[0]);
-                    if (!spotifyItem) {
-                        console.log(`https://api.spotify.com/v1/search?q=track:${filterLink(item.name)}+artist:${filterLink(item.artist.name)}&type=track`);
-                        return {
-                            name: item.name,
-                            image: item.image[0]["#text"],
-                            uri: item.url,
-                            artists: [{ name: item.artist.name, uri: item.artist.url }],
-                            duration: 0,
-                            album: "N/A",
-                            popularity: 0,
-                            explicit: false,
-                            album_uri: "N/A",
-                        };
-                    }
-                    return {
-                        name: item.name,
-                        image: spotifyItem.album.images[0].url,
-                        uri: spotifyItem.uri,
-                        id: spotifyItem.id,
-                        artists: spotifyItem.artists.map((artist: any) => ({ name: artist.name, uri: artist.uri })),
-                        duration: spotifyItem.duration_ms,
-                        album: spotifyItem.album.name,
-                        popularity: spotifyItem.popularity,
-                        explicit: spotifyItem.explicit,
-                        album_uri: spotifyItem.album.uri,
-                    };
-                }
-            })
-        );
+        const cardData = await convertToSpotify(data, type);
 
-        if (type === "tracks" && cardData[0].id) {
-            const fetchedLikedArray = await checkLiked(cardData.map((track: { id: string }) => track.id));
+        if (type === "tracks") {
+            const fetchedLikedArray = await checkLiked(cardData.map(track => track.id));
             if (!fetchedLikedArray) {
                 setChartData(200);
                 return;

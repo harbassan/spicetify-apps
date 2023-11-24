@@ -6,6 +6,8 @@ import { apiRequest, updatePageCache } from "../funcs";
 import InlineGrid from "../components/inline_grid";
 import Status from "../components/status";
 import PageHeader from "../components/page_header";
+import { topArtistsReq } from "./top_artists";
+import { topTracksReq } from "./top_tracks";
 
 const GenresPage = ({ config }: any) => {
     const [topGenres, setTopGenres] = React.useState<
@@ -17,14 +19,14 @@ const GenresPage = ({ config }: any) => {
         | 100
         | 200
         | 300
-    >({ genres: [], features: {}, years: [] });
+    >(100);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],
         ["Past Month", "Past 6 Months", "All Time"],
         "top-genres"
     );
 
-    const fetchTopGenres = async (time_range: string, force?: boolean, set: boolean = true) => {
+    const fetchTopGenres = async (time_range: string, force?: boolean, set: boolean = true, force_refetch?: boolean) => {
         if (!force) {
             let storedData = Spicetify.LocalStorage.get(`stats:top-genres:${time_range}`);
             if (storedData) {
@@ -33,10 +35,30 @@ const GenresPage = ({ config }: any) => {
             }
         }
         const start = window.performance.now();
-        const [fetchedArtists, fetchedTracks] = await Promise.all([
-            apiRequest("topArtists", `https://api.spotify.com/v1/me/top/artists?limit=50&offset=0&time_range=${time_range}`).then((res: any) => res.items),
-            apiRequest("topTracks", `https://api.spotify.com/v1/me/top/tracks?limit=50&offset=0&time_range=${time_range}`).then((res: any) => res.items),
-        ]);
+
+        const cacheInfo = JSON.parse(Spicetify.LocalStorage.get("stats:cache-info") as string);
+
+        const fetchedItems = await Promise.all(
+            ["artists", "tracks"].map(async (type: string, index: number) => {
+                if (cacheInfo[index] === true && !force_refetch) {
+                    return await JSON.parse(Spicetify.LocalStorage.get(`stats:top-${type}:${time_range}`) as string);
+                }
+                const fetchedItems = await (type === "artists" ? topArtistsReq(time_range, config) : topTracksReq(time_range, config));
+                cacheInfo[index] = true;
+                cacheInfo[2] = true;
+                Spicetify.LocalStorage.set(`stats:top-${type}:${time_range}`, JSON.stringify(fetchedItems));
+                Spicetify.LocalStorage.set("stats:cache-info", JSON.stringify(cacheInfo));
+                return fetchedItems;
+            })
+        );
+
+        for (let i = 0; i < 2; i++) {
+            if (fetchedItems[i] === 200 || fetchedItems[i] === 300) return setTopGenres(fetchedItems[i]);
+        }
+
+        const fetchedArtists = fetchedItems[0].filter((artist: any) => artist?.genres);
+        const fetchedTracks = fetchedItems[1].filter((track: any) => track?.id);
+
         const genres: [string, number][] = fetchedArtists.reduce((acc: [string, number][], artist: any) => {
             artist.genres.forEach((genre: string) => {
                 const index = acc.findIndex(([g]) => g === genre);
@@ -54,8 +76,8 @@ const GenresPage = ({ config }: any) => {
         const topTracks = fetchedTracks.map((track: any) => {
             trackPopularity += track.popularity;
             if (track.explicit) explicitness++;
-            if (track.album.release_date) {
-                const year = track.album.release_date.slice(0, 4);
+            if (track.release_year) {
+                const year = track.release_year;
                 const index = releaseData.findIndex(([y]) => y === year);
                 if (index !== -1) {
                     releaseData[index][1] += 1;
@@ -111,7 +133,7 @@ const GenresPage = ({ config }: any) => {
 
     const fetchAudioFeatures = async (ids: string[]) => {
         ids = ids.filter(id => id.match(/^[a-zA-Z0-9]{22}$/));
-        const data = apiRequest("audioFeatures", `https://api.spotify.com/v1/audio-features?ids=${ids.join(",")}`);
+        const data = await apiRequest("audioFeatures", `https://api.spotify.com/v1/audio-features?ids=${ids.join(",")}`);
         return data;
     };
 
@@ -124,7 +146,7 @@ const GenresPage = ({ config }: any) => {
     }, [activeOption]);
 
     const props = {
-        callback: () => fetchTopGenres(activeOption, true),
+        callback: () => fetchTopGenres(activeOption, true, true, true),
         config: config,
         dropdown: dropdown,
     };
