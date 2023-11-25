@@ -7,7 +7,7 @@ import PlaylistPage from "../pages/playlist";
         return;
     }
 
-    Spicetify.LocalStorage.set("stats:cache-info", JSON.stringify([0, 0, 0, 0, 0]));
+    Spicetify.LocalStorage.set("stats:cache-info", JSON.stringify([0, 0, 0, 0, 0, 0]));
 
     const styleLink = document.createElement("link");
     styleLink.rel = "stylesheet";

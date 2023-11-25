@@ -164,7 +164,7 @@ export const convertToSpotify = async (data: any[], type: string) => {
                         name: item.name,
                         image: item.image[0]["#text"],
                         uri: item.url,
-                        id: "N/A",
+                        id: item.mbid,
                     };
                 };
                 return {
@@ -175,6 +175,27 @@ export const convertToSpotify = async (data: any[], type: string) => {
                     genres: spotifyItem.genres,
                 };
             }
+
+            if (type === "albums") {
+                const spotifyItem = await Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/search?q=${filterLink(item.name)}+artist:${filterLink(item.artist.name)}&type=album`).then(
+                    (res: any) => res.albums?.items[0]
+                );
+                if (!spotifyItem) {
+                    console.log(`https://api.spotify.com/v1/search?q=${filterLink(item.name)}+artist:${filterLink(item.artist.name)}&type=album`);
+                    return {
+                        name: item.name,
+                        image: item.image[2]["#text"],
+                        uri: item.url,
+                        id: item.mbid,
+                    };
+                };
+                return {
+                    name: item.name,
+                    image: spotifyItem.images[0].url,
+                    uri: spotifyItem.uri,
+                    id: spotifyItem.id,
+                };
+            };
 
             // type === "track"
             const spotifyItem = await Spicetify.CosmosAsync.get(

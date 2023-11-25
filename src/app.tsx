@@ -5,6 +5,7 @@ import TracksPage from "./pages/top_tracks";
 import GenresPage from "./pages/top_genres";
 import LibraryPage from "./pages/library";
 import ChartsPage from "./pages/charts";
+import AlbumsPage from "./pages/top_albums";
 import { STATS_VERSION, LATEST_RELEASE } from "./constants";
 import useConfig from "./components/hooks/useConfig";
 
@@ -14,6 +15,7 @@ import "./styles/settings_modal.scss";
 const pages: Record<string, JSX.Element> = {
     ["Artists"]: <ArtistsPage />,
     ["Tracks"]: <TracksPage />,
+    ["Albums"]: <AlbumsPage />,
     ["Genres"]: <GenresPage />,
     ["Library"]: <LibraryPage />,
     ["Charts"]: <ChartsPage />,
@@ -63,12 +65,13 @@ const App = () => {
         },
         { name: "Artists Page", key: "show-artists", type: "toggle", def: true, sectionHeader: "Pages" },
         { name: "Tracks Page", key: "show-tracks", type: "toggle", def: true },
+        { name: "Albums Page", key: "show-albums", type: "toggle", def: false, desc: `Requires Last.fm API key and username` },
         { name: "Genres Page", key: "show-genres", type: "toggle", def: true },
         { name: "Library Page", key: "show-library", type: "toggle", def: true },
         { name: "Charts Page", key: "show-charts", type: "toggle", def: true, desc: `Requires Last.fm API key` },
     ]);
 
-    const tabPages = ["Artists", "Tracks", "Genres", "Library", "Charts"].filter(page => config.CONFIG[`show-${page.toLowerCase()}`]);
+    const tabPages = ["Artists", "Tracks", "Albums", "Genres", "Library", "Charts"].filter(page => config.CONFIG[`show-${page.toLowerCase()}`]);
 
     const [navBar, activeLink, setActiveLink] = useNavigationBar(tabPages);
     const [hasPageSwitched, setHasPageSwitched] = React.useState(false); // TODO: edit spcr-navigation-bar to include initial active link
