@@ -159,7 +159,7 @@ export const convertToSpotify = async (data: any[], type: string) => {
                     (res: any) => res.artists?.items[0]
                 );
                 if (!spotifyItem) {
-                    console.log(`https://api.spotify.com/v1/search?q=track:${filterLink(item.name)}+artist:${filterLink(item.artist.name)}&type=track`);
+                    console.log(`https://api.spotify.com/v1/search?q=${filterLink(item.name)}&type=artist`);
                     return {
                         name: item.name,
                         image: item.image[0]["#text"],
@@ -212,7 +212,7 @@ export const convertToSpotify = async (data: any[], type: string) => {
                     album: "N/A",
                     popularity: 0,
                     explicit: false,
-                    album_uri: "N/A",
+                    album_uri: item.url,
                 };
             }
             return {

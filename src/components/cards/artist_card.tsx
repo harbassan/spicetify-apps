@@ -23,6 +23,9 @@ const DraggableComponent = (props: { uri: string; title: string; children: any }
 
 const Card = ({ name, image, uri, subtext }: cardProps) => {
     const goToArtist = (uriString: string) => {
+        if (uriString.includes("last")) {
+            return window.open(uriString, "_blank");
+        }
         const uriObj = Spicetify.URI.fromString(uriString);
         const url = uriObj.toURLPath(true);
         Spicetify.Platform.History.push(url);
