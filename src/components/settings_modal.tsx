@@ -3,7 +3,16 @@ import { Config } from "../types/stats_types";
 
 interface Props {
     CONFIG: Config;
-    settings: { name: string; key: string; type: "toggle" | "text" | "dropdown"; def: any; options?: string[]; placeholder?: string; desc: string }[];
+    settings: {
+        name: string;
+        key: string;
+        type: "toggle" | "text" | "dropdown";
+        def: any;
+        options?: string[];
+        placeholder?: string;
+        desc: string;
+        sectionHeader?: string;
+    }[];
     updateAppConfig: (CONFIG: Config) => void;
 }
 
@@ -105,6 +114,7 @@ const ConfigRow = (props: {
     options?: string[];
     placeholder?: string;
     desc?: string;
+    sectionHeader?: string;
 }) => {
     // @ts-ignore
     const enabled = !!props.modalConfig[props.storageKey];
@@ -180,7 +190,25 @@ const SettingsModal = ({ CONFIG, settings, updateAppConfig }: Props) => {
         setModalConfig({ ...CONFIG });
     };
 
-    const configRows = settings.map(setting => {
+    const configRows = settings.map((setting, index) => {
+        if (setting.sectionHeader) {
+            return (
+                <>
+                    {index != 0 ? <br></br> : <></>}
+                    <h2 className="section-header">{setting.sectionHeader}</h2>
+                    <ConfigRow
+                        name={setting.name}
+                        storageKey={setting.key}
+                        type={setting.type}
+                        options={setting.options}
+                        placeholder={setting.placeholder}
+                        desc={setting.desc}
+                        modalConfig={modalConfig}
+                        updateConfig={updateConfig}
+                    />
+                </>
+            );
+        }
         return (
             <ConfigRow
                 name={setting.name}

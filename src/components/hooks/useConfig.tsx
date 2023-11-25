@@ -16,7 +16,16 @@ export const getLocalStorageDataFromKey = (key: string, fallback?: unknown) => {
 };
 
 const useConfig = (
-    settings: { name: string; key: string; type: "toggle" | "text" | "dropdown"; def: any; options?: string[]; placeholder?: string; desc?: string }[]
+    settings: {
+        name: string;
+        key: string;
+        type: "toggle" | "text" | "dropdown";
+        def: any;
+        options?: string[];
+        placeholder?: string;
+        desc?: string;
+        sectionHeader?: string;
+    }[]
 ) => {
     const settingsArray: Record<string, any>[] = settings.map(setting => {
         return { [setting.key]: getLocalStorageDataFromKey(`stats:config:${setting.key}`, setting.def) };

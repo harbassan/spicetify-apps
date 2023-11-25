@@ -37,10 +37,6 @@ const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
 };
 
 const App = () => {
-    const [navBar, activeLink, setActiveLink] = useNavigationBar(["Artists", "Tracks", "Genres", "Library", "Charts"]);
-    const [hasPageSwitched, setHasPageSwitched] = React.useState(false); // TODO: edit spcr-navigation-bar to include initial active link
-    const [newUpdate, setNewUpdate] = React.useState(false);
-
     const config = useConfig([
         {
             name: "Last.fm Api Key",
@@ -49,6 +45,7 @@ const App = () => {
             def: null,
             placeholder: "Enter API Key",
             desc: `You can get this by visiting www.last.fm/api/account/create and simply entering any name.<br/>You'll need to make an account first, which is a plus.`,
+            sectionHeader: "Last.fm Integration",
         },
         {
             name: "Last.fm Username",
@@ -62,9 +59,20 @@ const App = () => {
             key: "use-lastfm",
             type: "toggle",
             def: false,
-            desc: `Last.fm charts your stats purely based on streaming count, whereas Spotify uses an algorithm`,
+            desc: `Last.fm charts your stats purely based on the streaming count, whereas Spotify factors in other variables`,
         },
+        { name: "Artists Page", key: "show-artists", type: "toggle", def: true, sectionHeader: "Pages" },
+        { name: "Tracks Page", key: "show-tracks", type: "toggle", def: true },
+        { name: "Genres Page", key: "show-genres", type: "toggle", def: true },
+        { name: "Library Page", key: "show-library", type: "toggle", def: true },
+        { name: "Charts Page", key: "show-charts", type: "toggle", def: true, desc: `Requires Last.fm API key` },
     ]);
+
+    const tabPages = ["Artists", "Tracks", "Genres", "Library", "Charts"].filter(page => config.CONFIG[`show-${page.toLowerCase()}`]);
+
+    const [navBar, activeLink, setActiveLink] = useNavigationBar(tabPages);
+    const [hasPageSwitched, setHasPageSwitched] = React.useState(false); // TODO: edit spcr-navigation-bar to include initial active link
+    const [newUpdate, setNewUpdate] = React.useState(false);
 
     React.useEffect(() => {
         setActiveLink(Spicetify.LocalStorage.get("stats:active-link") || "Artists");
