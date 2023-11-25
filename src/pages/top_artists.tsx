@@ -109,7 +109,9 @@ const ArtistsPage = ({ config }: any) => {
             );
     }
 
-    const artistCards = topArtists.map((artist, index) => <Card key={artist.id} name={artist.name} image={artist.image} uri={artist.uri} subtext={"Artist"} />);
+    const artistCards = topArtists.map((artist, index) => (
+        <Card key={artist.id} name={artist.name} image={artist.image} uri={artist.uri} subtext={`#${index + 1} Artist`} />
+    ));
 
     return (
         <>
