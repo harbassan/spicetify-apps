@@ -95,6 +95,24 @@ const ChartsPage = ({ config }: any) => {
             </PageHeader>
         );
     } else {
+        const createPlaylist = async () => {
+            // get short date
+            const date = new Date();
+            const day = date.getDate();
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
+            const shortDate = `${year}/${month < 10 ? `0${month}` : month}/${day < 10 ? `0${day}` : day}`;
+
+            await Spicetify.CosmosAsync.post("sp://core-playlist/v1/rootlist", {
+                operation: "create",
+                name: `Charts - Top Tracks - ${shortDate}`,
+                playlist: true,
+                public: false,
+                uris: chartData.map(track => track.uri),
+            }).catch(() => Spicetify.Snackbar.enqueueSnackbar("The playlist could not be created."));
+        };
+        props.createPlaylist = createPlaylist;
+
         if (!chartData[0]?.album) setChartData(100);
         const trackRows = chartData.map((track: any, index) => <TrackRow index={index + 1} {...track} />);
         return (

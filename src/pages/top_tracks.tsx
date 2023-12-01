@@ -136,8 +136,6 @@ const TracksPage = ({ config }: any) => {
             );
     }
 
-    topTracks as Record<string, any>[];
-
     const createPlaylist = async () => {
         await Spicetify.CosmosAsync.post("sp://core-playlist/v1/rootlist", {
             operation: "create",
@@ -145,14 +143,14 @@ const TracksPage = ({ config }: any) => {
             playlist: true,
             public: false,
             uris: topTracks.map(track => track.uri),
-        });
+        }).catch(() => Spicetify.Snackbar.enqueueSnackbar("The playlist could not be created."));
     };
 
-    const trackRows = topTracks.map((track: any, index) => <TrackRow index={index + 1} {...track} />);
+    props.createPlaylist = createPlaylist;
 
-    // <button className="stats-createPlaylistButton" data-encore-id="buttonSecondary" aria-expanded="false" onClick={createPlaylist}>
-    //     Turn Into Playlist
-    // </button>;
+    topTracks as Record<string, any>[];
+
+    const trackRows = topTracks.map((track: any, index) => <TrackRow index={index + 1} {...track} />);
 
     return (
         <>
