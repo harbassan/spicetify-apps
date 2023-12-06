@@ -150,7 +150,7 @@ const TracksPage = ({ config }: any) => {
 
     topTracks as Record<string, any>[];
 
-    const trackRows = topTracks.map((track: any, index) => <TrackRow index={index + 1} {...track} />);
+    const trackRows = topTracks.map((track: any, index) => <TrackRow index={index + 1} {...track} uris={topTracks.map(track => track.uri)} />);
 
     return (
         <>

@@ -1,4 +1,5 @@
 import React from "react";
+import { queue } from "../funcs";
 
 interface TrackArtistProps {
     uri: string;
@@ -17,6 +18,7 @@ interface TrackRowProps {
     explicit: boolean;
     index: number;
     album_uri: string;
+    uris: string[];
 }
 
 function formatDuration(durationMs: number) {
@@ -119,6 +121,12 @@ interface AlbumMenuProps extends Spicetify.ReactComponent.MenuProps {
     onRemoveCallback?: (uri: string) => void;
 }
 
+function playAndQueue(uri: string, uris: string[]) {
+    uris = uris.filter(u => !u.includes("last"));
+    uris = uris.concat(uris.splice(0, uris.indexOf(uri)));
+    queue(uris);
+}
+
 const MenuWrapper = React.memo((props: AlbumMenuProps) => <Spicetify.ReactComponent.AlbumMenu {...props} />);
 
 const TrackRow = (props: TrackRowProps) => {
@@ -135,7 +143,7 @@ const TrackRow = (props: TrackRowProps) => {
                         title={`${props.name} • ${props.artists.map(artist => artist.name).join(", ")}`}
                         className="main-trackList-trackListRow main-trackList-trackListRowGrid"
                         role="presentation"
-                        onClick={event => event.detail === 2 && Spicetify.Player.playUri(props.uri)}
+                        onClick={event => event.detail === 2 && playAndQueue(props.uri, props.uris)}
                         style={{ height: 56 }}
                     >
                         <div className="main-trackList-rowSectionIndex" role="gridcell" aria-colindex={1} tabIndex={-1}>
@@ -151,7 +159,7 @@ const TrackRow = (props: TrackRowProps) => {
                                         className="main-trackList-rowImagePlayButton"
                                         aria-label={`Play ${props.name}`}
                                         tabIndex={-1}
-                                        onClick={() => Spicetify.Player.playUri(props.uri)}
+                                        onClick={() => playAndQueue(props.uri, props.uris)}
                                     >
                                         <svg
                                             role="img"

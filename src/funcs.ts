@@ -258,3 +258,40 @@ export const checkLiked = async (tracks: string[]) => {
 
     return response;
 };
+
+// taken from shuffle+ extension
+export async function queue(list, context = null) {
+    // Delimits the end of our list, as Spotify may add new context tracks to the queue
+    list.push("spotify:delimiter");
+
+    const { _queue, _client } = Spicetify.Platform.PlayerAPI._queue;
+    const { prevTracks, queueRevision } = _queue;
+
+    // Format tracks with default values
+    const nextTracks = list.map(uri => ({
+        contextTrack: {
+            uri,
+            uid: "",
+            metadata: {
+                is_queued: "false"
+            }
+        },
+        removed: [],
+        blocked: [],
+        provider: "context"
+    }));
+
+    // Lowest level setQueue method from vendor~xpui.js
+    _client.setQueue({
+        nextTracks,
+        prevTracks,
+        queueRevision
+    });
+
+    if (context) {
+        const { sessionId } = Spicetify.Platform.PlayerAPI.getState();
+        Spicetify.Platform.PlayerAPI.updateContext(sessionId, { uri: `spotify:user:${Spicetify.Platform.LibraryAPI._currentUsername}:top:tracks`, url: "" });
+    }
+
+    Spicetify.Player.next();
+}

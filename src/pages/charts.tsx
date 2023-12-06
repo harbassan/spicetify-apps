@@ -114,7 +114,7 @@ const ChartsPage = ({ config }: any) => {
         props.createPlaylist = createPlaylist;
 
         if (!chartData[0]?.album) setChartData(100);
-        const trackRows = chartData.map((track: any, index) => <TrackRow index={index + 1} {...track} />);
+        const trackRows = chartData.map((track: any, index) => <TrackRow index={index + 1} {...track} uris={chartData.map(track => track.uri)} />);
         return (
             <PageHeader title="Charts - Top Tracks" {...props}>
                 <Tracklist>{trackRows}</Tracklist>
