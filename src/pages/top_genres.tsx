@@ -8,6 +8,8 @@ import Status from "../components/status";
 import PageHeader from "../components/page_header";
 import { topArtistsReq } from "./top_artists";
 import { topTracksReq } from "./top_tracks";
+import TrackRow from "../components/track_row";
+import Tracklist from "../components/tracklist";
 
 const GenresPage = ({ config }: any) => {
     const [topGenres, setTopGenres] = React.useState<
@@ -15,6 +17,7 @@ const GenresPage = ({ config }: any) => {
               genres: [string, number][];
               features: any;
               years: [string, number][];
+              obscureTracks: any[];
           }
         | 100
         | 200
@@ -75,6 +78,7 @@ const GenresPage = ({ config }: any) => {
         let releaseData: [string, number][] = [];
         const topTracks = fetchedTracks.map((track: any) => {
             trackPopularity += track.popularity;
+
             if (track.explicit) explicitness++;
             if (track.release_year) {
                 const year = track.release_year;
@@ -87,6 +91,41 @@ const GenresPage = ({ config }: any) => {
             }
             return track.id;
         });
+
+        async function testDupe(track: any) {
+            // perform a search to get rid of duplicate tracks
+            const spotifyItem = await Spicetify.CosmosAsync.get(
+                `https://api.spotify.com/v1/search?q=track:${track.name}+artist:${track.artists[0].name}&type=track`
+            ).then((res: any) => res.tracks?.items);
+            return spotifyItem.some((item: any) => {
+                return item.name === track.name && item.popularity > track.popularity;
+            });
+        }
+
+        let obscureTracks = [];
+        for (let i = 0; i < fetchedTracks.length; i++) {
+            let track = fetchedTracks[i];
+            if (!track?.popularity) continue;
+            if (obscureTracks.length < 5) {
+                const dupe = await testDupe(track);
+                if (dupe) continue;
+
+                obscureTracks.push(track);
+                obscureTracks.sort((a: any, b: any) => b.popularity - a.popularity);
+                continue;
+            }
+
+            for (let j = 0; j < 5; j++) {
+                if (track.popularity < obscureTracks[j].popularity) {
+                    const dupe = await testDupe(track);
+                    if (dupe) break;
+
+                    obscureTracks.splice(j, 0, track);
+                    obscureTracks = obscureTracks.slice(0, 5);
+                    break;
+                }
+            }
+        }
 
         const featureData = await fetchAudioFeatures(topTracks);
         if (!featureData) {
@@ -126,9 +165,12 @@ const GenresPage = ({ config }: any) => {
         }
         console.log("total genres fetch time:", window.performance.now() - start);
 
-        if (set) setTopGenres({ genres: genres, features: audioFeatures, years: releaseData });
+        if (set) setTopGenres({ genres: genres, features: audioFeatures, years: releaseData, obscureTracks: obscureTracks });
 
-        Spicetify.LocalStorage.set(`stats:top-genres:${time_range}`, JSON.stringify({ genres: genres, features: audioFeatures, years: releaseData }));
+        Spicetify.LocalStorage.set(
+            `stats:top-genres:${time_range}`,
+            JSON.stringify({ genres: genres, features: audioFeatures, years: releaseData, obscureTracks: obscureTracks })
+        );
     };
 
     const fetchAudioFeatures = async (ids: string[]) => {
@@ -190,6 +232,10 @@ const GenresPage = ({ config }: any) => {
         statCards.push(<StatCard stat={key[0].toUpperCase() + key.slice(1)} value={parseVal(key)} />);
     }
 
+    const obscureTracks = topGenres.obscureTracks.map((track: any, index: number) => (
+        <TrackRow index={index + 1} {...track} uris={topGenres.obscureTracks.map(track => track.uri)} />
+    ));
+
     return (
         <>
             <PageHeader title="Top Genres" {...props}>
@@ -207,6 +253,18 @@ const GenresPage = ({ config }: any) => {
                     </div>
                     <section>
                         <GenresCard genres={topGenres.years} total={50} />
+                    </section>
+                </section>
+                <section className="main-shelf-shelf Shelf">
+                    <div className="main-shelf-header">
+                        <div className="main-shelf-topRow">
+                            <div className="main-shelf-titleWrapper">
+                                <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">Most Obscure Tracks</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <section>
+                        <Tracklist minified={true}>{obscureTracks}</Tracklist>
                     </section>
                 </section>
             </PageHeader>
