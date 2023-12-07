@@ -147,7 +147,8 @@ const TrackRow = (props: TrackRowProps) => {
                         style={{ height: 56 }}
                     >
                         <div className="main-trackList-rowSectionIndex" role="gridcell" aria-colindex={1} tabIndex={-1}>
-                            <div className="main-trackList-rowMarker">
+                            // needs uri prop to work with playlist-labels
+                            <div uri={props.uri} className="main-trackList-rowMarker">
                                 <span className="TypeElement-ballad-type main-trackList-number" data-encore-id="type">
                                     {props.index}
                                 </span>
