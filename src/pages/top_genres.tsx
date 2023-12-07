@@ -239,7 +239,7 @@ const GenresPage = ({ config }: any) => {
     return (
         <>
             <PageHeader title="Top Genres" {...props}>
-                <section>
+                <section className="main-shelf-shelf Shelf">
                     <GenresCard genres={topGenres.genres} total={1275} />
                     <InlineGrid special>{statCards}</InlineGrid>
                 </section>

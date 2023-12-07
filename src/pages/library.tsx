@@ -289,7 +289,7 @@ const LibraryPage = ({ config }: any) => {
                     <StatCard stat="Total Minutes" value={Math.floor(library.totalDuration / 60)} />
                     <StatCard stat="Total Hours" value={(library.totalDuration / (60 * 60)).toFixed(1)} />
                 </section>
-                <section>
+                <section className="main-shelf-shelf Shelf">
                     <div className="main-shelf-header">
                         <div className="main-shelf-topRow">
                             <div className="main-shelf-titleWrapper">
