@@ -18,7 +18,7 @@
 
 .stats-gridInline {
     --grid-gap: 24px;
-    grid-template-columns: repeat(10, 180px);
+    grid-template-columns: repeat(10, 180px) !important;
     overflow-x: hidden;
     scroll-behavior: smooth;
     margin-top: 5px;
