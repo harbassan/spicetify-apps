@@ -5,8 +5,9 @@ import Status from "../components/status";
 import { apiRequest, updatePageCache, convertToSpotify, checkLiked } from "../funcs";
 import PageHeader from "../components/page_header";
 import Tracklist from "../components/tracklist";
+import { ConfigWrapper, Track } from "../types/stats_types";
 
-export const topTracksReq = async (time_range: string, config: any) => {
+export const topTracksReq = async (time_range: string, config: ConfigWrapper) => {
     if (config.CONFIG["use-lastfm"] === true) {
         if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) {
             return 300;
@@ -73,8 +74,8 @@ export const topTracksReq = async (time_range: string, config: any) => {
     }
 };
 
-const TracksPage = ({ config }: any) => {
-    const [topTracks, setTopTracks] = React.useState<Record<string, any>[] | 100 | 200 | 300>(100);
+const TracksPage = ({ config }: { config: ConfigWrapper }) => {
+    const [topTracks, setTopTracks] = React.useState<Track[] | 100 | 200 | 300>(100);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],
         ["Past Month", "Past 6 Months", "All Time"],
@@ -113,6 +114,7 @@ const TracksPage = ({ config }: any) => {
         callback: () => fetchTopTracks(activeOption, true),
         config: config,
         dropdown: dropdown,
+        createPlaylist: () => {},
     };
 
     switch (topTracks) {
@@ -143,14 +145,13 @@ const TracksPage = ({ config }: any) => {
             playlist: true,
             public: false,
             uris: topTracks.map(track => track.uri),
+            // @ts-ignore
         }).catch(() => Spicetify.Snackbar.enqueueSnackbar("The playlist could not be created."));
     };
 
     props.createPlaylist = createPlaylist;
 
-    topTracks as Record<string, any>[];
-
-    const trackRows = topTracks.map((track: any, index) => <TrackRow index={index + 1} {...track} uris={topTracks.map(track => track.uri)} />);
+    const trackRows = topTracks.map((track: Track, index) => <TrackRow index={index + 1} {...track} uris={topTracks.map(track => track.uri)} />);
 
     return (
         <>

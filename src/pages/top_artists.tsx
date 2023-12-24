@@ -4,8 +4,9 @@ import Card from "../components/cards/artist_card";
 import { apiRequest, updatePageCache, convertToSpotify } from "../funcs";
 import Status from "../components/status";
 import PageHeader from "../components/page_header";
+import { ArtistCardProps, ConfigWrapper } from "../types/stats_types";
 
-export const topArtistsReq = async (time_range: string, config: any) => {
+export const topArtistsReq = async (time_range: string, config: ConfigWrapper) => {
     if (config.CONFIG["use-lastfm"] === true) {
         if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) {
             return 300;
@@ -49,8 +50,8 @@ export const topArtistsReq = async (time_range: string, config: any) => {
     }
 };
 
-const ArtistsPage = ({ config }: any) => {
-    const [topArtists, setTopArtists] = React.useState<any[] | 100 | 200 | 300>(100);
+const ArtistsPage = ({ config }: { config: ConfigWrapper }) => {
+    const [topArtists, setTopArtists] = React.useState<ArtistCardProps[] | 100 | 200 | 300>(100);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],
         ["Past Month", "Past 6 Months", "All Time"],

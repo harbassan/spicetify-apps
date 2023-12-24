@@ -1,23 +1,9 @@
 import React from "react";
 import { queue } from "../funcs";
+import { Track } from "../types/stats_types";
 
-interface TrackArtistProps {
-    uri: string;
-    name: string;
-}
-
-interface TrackRowProps {
-    liked: boolean;
-    name: string;
-    image: string;
-    uri: string;
-    artists: TrackArtistProps[];
-    duration: number;
-    album: string;
-    popularity: number;
-    explicit: boolean;
+interface TrackRowProps extends Track {
     index: number;
-    album_uri: string;
     uris: string[];
 }
 

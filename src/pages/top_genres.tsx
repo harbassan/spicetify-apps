@@ -10,19 +10,17 @@ import { topArtistsReq } from "./top_artists";
 import { topTracksReq } from "./top_tracks";
 import TrackRow from "../components/track_row";
 import Tracklist from "../components/tracklist";
+import { ConfigWrapper, Track } from "../types/stats_types";
 
-const GenresPage = ({ config }: any) => {
-    const [topGenres, setTopGenres] = React.useState<
-        | {
-              genres: [string, number][];
-              features: any;
-              years: [string, number][];
-              obscureTracks: any[];
-          }
-        | 100
-        | 200
-        | 300
-    >(100);
+interface GenresPageProps {
+    genres: [string, number][];
+    features: Record<string, any>;
+    years: [string, number][];
+    obscureTracks: Track[];
+}
+
+const GenresPage = ({ config }: { config: ConfigWrapper }) => {
+    const [topGenres, setTopGenres] = React.useState<GenresPageProps | 100 | 200 | 300>(100);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],
         ["Past Month", "Past 6 Months", "All Time"],
@@ -76,7 +74,7 @@ const GenresPage = ({ config }: any) => {
         let trackPopularity = 0;
         let explicitness = 0;
         let releaseData: [string, number][] = [];
-        const topTracks = fetchedTracks.map((track: any) => {
+        const topTracks = fetchedTracks.map((track: Track) => {
             trackPopularity += track.popularity;
 
             if (track.explicit) explicitness++;
@@ -92,7 +90,7 @@ const GenresPage = ({ config }: any) => {
             return track.id;
         });
 
-        async function testDupe(track: any) {
+        async function testDupe(track: Track) {
             // perform a search to get rid of duplicate tracks
             const spotifyItem = await Spicetify.CosmosAsync.get(
                 `https://api.spotify.com/v1/search?q=track:${track.name}+artist:${track.artists[0].name}&type=track`
@@ -111,7 +109,7 @@ const GenresPage = ({ config }: any) => {
                 if (dupe) continue;
 
                 obscureTracks.push(track);
-                obscureTracks.sort((a: any, b: any) => b.popularity - a.popularity);
+                obscureTracks.sort((a: Track, b: Track) => b.popularity - a.popularity);
                 continue;
             }
 
@@ -232,7 +230,7 @@ const GenresPage = ({ config }: any) => {
         statCards.push(<StatCard stat={key[0].toUpperCase() + key.slice(1)} value={parseVal(key)} />);
     }
 
-    const obscureTracks = topGenres.obscureTracks.map((track: any, index: number) => (
+    const obscureTracks = topGenres.obscureTracks.map((track: Track, index: number) => (
         <TrackRow index={index + 1} {...track} uris={topGenres.obscureTracks.map(track => track.uri)} />
     ));
 

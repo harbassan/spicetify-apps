@@ -5,6 +5,7 @@ import ArtistCard from "../components/cards/artist_card";
 import { apiRequest, fetchAudioFeatures, fetchTopArtists, fetchTopAlbums } from "../funcs";
 import Status from "../components/status";
 import InlineGrid from "../components/inline_grid";
+import { Album, ArtistCardProps } from "../types/stats_types";
 
 interface LibraryProps {
     audioFeatures: Record<string, number>;
@@ -15,8 +16,8 @@ interface LibraryProps {
     genresDenominator: number;
     years: [string, number][];
     yearsDenominator: number;
-    artists: { name: string; uri: string; image: string; freq: number }[];
-    albums: { name: string; uri: string; image: string; freq: number }[];
+    artists: ArtistCardProps[];
+    albums: Album[];
 }
 
 const PlaylistPage = ({ uri }: { uri: string }) => {
@@ -140,11 +141,11 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
         statCards.push(<StatCard stat={obj[0][0].toUpperCase() + obj[0].slice(1)} value={parseVal(obj)} />);
     });
 
-    const artistCards: JSX.Element[] = library.artists.map((artist: any) => (
+    const artistCards: React.JSX.Element[] = library.artists.map((artist: ArtistCardProps) => (
         <ArtistCard name={artist.name} image={artist.image} uri={artist.uri} subtext={`Appears in ${artist.freq} tracks`} />
     ));
 
-    const albumCards: JSX.Element[] = library.albums.map(album => {
+    const albumCards: React.JSX.Element[] = library.albums.map((album: Album) => {
         return <ArtistCard name={album.name} image={album.image} uri={album.uri} subtext={`Appears in ${album.freq} tracks`} />;
     });
 

@@ -6,9 +6,10 @@ import ArtistCard from "../components/cards/artist_card";
 import TrackRow from "../components/track_row";
 import Tracklist from "../components/tracklist";
 import PageHeader from "../components/page_header";
+import { ArtistCardProps, ConfigWrapper, Track } from "../types/stats_types";
 
-const ChartsPage = ({ config }: any) => {
-    const [chartData, setChartData] = React.useState<Record<string, any>[] | 100 | 200 | 500>(100);
+const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
+    const [chartData, setChartData] = React.useState<Track[] | ArtistCardProps[] | 100 | 200 | 500>(100);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(["artists", "tracks"], ["Top Artists", "Top Tracks"], "charts");
 
     async function fetchChartData(type: string, force?: boolean, set: boolean = true) {
@@ -62,6 +63,7 @@ const ChartsPage = ({ config }: any) => {
         callback: () => fetchChartData(activeOption, true),
         config: config,
         dropdown: dropdown,
+        createPlaylist: () => {},
     };
 
     switch (chartData) {
@@ -109,11 +111,15 @@ const ChartsPage = ({ config }: any) => {
                 playlist: true,
                 public: false,
                 uris: chartData.map(track => track.uri),
+                // @ts-ignore
             }).catch(() => Spicetify.Snackbar.enqueueSnackbar("The playlist could not be created."));
         };
         props.createPlaylist = createPlaylist;
 
-        if (!chartData[0]?.album) setChartData(100);
+        // force type to Track[] to prevent errors
+        let tracksData = chartData as Track[];
+
+        if (!tracksData[0]?.album) setChartData(100);
         const trackRows = chartData.map((track: any, index) => <TrackRow index={index + 1} {...track} uris={chartData.map(track => track.uri)} />);
         return (
             <PageHeader title="Charts - Top Tracks" {...props}>

@@ -1,3 +1,5 @@
+import { Album, ArtistCardProps } from "./types/stats_types";
+
 export const updatePageCache = (i: any, callback: Function, activeOption: string, lib: any = false) => {
     let cacheInfo = Spicetify.LocalStorage.get("stats:cache-info");
     if (!cacheInfo) return;
@@ -6,7 +8,8 @@ export const updatePageCache = (i: any, callback: Function, activeOption: string
     if (!cacheInfoArray[i]) {
         if (!lib) {
             ["short_term", "medium_term", "long_term"].filter(option => option !== activeOption).forEach(option => callback(option, true, false));
-        } if (lib === "charts") {
+        }
+        if (lib === "charts") {
             ["artists", "tracks"].filter(option => option !== activeOption).forEach(option => callback(option, true, false));
         }
         callback(activeOption, true);
@@ -39,7 +42,6 @@ export const apiRequest = async (name: string, url: string, timeout = 5, log = t
     }
 };
 
-
 export const fetchAudioFeatures = async (ids: string[]) => {
     const batchSize = 100;
     const batches = [];
@@ -70,52 +72,52 @@ export const fetchAudioFeatures = async (ids: string[]) => {
 };
 
 export const fetchTopAlbums = async (albums: Record<string, number>) => {
-
     let album_keys = Object.keys(albums)
         .filter(id => id.match(/^[a-zA-Z0-9]{22}$/))
         .sort((a, b) => albums[b] - albums[a])
         .slice(0, 100);
-    
+
     let release_years: Record<string, number> = {};
     let total_album_tracks = 0;
-    
-    let top_albums: any[] = await Promise.all(album_keys.map(async (albumID: string) => {
-        let albumMeta;
-        try {
-            albumMeta = await Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.getAlbum, {
-                uri: `spotify:album:${albumID}`,
-                locale: "en",
-                offset: 0,
-                limit: 50,
-            });
-            if (!albumMeta?.data?.albumUnion?.name) throw new Error("Invalid URI");
-        } catch (e) {
-            console.error("stats - album metadata request failed:", e);
-            return null;
-        }
-    
-        const releaseYear: string = albumMeta.data.albumUnion.date.isoString.slice(0, 4);
 
-        release_years[releaseYear] = (release_years[releaseYear] || 0) + albums[albumID];
-        total_album_tracks += albums[albumID];
-        
-        return({
-            name: albumMeta.data.albumUnion.name,
-            uri: albumMeta.data.albumUnion.uri,
-            image: albumMeta.data.albumUnion.coverArt.sources[0]?.url || "https://commons.wikimedia.org/wiki/File:Black_square.jpg",
-            freq: albums[albumID],
-        });
-    }));
+    let top_albums: Album[] = <Album[]>await Promise.all(
+        album_keys.map(async (albumID: string) => {
+            let albumMeta;
+            try {
+                albumMeta = await Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.getAlbum, {
+                    uri: `spotify:album:${albumID}`,
+                    locale: "en",
+                    offset: 0,
+                    limit: 50,
+                });
+                if (!albumMeta?.data?.albumUnion?.name) throw new Error("Invalid URI");
+            } catch (e) {
+                console.error("stats - album metadata request failed:", e);
+                return;
+            }
 
-    top_albums = top_albums.filter(el => el != null).slice(0,10);
+            const releaseYear: string = albumMeta.data.albumUnion.date.isoString.slice(0, 4);
+
+            release_years[releaseYear] = (release_years[releaseYear] || 0) + albums[albumID];
+            total_album_tracks += albums[albumID];
+
+            return {
+                name: albumMeta.data.albumUnion.name,
+                uri: albumMeta.data.albumUnion.uri,
+                image: albumMeta.data.albumUnion.coverArt.sources[0]?.url || "https://commons.wikimedia.org/wiki/File:Black_square.jpg",
+                freq: albums[albumID],
+            };
+        })
+    );
+
+    top_albums = top_albums.filter(el => el != null).slice(0, 10);
     return [top_albums, Object.entries(release_years), total_album_tracks];
 };
-
 
 export const fetchTopArtists = async (artists: Record<string, number>) => {
     if (Object.keys(artists).length === 0) return [[], [], 0];
 
-    let artist_keys: any[] = Object.keys(artists)
+    let artist_keys: string[] = Object.keys(artists)
         .filter(id => id.match(/^[a-zA-Z0-9]{22}$/))
         .sort((a, b) => artists[b] - artists[a])
         .slice(0, 50);
@@ -125,7 +127,7 @@ export const fetchTopArtists = async (artists: Record<string, number>) => {
 
     const artistsMeta = await apiRequest("artistsMetadata", `https://api.spotify.com/v1/artists?ids=${artist_keys.join(",")}`);
 
-    let top_artists: any[] = artistsMeta?.artists?.map((artist: any) => {
+    let top_artists: ArtistCardProps[] = artistsMeta?.artists?.map((artist: any) => {
         if (!artist) return null;
 
         artist.genres.forEach((genre: string) => {
@@ -133,16 +135,18 @@ export const fetchTopArtists = async (artists: Record<string, number>) => {
         });
         total_genre_tracks += artists[artist.id];
 
-        return ({
+        return {
             name: artist.name,
             uri: artist.uri,
             image: artist.images[2]?.url || "https://commons.wikimedia.org/wiki/File:Black_square.jpg",
             freq: artists[artist.id],
-        });           
-    })
+        };
+    });
 
-    top_artists = top_artists.filter(el => el != null).slice(0,10);
-    const top_genres = Object.entries(genres).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    top_artists = top_artists.filter(el => el != null).slice(0, 10);
+    const top_genres = Object.entries(genres)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
     return [top_artists, top_genres, total_genre_tracks];
 };
 
@@ -166,7 +170,7 @@ export const convertToSpotify = async (data: any[], type: string) => {
                         uri: item.url,
                         id: item.mbid,
                     };
-                };
+                }
                 return {
                     name: item.name,
                     image: spotifyItem.images[0].url,
@@ -177,9 +181,9 @@ export const convertToSpotify = async (data: any[], type: string) => {
             }
 
             if (type === "albums") {
-                const spotifyItem = await Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/search?q=${filterLink(item.name)}+artist:${filterLink(item.artist.name)}&type=album`).then(
-                    (res: any) => res.albums?.items[0]
-                );
+                const spotifyItem = await Spicetify.CosmosAsync.get(
+                    `https://api.spotify.com/v1/search?q=${filterLink(item.name)}+artist:${filterLink(item.artist.name)}&type=album`
+                ).then((res: any) => res.albums?.items[0]);
                 if (!spotifyItem) {
                     console.log(`https://api.spotify.com/v1/search?q=${filterLink(item.name)}+artist:${filterLink(item.artist.name)}&type=album`);
                     return {
@@ -188,14 +192,14 @@ export const convertToSpotify = async (data: any[], type: string) => {
                         uri: item.url,
                         id: item.mbid,
                     };
-                };
+                }
                 return {
                     name: item.name,
                     image: spotifyItem.images[0].url,
                     uri: spotifyItem.uri,
                     id: spotifyItem.id,
                 };
-            };
+            }
 
             // type === "track"
             const spotifyItem = await Spicetify.CosmosAsync.get(
@@ -230,7 +234,7 @@ export const convertToSpotify = async (data: any[], type: string) => {
             };
         })
     );
-}
+};
 
 export const checkLiked = async (tracks: string[]) => {
     const nullIndexes: number[] = [];
@@ -260,7 +264,7 @@ export const checkLiked = async (tracks: string[]) => {
 };
 
 // taken from shuffle+ extension
-export async function queue(list, context = null) {
+export async function queue(list: any, context = null) {
     // Delimits the end of our list, as Spotify may add new context tracks to the queue
     list.push("spotify:delimiter");
 
@@ -268,24 +272,24 @@ export async function queue(list, context = null) {
     const { prevTracks, queueRevision } = _queue;
 
     // Format tracks with default values
-    const nextTracks = list.map(uri => ({
+    const nextTracks = list.map((uri: string) => ({
         contextTrack: {
             uri,
             uid: "",
             metadata: {
-                is_queued: "false"
-            }
+                is_queued: "false",
+            },
         },
         removed: [],
         blocked: [],
-        provider: "context"
+        provider: "context",
     }));
 
     // Lowest level setQueue method from vendor~xpui.js
     _client.setQueue({
         nextTracks,
         prevTracks,
-        queueRevision
+        queueRevision,
     });
 
     if (context) {

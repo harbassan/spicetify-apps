@@ -1,12 +1,13 @@
 import React from "react";
 import RefreshButton from "./buttons/refresh_button";
 import SettingsButton from "./buttons/settings_button";
+import { ConfigWrapper } from "../types/stats_types";
 
 interface PageHeaderProps {
     title: string;
     callback: () => void;
-    config: any;
-    dropdown: any;
+    config: ConfigWrapper;
+    dropdown: React.ReactElement;
     createPlaylist?: () => void;
     children: any;
 }

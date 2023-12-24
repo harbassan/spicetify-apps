@@ -12,7 +12,7 @@ import useConfig from "./components/hooks/useConfig";
 import "./styles/app.scss";
 import "./styles/settings_modal.scss";
 
-const pages: Record<string, JSX.Element> = {
+const pages: Record<string, React.ReactElement> = {
     ["Artists"]: <ArtistsPage />,
     ["Tracks"]: <TracksPage />,
     ["Albums"]: <AlbumsPage />,

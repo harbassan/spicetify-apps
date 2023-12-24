@@ -7,22 +7,23 @@ import InlineGrid from "../components/inline_grid";
 import { apiRequest, updatePageCache, fetchAudioFeatures, fetchTopAlbums, fetchTopArtists } from "../funcs";
 import Status from "../components/status";
 import PageHeader from "../components/page_header";
+import { Album, ArtistCardProps, ConfigWrapper } from "../types/stats_types";
 
 interface LibraryProps {
     audioFeatures: Record<string, number>;
     trackCount: number;
     totalDuration: number;
     artistCount: number;
-    artists: any[];
+    artists: ArtistCardProps[];
     genres: any[];
     genresDenominator: number;
     playlistCount: number;
-    albums: any[];
+    albums: Album[];
     years: any[];
     yearsDenominator: number;
 }
 
-const LibraryPage = ({ config }: any) => {
+const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
     const [library, setLibrary] = React.useState<LibraryProps | 100 | 200 | 300>(100);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(["owned", "all"], ["My Playlists", "All Playlists"], "library");
 
@@ -273,9 +274,9 @@ const LibraryPage = ({ config }: any) => {
 
     const artistCards: JSX.Element[] = library.artists
         .slice(0, 10)
-        .map((artist: any) => <ArtistCard name={artist.name} image={artist.image} uri={artist.uri} subtext={`Appears in ${artist.freq} tracks`} />);
+        .map((artist: ArtistCardProps) => <ArtistCard name={artist.name} image={artist.image} uri={artist.uri} subtext={`Appears in ${artist.freq} tracks`} />);
 
-    const albumCards: JSX.Element[] = library.albums.map(album => {
+    const albumCards: React.JSX.Element[] = library.albums.map((album: Album) => {
         return <ArtistCard name={album.name} image={album.image} uri={album.uri} subtext={`Appears in ${album.freq} tracks`} />;
     });
 
