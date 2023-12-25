@@ -71,7 +71,7 @@ export const fetchAudioFeatures = async (ids: string[]) => {
     return data;
 };
 
-export const fetchTopAlbums = async (albums: Record<string, number>) => {
+export const fetchTopAlbums = async (albums: Record<string, number>, cachedAlbums?: Album[]) => {
     let album_keys = Object.keys(albums)
         .filter(id => id.match(/^[a-zA-Z0-9]{22}$/))
         .sort((a, b) => albums[b] - albums[a])
@@ -83,28 +83,41 @@ export const fetchTopAlbums = async (albums: Record<string, number>) => {
     let top_albums: Album[] = <Album[]>await Promise.all(
         album_keys.map(async (albumID: string) => {
             let albumMeta;
-            try {
-                albumMeta = await Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.getAlbum, {
-                    uri: `spotify:album:${albumID}`,
-                    locale: "en",
-                    offset: 0,
-                    limit: 50,
-                });
-                if (!albumMeta?.data?.albumUnion?.name) throw new Error("Invalid URI");
-            } catch (e) {
-                console.error("stats - album metadata request failed:", e);
-                return;
+            // loop through and see if the album is already cached
+            if (cachedAlbums) {
+                for (let i = 0; i < cachedAlbums.length; i++) {
+                    if (cachedAlbums[i].uri === `spotify:album:${albumID}`) {
+                        albumMeta = cachedAlbums[i];
+                        break;
+                    }
+                }
             }
 
-            const releaseYear: string = albumMeta.data.albumUnion.date.isoString.slice(0, 4);
+            if (!albumMeta) {
+                try {
+                    albumMeta = await Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.getAlbum, {
+                        uri: `spotify:album:${albumID}`,
+                        locale: "en",
+                        offset: 0,
+                        limit: 50,
+                    });
+                    if (!albumMeta?.data?.albumUnion?.name) throw new Error("Invalid URI");
+                } catch (e) {
+                    console.error("stats - album metadata request failed:", e);
+                    return;
+                }
+            }
+
+            const releaseYear: string = albumMeta?.release_year || albumMeta.data.albumUnion.date.isoString.slice(0, 4);
 
             release_years[releaseYear] = (release_years[releaseYear] || 0) + albums[albumID];
             total_album_tracks += albums[albumID];
 
             return {
-                name: albumMeta.data.albumUnion.name,
-                uri: albumMeta.data.albumUnion.uri,
-                image: albumMeta.data.albumUnion.coverArt.sources[0]?.url || "https://commons.wikimedia.org/wiki/File:Black_square.jpg",
+                name: albumMeta.name || albumMeta.data.albumUnion.name,
+                uri: albumMeta.uri || albumMeta.data.albumUnion.uri,
+                image: albumMeta.image || albumMeta.data.albumUnion.coverArt.sources[0]?.url || "https://commons.wikimedia.org/wiki/File:Black_square.jpg",
+                release_year: releaseYear,
                 freq: albums[albumID],
             };
         })

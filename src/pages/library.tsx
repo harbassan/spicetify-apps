@@ -135,7 +135,7 @@ const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
             const [ownedTopArtists, ownedTopGenres, ownedTopGenresTotal]: any = await fetchTopArtists(ownedArtists);
 
             const [topAlbums, releaseYears, releaseYearsTotal]: any = await fetchTopAlbums(albums);
-            const [ownedTopAlbums, ownedReleaseYears, ownedReleaseYearsTotal]: any = await fetchTopAlbums(ownedAlbums);
+            const [ownedTopAlbums, ownedReleaseYears, ownedReleaseYearsTotal]: any = await fetchTopAlbums(ownedAlbums, topAlbums);
 
             const fetchedFeatures: any[] = await fetchAudioFeatures(trackIDs);
 
@@ -226,7 +226,7 @@ const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
     }, [activeOption]);
 
     const props = {
-        callback: () => fetchData(activeOption),
+        callback: () => fetchData(activeOption, true),
         config: config,
         dropdown: dropdown,
     };
