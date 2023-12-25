@@ -148,7 +148,6 @@ const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
                 instrumentalness: 0,
                 liveness: 0,
                 tempo: 0,
-                loudness: 0,
             };
 
             let ownedAudioFeatures: Record<string, number> = {};
@@ -257,8 +256,6 @@ const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
         switch (obj[0]) {
             case "tempo":
                 return Math.round(obj[1]) + "bpm";
-            case "loudness":
-                return Math.round(obj[1]) + "dB";
             case "popularity":
                 return Math.round(obj[1]) + "%";
             default:

@@ -2,7 +2,7 @@ import React from "react";
 import useDropdownMenu from "../components/hooks/useDropdownMenu";
 import StatCard from "../components/cards/stat_card";
 import GenresCard from "../components/cards/genres_card";
-import { apiRequest, updatePageCache } from "../funcs";
+import { apiRequest, fetchAudioFeatures, updatePageCache } from "../funcs";
 import InlineGrid from "../components/inline_grid";
 import Status from "../components/status";
 import PageHeader from "../components/page_header";
@@ -125,39 +125,29 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
             }
         }
 
-        const featureData = await fetchAudioFeatures(topTracks);
-        if (!featureData) {
-            setTopGenres(200);
-            return;
+        const fetchedFeatures: any[] = await fetchAudioFeatures(topTracks);
+
+        let audioFeatures: Record<string, number> = {
+            danceability: 0,
+            energy: 0,
+            valence: 0,
+            speechiness: 0,
+            acousticness: 0,
+            instrumentalness: 0,
+            liveness: 0,
+            tempo: 0,
+        };
+
+        for (let i = 0; i < fetchedFeatures.length; i++) {
+            if (!fetchedFeatures[i]) continue;
+            const track = fetchedFeatures[i];
+            Object.keys(audioFeatures).forEach(feature => {
+                audioFeatures[feature] += track[feature];
+            });
         }
 
-        const audioFeatures = featureData.audio_features.reduce(
-            (acc: { [key: string]: number }, track: any) => {
-                acc["danceability"] += track["danceability"];
-                acc["energy"] += track["energy"];
-                acc["valence"] += track["valence"];
-                acc["speechiness"] += track["speechiness"];
-                acc["acousticness"] += track["acousticness"];
-                acc["instrumentalness"] += track["instrumentalness"];
-                acc["liveness"] += track["liveness"];
-                acc["tempo"] += track["tempo"];
-                acc["loudness"] += track["loudness"];
-                return acc;
-            },
-            {
-                popularity: trackPopularity,
-                explicitness: explicitness,
-                danceability: 0,
-                energy: 0,
-                valence: 0,
-                speechiness: 0,
-                acousticness: 0,
-                instrumentalness: 0,
-                liveness: 0,
-                tempo: 0,
-                loudness: 0,
-            }
-        );
+        audioFeatures = { popularity: trackPopularity, explicitness, ...audioFeatures };
+
         for (let key in audioFeatures) {
             audioFeatures[key] = audioFeatures[key] / 50;
         }
@@ -169,12 +159,6 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
             `stats:top-genres:${time_range}`,
             JSON.stringify({ genres: genres, features: audioFeatures, years: releaseData, obscureTracks: obscureTracks })
         );
-    };
-
-    const fetchAudioFeatures = async (ids: string[]) => {
-        ids = ids.filter(id => id.match(/^[a-zA-Z0-9]{22}$/));
-        const data = await apiRequest("audioFeatures", `https://api.spotify.com/v1/audio-features?ids=${ids.join(",")}`);
-        return data;
     };
 
     React.useEffect(() => {
@@ -216,8 +200,6 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
         switch (key) {
             case "tempo":
                 return Math.round(topGenres.features[key]) + "bpm";
-            case "loudness":
-                return Math.round(topGenres.features[key]) + "dB";
             case "popularity":
                 return Math.round(topGenres.features[key]) + "%";
             default:

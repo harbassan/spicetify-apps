@@ -61,9 +61,7 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
 
         const fetchedFeatures: any[] = await fetchAudioFeatures(trackIDs);
 
-        const audioFeatures: Record<string, number> = {
-            popularity: popularity,
-            explicitness: explicitCount,
+        let audioFeatures: Record<string, number> = {
             danceability: 0,
             energy: 0,
             valence: 0,
@@ -72,22 +70,17 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
             instrumentalness: 0,
             liveness: 0,
             tempo: 0,
-            loudness: 0,
         };
 
         for (let i = 0; i < fetchedFeatures.length; i++) {
             if (!fetchedFeatures[i]) continue;
             const track = fetchedFeatures[i];
-            audioFeatures["danceability"] += track["danceability"];
-            audioFeatures["energy"] += track["energy"];
-            audioFeatures["valence"] += track["valence"];
-            audioFeatures["speechiness"] += track["speechiness"];
-            audioFeatures["acousticness"] += track["acousticness"];
-            audioFeatures["instrumentalness"] += track["instrumentalness"];
-            audioFeatures["liveness"] += track["liveness"];
-            audioFeatures["tempo"] += track["tempo"];
-            audioFeatures["loudness"] += track["loudness"];
+            Object.keys(audioFeatures).forEach(feature => {
+                audioFeatures[feature] += track[feature];
+            });
         }
+
+        audioFeatures = { popularity, explicitness: explicitCount, ...audioFeatures };
 
         for (let key in audioFeatures) {
             audioFeatures[key] /= fetchedFeatures.length;
@@ -126,8 +119,6 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
         switch (obj[0]) {
             case "tempo":
                 return Math.round(obj[1]) + "bpm";
-            case "loudness":
-                return Math.round(obj[1]) + "dB";
             case "popularity":
                 return Math.round(obj[1]) + "%";
             default:
