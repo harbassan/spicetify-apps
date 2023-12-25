@@ -1,10 +1,22 @@
 import React from "react";
 import PlaylistPage from "../pages/playlist";
+import { STATS_VERSION } from "../constants";
 
 (async function stats() {
     if (!Spicetify.Platform) {
         setTimeout(stats, 100);
         return;
+    }
+
+    const version = localStorage.getItem("stats:version");
+    if (!version || version !== STATS_VERSION) {
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i) as string;
+            if (key.startsWith("stats:") && !key.startsWith("stats:config:")) {
+                localStorage.removeItem(key);
+            }
+        }
+        localStorage.setItem("stats:version", STATS_VERSION);
     }
 
     Spicetify.LocalStorage.set("stats:cache-info", JSON.stringify([0, 0, 0, 0, 0, 0]));
