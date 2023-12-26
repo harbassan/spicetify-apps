@@ -1,4 +1,4 @@
-/* ../../AppData/Local/Temp/tmp-13456-PqjxUa5cmX0M/18bcc608f211/navBar.module.css */
+/* ../../AppData/Local/Temp/tmp-6912-LESOepgMxajG/18ca59b28c22/navBar.module.css */
 .navBar-module__topBarHeaderItem___v29bR_stats {
   -webkit-app-region: no-drag;
   display: inline-block;
@@ -46,10 +46,10 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   padding: 0;
 }
 
-/* ../../AppData/Local/Temp/tmp-13456-PqjxUa5cmX0M/18bcc608ed00/app.css */
+/* ../../AppData/Local/Temp/tmp-6912-LESOepgMxajG/18ca59b275b0/app.css */
 .stats-grid {
   --grid-gap: 24px;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
 }
 .stats-refreshButton {
   width: 32px;
@@ -64,7 +64,7 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
 }
 .stats-gridInline {
   --grid-gap: 24px;
-  grid-template-columns: repeat(10, 180px);
+  grid-template-columns: repeat(10, 180px) !important;
   overflow-x: hidden;
   scroll-behavior: smooth;
   margin-top: 5px;
@@ -85,7 +85,7 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 75vh;
+  min-height: 60vh;
   flex-direction: column;
   gap: 16px;
 }
@@ -93,6 +93,7 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   display: flex;
   gap: 24px;
   align-items: center;
+  margin-bottom: 16px;
 }
 .stats-page {
   display: flex;
@@ -112,16 +113,17 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   margin-right: 5px;
   background-color: var(--spice-player);
   color: var(--spice-subtext);
-  &:hover {
-    background-color: #282828;
-  }
+}
+.stats-scrollButton:hover {
+  background-color: var(--spice-card);
 }
 .stats-createPlaylistButton {
+  margin-left: 24px;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
   font-size: 0.8125rem;
   font-weight: 700;
-  font-family: var( --font-family, CircularSp, CircularSp-Arab, CircularSp-Hebr, CircularSp-Cyrl, CircularSp-Grek, CircularSp-Deva, var(--fallback-fonts, sans-serif) );
+  font-family: var(--font-family, CircularSp, CircularSp-Arab, CircularSp-Hebr, CircularSp-Cyrl, CircularSp-Grek, CircularSp-Deva, var(--fallback-fonts, sans-serif));
   background-color: transparent;
   border-radius: 500px;
   cursor: pointer;
@@ -151,10 +153,10 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  &:hover {
-    transform: scale(1.04);
-    border-color: var(--essential-base, #000000);
-  }
+}
+.stats-createPlaylistButton:hover {
+  transform: scale(1.04);
+  border-color: var(--essential-base, #000000);
 }
 .stats-header {
   -webkit-box-pack: justify;
@@ -229,4 +231,138 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
 }
 .GenericModal[aria-label="Playlist Stats"] .main-shelf-title {
   color: var(--spice-text);
+}
+.status-icon {
+  width: 40px;
+  height: 40px;
+  fill: currentColor;
+}
+
+/* ../../AppData/Local/Temp/tmp-6912-LESOepgMxajG/18ca59b28921/settings_modal.css */
+#stats-config-container {
+  gap: 10px;
+  display: flex;
+  flex-direction: column;
+}
+#stats-config-container .toggle-wrapper {
+  display: inline-flex;
+  position: relative;
+  align-items: center;
+  cursor: pointer;
+}
+#stats-config-container .section-header {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  margin-block: 0px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--spice-text);
+}
+#stats-config-container .col.description {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  margin-block: 0px;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--spice-subtext);
+}
+#stats-config-container .disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+#stats-config-container .toggle-input {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+#stats-config-container .toggle-input:checked ~ .toggle-indicator-wrapper {
+  background-color: var(--spice-text);
+}
+#stats-config-container .toggle-input:checked ~ .toggle-indicator-wrapper .toggle-indicator {
+  background-color: #fff;
+  left: auto;
+  right: 2px;
+  right: 3px;
+}
+#stats-config-container .toggle-input:hover ~ .toggle-indicator-wrapper {
+  filter: brightness(1.3);
+}
+#stats-config-container .toggle-input:hover:checked ~ .toggle-indicator-wrapper {
+  filter: brightness(1.15);
+}
+#stats-config-container .toggle-input:active:not([disabled]) ~ .toggle-indicator-wrapper .toggle-indicator {
+  width: 20px;
+}
+#stats-config-container .toggle-indicator-wrapper {
+  background-color: #535353;
+  border-radius: 24px;
+  height: 24px;
+  position: relative;
+  width: 42px;
+}
+#stats-config-container .toggle-indicator {
+  background: #fff;
+  border-radius: inherit;
+  height: 20px;
+  left: 2px;
+  position: absolute;
+  top: 2px;
+  transition:
+    background-color,
+    left,
+    right,
+    width 0.1s ease;
+  width: 20px;
+  height: 18px;
+  width: 18px;
+  top: 3px;
+  left: 3px;
+  background: var(--spice-shadow) !important;
+}
+#stats-config-container .text-input {
+  background: rgba(var(--spice-rgb-selected-row), 0.1);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--spice-text);
+  font-family: inherit;
+  font-size: 14px;
+  height: 32px;
+  padding: 0 12px;
+  width: 100%;
+}
+#stats-config-container .text-input:focus {
+  background-color: var(--spice-tab-active);
+  border: 1px solid var(--spice-button-disabled);
+  outline: none;
+}
+#stats-config-container .dropdown-input {
+  background-color: var(--spice-tab-active);
+  border: 0;
+  border-radius: 4px;
+  color: rgba(var(--spice-rgb-selected-row), 0.7);
+  font-size: 14px;
+  font-weight: 400;
+  height: 32px;
+  letter-spacing: 0.24px;
+  line-height: 20px;
+  padding: 0 32px 0 12px;
+  width: 100%;
+}
+#stats-config-container .tooltip-icon {
+  float: right;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  height: 22px;
+  fill: var(--spice-subtext);
+}
+#stats-config-container .tooltip-icon:hover {
+  fill: var(--spice-text);
+}
+#stats-config-container .tooltip {
+  text-align: center;
+}
+#stats-config-container .setting-row {
+  display: flex;
+  justify-content: space-between;
 }

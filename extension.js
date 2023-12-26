@@ -53,24 +53,21 @@ var stats = (() => {
   // src/pages/playlist.tsx
   var import_react6 = __toESM(require_react());
 
-  // src/components/stat_card.tsx
+  // src/components/cards/stat_card.tsx
   var import_react = __toESM(require_react());
   var StatCard = (props) => {
     return /* @__PURE__ */ import_react.default.createElement(import_react.default.Fragment, null, /* @__PURE__ */ import_react.default.createElement("div", {
       className: "main-card-card"
     }, /* @__PURE__ */ import_react.default.createElement("div", {
-      draggable: "true",
-      className: "main-card-draggable"
-    }, /* @__PURE__ */ import_react.default.createElement("div", {
       className: "stats-cardValue"
     }, props.value), /* @__PURE__ */ import_react.default.createElement("div", null, /* @__PURE__ */ import_react.default.createElement("div", {
       className: "TypeElement-balladBold-textBase-4px-type main-cardHeader-text stats-cardText",
       "data-encore-id": "type"
-    }, props.stat)))));
+    }, props.stat))));
   };
   var stat_card_default = import_react.default.memo(StatCard);
 
-  // src/components/genres_card.tsx
+  // src/components/cards/genres_card.tsx
   var import_react2 = __toESM(require_react());
   var genreLine = (name, value, limit, total) => {
     return /* @__PURE__ */ import_react2.default.createElement("div", {
@@ -99,7 +96,7 @@ var stats = (() => {
   };
   var genres_card_default = import_react2.default.memo(genresCard);
 
-  // src/components/artist_card.tsx
+  // src/components/cards/artist_card.tsx
   var import_react3 = __toESM(require_react());
   var DraggableComponent = (props) => {
     var _a, _b;
@@ -110,29 +107,34 @@ var stats = (() => {
       className: "main-card-draggable"
     }, props.children);
   };
-  var MenuWrapper = import_react3.default.memo((props) => /* @__PURE__ */ import_react3.default.createElement(Spicetify.ReactComponent.ArtistMenu, __spreadValues({}, props)));
   var Card = ({ name, image, uri, subtext }) => {
     const goToArtist = (uriString) => {
+      if (uriString.includes("last")) {
+        return window.open(uriString, "_blank");
+      }
       const uriObj = Spicetify.URI.fromString(uriString);
       const url = uriObj.toURLPath(true);
       Spicetify.Platform.History.push(url);
       Spicetify.Platform.History.goForward();
     };
+    const isArtist = uri.includes("artist");
+    const MenuWrapper = import_react3.default.memo((props) => {
+      return isArtist ? /* @__PURE__ */ import_react3.default.createElement(Spicetify.ReactComponent.ArtistMenu, __spreadValues({}, props)) : /* @__PURE__ */ import_react3.default.createElement(Spicetify.ReactComponent.AlbumMenu, __spreadValues({}, props));
+    });
     return /* @__PURE__ */ import_react3.default.createElement(import_react3.default.Fragment, null, /* @__PURE__ */ import_react3.default.createElement(Spicetify.ReactComponent.ContextMenu, {
       menu: /* @__PURE__ */ import_react3.default.createElement(MenuWrapper, {
         uri
       }),
       trigger: "right-click"
     }, /* @__PURE__ */ import_react3.default.createElement("div", {
-      className: "main-card-card",
-      onClick: () => goToArtist(uri)
+      className: "main-card-card"
     }, /* @__PURE__ */ import_react3.default.createElement(DraggableComponent, {
       uri,
       title: name
     }, /* @__PURE__ */ import_react3.default.createElement("div", {
       className: "main-card-imageContainer"
     }, /* @__PURE__ */ import_react3.default.createElement("div", {
-      className: "main-cardImage-imageWrapper main-cardImage-circular"
+      className: `main-cardImage-imageWrapper ${isArtist ? `main-cardImage-circular` : ""}`
     }, /* @__PURE__ */ import_react3.default.createElement("div", {
       className: ""
     }, /* @__PURE__ */ import_react3.default.createElement("img", {
@@ -140,9 +142,10 @@ var stats = (() => {
       draggable: "false",
       loading: "lazy",
       src: image,
-      className: "main-image-image main-cardImage-image main-cardImage-circular main-image-loaded"
+      className: `main-image-image main-cardImage-image ${isArtist ? `main-cardImage-circular` : ""} main-image-loaded`
     }))), /* @__PURE__ */ import_react3.default.createElement("div", {
-      className: "main-card-PlayButtonContainer"
+      className: "main-card-PlayButtonContainer",
+      onClick: () => Spicetify.Player.playUri(uri)
     }, /* @__PURE__ */ import_react3.default.createElement("div", {
       className: "main-playButton-PlayButton"
     }, /* @__PURE__ */ import_react3.default.createElement("button", {
@@ -176,7 +179,8 @@ var stats = (() => {
       className: "TypeElement-mesto-textSubdued-type main-cardSubHeader-root",
       "data-encore-id": "type"
     }, /* @__PURE__ */ import_react3.default.createElement("span", null, subtext))), /* @__PURE__ */ import_react3.default.createElement("div", {
-      className: "main-card-cardLink"
+      className: "main-card-cardLink",
+      onClick: () => goToArtist(uri)
     })))));
   };
   var artist_card_default = import_react3.default.memo(Card);
@@ -224,36 +228,49 @@ var stats = (() => {
     }, []);
     return data;
   };
-  var fetchTopAlbums = async (albums) => {
+  var fetchTopAlbums = async (albums, cachedAlbums) => {
     let album_keys = Object.keys(albums).filter((id) => id.match(/^[a-zA-Z0-9]{22}$/)).sort((a, b) => albums[b] - albums[a]).slice(0, 100);
     let release_years = {};
     let total_album_tracks = 0;
-    let top_albums = await Promise.all(album_keys.map(async (albumID) => {
-      var _a, _b, _c;
-      let albumMeta;
-      try {
-        albumMeta = await Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.getAlbum, {
-          uri: `spotify:album:${albumID}`,
-          locale: "en",
-          offset: 0,
-          limit: 50
-        });
-        if (!((_b = (_a = albumMeta == null ? void 0 : albumMeta.data) == null ? void 0 : _a.albumUnion) == null ? void 0 : _b.name))
-          throw new Error("Invalid URI");
-      } catch (e) {
-        console.error("stats - album metadata request failed:", e);
-        return null;
-      }
-      const releaseYear = albumMeta.data.albumUnion.date.isoString.slice(0, 4);
-      release_years[releaseYear] = (release_years[releaseYear] || 0) + albums[albumID];
-      total_album_tracks += albums[albumID];
-      return {
-        name: albumMeta.data.albumUnion.name,
-        uri: albumMeta.data.albumUnion.uri,
-        image: ((_c = albumMeta.data.albumUnion.coverArt.sources[0]) == null ? void 0 : _c.url) || "https://commons.wikimedia.org/wiki/File:Black_square.jpg",
-        freq: albums[albumID]
-      };
-    }));
+    let top_albums = await Promise.all(
+      album_keys.map(async (albumID) => {
+        var _a, _b, _c;
+        let albumMeta;
+        if (cachedAlbums) {
+          for (let i = 0; i < cachedAlbums.length; i++) {
+            if (cachedAlbums[i].uri === `spotify:album:${albumID}`) {
+              albumMeta = cachedAlbums[i];
+              break;
+            }
+          }
+        }
+        if (!albumMeta) {
+          try {
+            albumMeta = await Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.getAlbum, {
+              uri: `spotify:album:${albumID}`,
+              locale: "en",
+              offset: 0,
+              limit: 50
+            });
+            if (!((_b = (_a = albumMeta == null ? void 0 : albumMeta.data) == null ? void 0 : _a.albumUnion) == null ? void 0 : _b.name))
+              throw new Error("Invalid URI");
+          } catch (e) {
+            console.error("stats - album metadata request failed:", e);
+            return;
+          }
+        }
+        const releaseYear = (albumMeta == null ? void 0 : albumMeta.release_year) || albumMeta.data.albumUnion.date.isoString.slice(0, 4);
+        release_years[releaseYear] = (release_years[releaseYear] || 0) + albums[albumID];
+        total_album_tracks += albums[albumID];
+        return {
+          name: albumMeta.name || albumMeta.data.albumUnion.name,
+          uri: albumMeta.uri || albumMeta.data.albumUnion.uri,
+          image: albumMeta.image || ((_c = albumMeta.data.albumUnion.coverArt.sources[0]) == null ? void 0 : _c.url) || "https://commons.wikimedia.org/wiki/File:Black_square.jpg",
+          release_year: releaseYear,
+          freq: albums[albumID]
+        };
+      })
+    );
     top_albums = top_albums.filter((el) => el != null).slice(0, 10);
     return [top_albums, Object.entries(release_years), total_album_tracks];
   };
@@ -287,20 +304,43 @@ var stats = (() => {
 
   // src/components/status.tsx
   var import_react4 = __toESM(require_react());
-  var Status = (props) => {
-    return /* @__PURE__ */ import_react4.default.createElement(import_react4.default.Fragment, null, /* @__PURE__ */ import_react4.default.createElement("div", {
-      className: "stats-loadingWrapper"
-    }, /* @__PURE__ */ import_react4.default.createElement("svg", {
+  var ErrorIcon = () => {
+    return /* @__PURE__ */ import_react4.default.createElement("svg", {
+      "data-encore-id": "icon",
+      role: "img",
+      "aria-hidden": "true",
+      viewBox: "0 0 24 24",
+      className: "status-icon"
+    }, /* @__PURE__ */ import_react4.default.createElement("path", {
+      d: "M11 18v-2h2v2h-2zm0-4V6h2v8h-2z"
+    }), /* @__PURE__ */ import_react4.default.createElement("path", {
+      d: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM1 12C1 5.925 5.925 1 12 1s11 4.925 11 11-4.925 11-11 11S1 18.075 1 12z"
+    }));
+  };
+  var LibraryIcon = () => {
+    return /* @__PURE__ */ import_react4.default.createElement("svg", {
       role: "img",
       height: "46",
       width: "46",
       "aria-hidden": "true",
       viewBox: "0 0 24 24",
       "data-encore-id": "icon",
-      className: "Svg-img-24 Svg-img-24-icon"
+      className: "status-icon"
     }, /* @__PURE__ */ import_react4.default.createElement("path", {
       d: "M14.5 2.134a1 1 0 0 1 1 0l6 3.464a1 1 0 0 1 .5.866V21a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1V3a1 1 0 0 1 .5-.866zM16 4.732V20h4V7.041l-4-2.309zM3 22a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1zm6 0a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1z"
-    })), /* @__PURE__ */ import_react4.default.createElement("h1", null, props.heading), /* @__PURE__ */ import_react4.default.createElement("h2", null, props.subheading)));
+    }));
+  };
+  var Status = (props) => {
+    const [isVisible, setIsVisible] = import_react4.default.useState(false);
+    import_react4.default.useEffect(() => {
+      const to = setTimeout(() => {
+        setIsVisible(true);
+      }, 500);
+      return () => clearTimeout(to);
+    }, []);
+    return isVisible ? /* @__PURE__ */ import_react4.default.createElement(import_react4.default.Fragment, null, /* @__PURE__ */ import_react4.default.createElement("div", {
+      className: "stats-loadingWrapper"
+    }, props.icon === "error" ? /* @__PURE__ */ import_react4.default.createElement(ErrorIcon, null) : /* @__PURE__ */ import_react4.default.createElement(LibraryIcon, null), /* @__PURE__ */ import_react4.default.createElement("h1", null, props.heading), /* @__PURE__ */ import_react4.default.createElement("h3", null, props.subheading))) : /* @__PURE__ */ import_react4.default.createElement(import_react4.default.Fragment, null);
   };
   var status_default = Status;
 
@@ -342,12 +382,12 @@ var stats = (() => {
 
   // src/pages/playlist.tsx
   var PlaylistPage = ({ uri }) => {
-    const [library, setLibrary] = import_react6.default.useState(null);
+    const [library, setLibrary] = import_react6.default.useState(100);
     const fetchData = async () => {
       const start = window.performance.now();
       const playlistMeta = await apiRequest("playlistMeta", `sp://core-playlist/v1/playlist/${uri}`);
       if (!playlistMeta) {
-        setLibrary(false);
+        setLibrary(200);
         return;
       }
       let duration = playlistMeta.playlist.duration;
@@ -372,9 +412,7 @@ var stats = (() => {
       const [topAlbums, releaseYears, releaseYearsTotal] = await fetchTopAlbums(albums);
       const [topArtists, topGenres, topGenresTotal] = await fetchTopArtists(artists);
       const fetchedFeatures = await fetchAudioFeatures(trackIDs);
-      const audioFeatures = {
-        popularity,
-        explicitness: explicitCount,
+      let audioFeatures = {
         danceability: 0,
         energy: 0,
         valence: 0,
@@ -382,23 +420,17 @@ var stats = (() => {
         acousticness: 0,
         instrumentalness: 0,
         liveness: 0,
-        tempo: 0,
-        loudness: 0
+        tempo: 0
       };
       for (let i = 0; i < fetchedFeatures.length; i++) {
         if (!fetchedFeatures[i])
           continue;
         const track = fetchedFeatures[i];
-        audioFeatures["danceability"] += track["danceability"];
-        audioFeatures["energy"] += track["energy"];
-        audioFeatures["valence"] += track["valence"];
-        audioFeatures["speechiness"] += track["speechiness"];
-        audioFeatures["acousticness"] += track["acousticness"];
-        audioFeatures["instrumentalness"] += track["instrumentalness"];
-        audioFeatures["liveness"] += track["liveness"];
-        audioFeatures["tempo"] += track["tempo"];
-        audioFeatures["loudness"] += track["loudness"];
+        Object.keys(audioFeatures).forEach((feature) => {
+          audioFeatures[feature] += track[feature];
+        });
       }
+      audioFeatures = __spreadValues({ popularity, explicitness: explicitCount }, audioFeatures);
       for (let key in audioFeatures) {
         audioFeatures[key] /= fetchedFeatures.length;
       }
@@ -420,22 +452,24 @@ var stats = (() => {
     import_react6.default.useEffect(() => {
       fetchData();
     }, []);
-    if (library === null)
-      return /* @__PURE__ */ import_react6.default.createElement(import_react6.default.Fragment, null, /* @__PURE__ */ import_react6.default.createElement(status_default, {
-        heading: "Analysing The Playlist",
-        subheading: "This might take a while"
-      }));
-    if (!library)
-      return /* @__PURE__ */ import_react6.default.createElement(import_react6.default.Fragment, null, /* @__PURE__ */ import_react6.default.createElement(status_default, {
-        heading: "Failed to Fetch Playlist Stats",
-        subheading: "Make an issue on Github"
-      }));
+    switch (library) {
+      case 200:
+        return /* @__PURE__ */ import_react6.default.createElement(status_default, {
+          icon: "error",
+          heading: "Failed to Fetch Stats",
+          subheading: "Make an issue on Github"
+        });
+      case 100:
+        return /* @__PURE__ */ import_react6.default.createElement(status_default, {
+          icon: "library",
+          heading: "Analysing the Playlist",
+          subheading: "This may take a while"
+        });
+    }
     const parseVal = (obj) => {
       switch (obj[0]) {
         case "tempo":
           return Math.round(obj[1]) + "bpm";
-        case "loudness":
-          return Math.round(obj[1]) + "dB";
         case "popularity":
           return Math.round(obj[1]) + "%";
         default:
@@ -463,14 +497,6 @@ var stats = (() => {
         subtext: `Appears in ${album.freq} tracks`
       });
     });
-    const scrollGrid2 = (event) => {
-      const grid = event.target.parentNode.querySelector("div");
-      grid.scrollLeft += grid.clientWidth;
-    };
-    const scrollGridLeft2 = (event) => {
-      const grid = event.target.parentNode.querySelector("div");
-      grid.scrollLeft -= grid.clientWidth;
-    };
     return /* @__PURE__ */ import_react6.default.createElement("div", {
       className: "stats-page"
     }, /* @__PURE__ */ import_react6.default.createElement("section", {
@@ -537,13 +563,29 @@ var stats = (() => {
   };
   var playlist_default = import_react6.default.memo(PlaylistPage);
 
+  // package.json
+  var version = "0.3.0";
+
+  // src/constants.ts
+  var STATS_VERSION = version;
+
   // src/extensions/extension.tsx
   (async function stats() {
     if (!Spicetify.Platform) {
       setTimeout(stats, 100);
       return;
     }
-    Spicetify.LocalStorage.set("stats:cache-info", JSON.stringify([0, 0, 0, 0]));
+    const version2 = localStorage.getItem("stats:version");
+    if (!version2 || version2 !== STATS_VERSION) {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith("stats:") && !key.startsWith("stats:config:")) {
+          localStorage.removeItem(key);
+        }
+      }
+      localStorage.setItem("stats:version", STATS_VERSION);
+    }
+    Spicetify.LocalStorage.set("stats:cache-info", JSON.stringify([0, 0, 0, 0, 0, 0]));
     const styleLink = document.createElement("link");
     styleLink.rel = "stylesheet";
     styleLink.href = "/spicetify-routes-stats.css";
