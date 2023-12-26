@@ -163,7 +163,7 @@ export const fetchTopArtists = async (artists: Record<string, number>) => {
     return [top_artists, top_genres, total_genre_tracks];
 };
 
-function filterLink(str: string): string {
+export function filterLink(str: string): string {
     const normalizedStr = str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     return normalizedStr.replace(/[^a-zA-Z0-9\-._~:/?#[\]@!$&()*+,;= ]/g, "").replace(/ /g, "+");
 }

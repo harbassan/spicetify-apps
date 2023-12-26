@@ -2,7 +2,7 @@ import React from "react";
 import useDropdownMenu from "../components/hooks/useDropdownMenu";
 import StatCard from "../components/cards/stat_card";
 import GenresCard from "../components/cards/genres_card";
-import { apiRequest, fetchAudioFeatures, updatePageCache } from "../funcs";
+import { fetchAudioFeatures, filterLink, updatePageCache } from "../funcs";
 import InlineGrid from "../components/inline_grid";
 import Status from "../components/status";
 import PageHeader from "../components/page_header";
@@ -93,8 +93,9 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
         async function testDupe(track: Track) {
             // perform a search to get rid of duplicate tracks
             const spotifyItem = await Spicetify.CosmosAsync.get(
-                `https://api.spotify.com/v1/search?q=track:${track.name}+artist:${track.artists[0].name}&type=track`
+                `https://api.spotify.com/v1/search?q=track:${filterLink(track.name)}+artist:${filterLink(track.artists[0].name)}&type=track`
             ).then((res: any) => res.tracks?.items);
+            if (!spotifyItem) return false;
             return spotifyItem.some((item: any) => {
                 return item.name === track.name && item.popularity > track.popularity;
             });
