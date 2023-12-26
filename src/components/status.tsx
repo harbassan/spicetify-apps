@@ -18,7 +18,16 @@ const LibraryIcon = () => {
 };
 
 const Status = (props: { icon: "error" | "library"; heading: string; subheading: string }) => {
-    return (
+    const [isVisible, setIsVisible] = React.useState(false);
+
+    React.useEffect(() => {
+        const to = setTimeout(() => {
+            setIsVisible(true);
+        }, 500);
+        return () => clearTimeout(to);
+    }, []);
+
+    return isVisible ? (
         <>
             <div className="stats-loadingWrapper">
                 {props.icon === "error" ? <ErrorIcon /> : <LibraryIcon />}
@@ -26,6 +35,8 @@ const Status = (props: { icon: "error" | "library"; heading: string; subheading:
                 <h3>{props.subheading}</h3>
             </div>
         </>
+    ) : (
+        <></>
     );
 };
 
