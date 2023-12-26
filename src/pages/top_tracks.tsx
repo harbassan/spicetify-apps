@@ -1,10 +1,11 @@
 import React from "react";
+
 import TrackRow from "../components/track_row";
-import useDropdownMenu from "../components/hooks/useDropdownMenu";
 import Status from "../components/status";
-import { apiRequest, updatePageCache, convertToSpotify, checkLiked } from "../funcs";
 import PageHeader from "../components/page_header";
 import Tracklist from "../components/tracklist";
+import useDropdownMenu from "../components/hooks/useDropdownMenu";
+import { apiRequest, updatePageCache, convertToSpotify, checkLiked } from "../funcs";
 import { ConfigWrapper, Track } from "../types/stats_types";
 
 export const topTracksReq = async (time_range: string, config: ConfigWrapper) => {
@@ -58,8 +59,8 @@ export const topTracksReq = async (time_range: string, config: ConfigWrapper) =>
                 image: track.album.images[2]
                     ? track.album.images[2].url
                     : track.album.images[1]
-                    ? track.album.images[1].url
-                    : "https://images.squarespace-cdn.com/content/v1/55fc0004e4b069a519961e2d/1442590746571-RPGKIXWGOO671REUNMCB/image-asset.gif",
+                        ? track.album.images[1].url
+                        : "https://images.squarespace-cdn.com/content/v1/55fc0004e4b069a519961e2d/1442590746571-RPGKIXWGOO671REUNMCB/image-asset.gif",
                 uri: track.uri,
                 id: track.id,
                 artists: track.artists.map((artist: any) => ({ name: artist.name, uri: artist.uri })),
@@ -111,54 +112,43 @@ const TracksPage = ({ config }: { config: ConfigWrapper }) => {
     }, [activeOption]);
 
     const props = {
-        callback: () => fetchTopTracks(activeOption, true),
+        title: "Top Tracks",
+        refreshCallback: () => fetchTopTracks(activeOption, true),
         config: config,
         dropdown: dropdown,
-        createPlaylist: () => {},
     };
 
     switch (topTracks) {
         case 300:
             return (
-                <PageHeader title={`Top Tracks`} {...props}>
+                <PageHeader {...props}>
                     <Status icon="error" heading="No API Key or Username" subheading="Please enter these in the settings menu" />
                 </PageHeader>
             );
         case 200:
             return (
-                <PageHeader title={`TopTracks`} {...props}>
+                <PageHeader {...props}>
                     <Status icon="error" heading="Failed to Fetch Top Tracks" subheading="An error occurred while fetching the data" />
                 </PageHeader>
             );
         case 100:
             return (
-                <PageHeader title={`Top Tracks`} {...props}>
+                <PageHeader {...props}>
                     <Status icon="library" heading="Loading" subheading="Fetching data..." />
                 </PageHeader>
             );
     }
 
-    const createPlaylist = async () => {
-        await Spicetify.CosmosAsync.post("sp://core-playlist/v1/rootlist", {
-            operation: "create",
-            name: `Top Songs - ${activeOption}`,
-            playlist: true,
-            public: false,
-            uris: topTracks.map(track => track.uri),
-            // @ts-ignore
-        }).catch(() => Spicetify.Snackbar.enqueueSnackbar("The playlist could not be created."));
+    const infoToCreatePlaylist = {
+        playlistName: `Top Songs - ${activeOption}`,
+        itemsUris: topTracks.map(track => track.uri),
     };
-
-    props.createPlaylist = createPlaylist;
-
     const trackRows = topTracks.map((track: Track, index) => <TrackRow index={index + 1} {...track} uris={topTracks.map(track => track.uri)} />);
 
     return (
-        <>
-            <PageHeader title="Top Tracks" {...props}>
-                <Tracklist>{trackRows}</Tracklist>
-            </PageHeader>
-        </>
+        <PageHeader {...props} infoToCreatePlaylist={infoToCreatePlaylist}>
+            <Tracklist>{trackRows}</Tracklist>
+        </PageHeader>
     );
 };
 

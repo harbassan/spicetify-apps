@@ -3,15 +3,6 @@
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
 }
 
-.stats-refreshButton {
-    width: 32px;
-    height: 32px;
-}
-.collection-searchBar-searchBar {
-    display: flex;
-    gap: 8px;
-}
-
 .stats-specialGrid {
     grid-template-columns: repeat(11, 180px) !important;
 }
@@ -76,66 +67,27 @@
     }
 }
 
-.stats-createPlaylistButton {
-    margin-left: 24px;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    font-size: 0.8125rem;
-    font-weight: 700;
-    font-family: var(
-        --font-family,
-        CircularSp,
-        CircularSp-Arab,
-        CircularSp-Hebr,
-        CircularSp-Cyrl,
-        CircularSp-Grek,
-        CircularSp-Deva,
-        var(--fallback-fonts, sans-serif)
-    );
-    background-color: transparent;
-    border-radius: 500px;
-    cursor: pointer;
-    position: relative;
-    text-align: center;
-    text-decoration: none;
-    text-transform: none;
-    touch-action: manipulation;
-    transition-duration: 33ms;
-    transition-property: background-color, border-color, color, box-shadow, filter, transform;
-    user-select: none;
-    vertical-align: middle;
-    transform: translate3d(0px, 0px, 0px);
-    padding-block: 3px;
-    padding-inline: 15px;
-    border: 1px solid var(--essential-subdued, #878787);
-    color: var(--text-base, #000000);
-    min-block-size: 32px;
-    display: inline-flex;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    justify-content: center;
-
-    &:hover {
-        transform: scale(1.04);
-        border-color: var(--essential-base, #000000);
-    }
-}
-
 .stats-header {
-    -webkit-box-pack: justify;
-    -ms-flex-pack: justify;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    -ms-flex-line-pack: justify;
     align-content: space-between;
     align-items: center;
-    color: var(--spice-text);
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
     justify-content: space-between;
     margin: 16px 0;
+}
+
+.stats-header-right, .stats-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 50%;
+}
+
+.stats-header-right {
+    justify-content: flex-end;
+}
+
+.stats-header-left {
+    justify-content: flex-start;
 }
 
 .stats-tracklistHeader > div {
@@ -143,6 +95,10 @@
     -webkit-app-region: no-drag;
     gap: 20px;
     align-items: center;
+}
+
+.stats-make-playlist-button {
+    margin-inline-start: 12px;
 }
 
 .stats-genreCard {
@@ -180,16 +136,6 @@
 .stats-genreValue {
     color: var(--spice-text);
     font-size: 0.875rem;
-}
-
-.stats-cardValue {
-    font-size: 2rem;
-    font-weight: bold;
-    color: var(--spice-text);
-}
-
-.stats-cardText {
-    color: var(--spice-text);
 }
 
 .new-update {

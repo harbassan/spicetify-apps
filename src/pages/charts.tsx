@@ -1,4 +1,5 @@
 import React from "react";
+
 import Status from "../components/status";
 import useDropdownMenu from "../components/hooks/useDropdownMenu";
 import { apiRequest, checkLiked, convertToSpotify, updatePageCache } from "../funcs";
@@ -60,7 +61,8 @@ const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
     }, [activeOption]);
 
     const props = {
-        callback: () => fetchChartData(activeOption, true),
+        title: `Charts -  Top ${activeOption.charAt(0).toUpperCase()}${activeOption.slice(1)}`,
+        refreshCallback: () => fetchChartData(activeOption, true),
         config: config,
         dropdown: dropdown,
     };
@@ -68,19 +70,19 @@ const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
     switch (chartData) {
         case 200:
             return (
-                <PageHeader title={`Charts -  Top ${activeOption.charAt(0).toUpperCase()}${activeOption.slice(1)}`} {...props}>
+                <PageHeader {...props}>
                     <Status icon="error" heading="No API Key" subheading="Please enter your Last.fm API key in the settings menu." />
                 </PageHeader>
             );
         case 500:
             return (
-                <PageHeader title={`Charts -  Top ${activeOption.charAt(0).toUpperCase()}${activeOption.slice(1)}`} {...props}>
+                <PageHeader {...props}>
                     <Status icon="error" heading="Error" subheading="An error occurred while fetching the data." />
                 </PageHeader>
             );
         case 100:
             return (
-                <PageHeader title={`Charts -  Top ${activeOption.charAt(0).toUpperCase()}${activeOption.slice(1)}`} {...props}>
+                <PageHeader {...props}>
                     <Status icon="library" heading="Loading" subheading="Fetching data from Last.fm..." />
                 </PageHeader>
             );
@@ -91,38 +93,28 @@ const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
         const artistCards = chartData.map((artist, index) => (
             <ArtistCard key={artist.id} name={artist.name} image={artist.image} uri={artist.uri} subtext={`#${index + 1} Artist`} />
         ));
+        props.title = `Charts - Top Artists`;
         return (
-            <PageHeader title="Charts - Top Artists" {...props}>
+            <PageHeader {...props}>
                 <div className={`main-gridContainer-gridContainer stats-grid`}>{artistCards}</div>
             </PageHeader>
         );
     } else {
-        const createPlaylist = async () => {
-            // get short date
-            const date = new Date();
-            const day = date.getDate();
-            const month = date.getMonth() + 1;
-            const year = date.getFullYear();
-            const shortDate = `${year}/${month < 10 ? `0${month}` : month}/${day < 10 ? `0${day}` : day}`;
-
-            await Spicetify.CosmosAsync.post("sp://core-playlist/v1/rootlist", {
-                operation: "create",
-                name: `Charts - Top Tracks - ${shortDate}`,
-                playlist: true,
-                public: false,
-                uris: chartData.map(track => track.uri),
-                // @ts-ignore
-            }).catch(() => Spicetify.Snackbar.enqueueSnackbar("The playlist could not be created."));
+        const date = new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+        const infoToCreatePlaylist = {
+            playlistName: `Charts - Top Tracks - ${date}`,
+            itemsUris: chartData.map(track => track.uri),
         };
-        // @ts-ignore
-        props.createPlaylist = createPlaylist;
-
-        // force type to Track[] to prevent errors
-        let tracksData = chartData as Track[];
-
+        
         const trackRows = chartData.map((track: any, index) => <TrackRow index={index + 1} {...track} uris={chartData.map(track => track.uri)} />);
+
+        props.title = `Charts - Top Tracks`;
         return (
-            <PageHeader title="Charts - Top Tracks" {...props}>
+            <PageHeader {...props} infoToCreatePlaylist={infoToCreatePlaylist}>
                 <Tracklist>{trackRows}</Tracklist>
             </PageHeader>
         );

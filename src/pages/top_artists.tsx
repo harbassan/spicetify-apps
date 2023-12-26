@@ -84,7 +84,8 @@ const ArtistsPage = ({ config }: { config: ConfigWrapper }) => {
     }, [activeOption]);
 
     const props = {
-        callback: () => fetchTopArtists(activeOption, true),
+        title: "Top Artists",
+        refreshCallback: () => fetchTopArtists(activeOption, true),
         config: config,
         dropdown: dropdown,
     };
@@ -92,19 +93,19 @@ const ArtistsPage = ({ config }: { config: ConfigWrapper }) => {
     switch (topArtists) {
         case 300:
             return (
-                <PageHeader title={`Top Artists`} {...props}>
+                <PageHeader {...props}>
                     <Status icon="error" heading="No API Key or Username" subheading="Please enter these in the settings menu" />
                 </PageHeader>
             );
         case 200:
             return (
-                <PageHeader title={`Top Artists`} {...props}>
+                <PageHeader {...props}>
                     <Status icon="error" heading="Failed to Fetch Top Artists" subheading="An error occurred while fetching the data" />
                 </PageHeader>
             );
         case 100:
             return (
-                <PageHeader title={`Top Artists`} {...props}>
+                <PageHeader {...props}>
                     <Status icon="library" heading="Loading" subheading="Fetching data..." />
                 </PageHeader>
             );
@@ -116,7 +117,7 @@ const ArtistsPage = ({ config }: { config: ConfigWrapper }) => {
 
     return (
         <>
-            <PageHeader title="Top Artists" {...props}>
+            <PageHeader {...props}>
                 <div className={`main-gridContainer-gridContainer stats-grid`}>{artistCards}</div>
             </PageHeader>
         </>
