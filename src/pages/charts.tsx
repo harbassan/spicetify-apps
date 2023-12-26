@@ -63,7 +63,6 @@ const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
         callback: () => fetchChartData(activeOption, true),
         config: config,
         dropdown: dropdown,
-        createPlaylist: () => {},
     };
 
     switch (chartData) {
@@ -87,7 +86,8 @@ const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
             );
     }
 
-    if (activeOption === "artists") {
+    // @ts-ignore
+    if (!chartData[0]?.album) {
         const artistCards = chartData.map((artist, index) => (
             <ArtistCard key={artist.id} name={artist.name} image={artist.image} uri={artist.uri} subtext={`#${index + 1} Artist`} />
         ));
@@ -114,12 +114,12 @@ const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
                 // @ts-ignore
             }).catch(() => Spicetify.Snackbar.enqueueSnackbar("The playlist could not be created."));
         };
+        // @ts-ignore
         props.createPlaylist = createPlaylist;
 
         // force type to Track[] to prevent errors
         let tracksData = chartData as Track[];
 
-        if (!tracksData[0]?.album) setChartData(100);
         const trackRows = chartData.map((track: any, index) => <TrackRow index={index + 1} {...track} uris={chartData.map(track => track.uri)} />);
         return (
             <PageHeader title="Charts - Top Tracks" {...props}>
