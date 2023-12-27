@@ -1,20 +1,23 @@
 import React from "react";
+
 import useDropdownMenu from "../components/hooks/useDropdownMenu";
 import StatCard from "../components/cards/stat_card";
 import GenresCard from "../components/cards/genres_card";
-import { fetchAudioFeatures, filterLink, updatePageCache } from "../funcs";
 import InlineGrid from "../components/inline_grid";
 import Status from "../components/status";
 import PageHeader from "../components/page_header";
-import { topArtistsReq } from "./top_artists";
-import { topTracksReq } from "./top_tracks";
 import TrackRow from "../components/track_row";
 import Tracklist from "../components/tracklist";
+import Shelf from "../components/shelf";
+
+import { topArtistsReq } from "./top_artists";
+import { topTracksReq } from "./top_tracks";
+import { fetchAudioFeatures, filterLink, updatePageCache } from "../funcs";
 import { ConfigWrapper, Track } from "../types/stats_types";
 
 interface GenresPageProps {
     genres: [string, number][];
-    features: Record<string, any>;
+    features: Record<string, number>;
     years: [string, number][];
     obscureTracks: Track[];
 }
@@ -171,7 +174,8 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
     }, [activeOption]);
 
     const props = {
-        callback: () => fetchTopGenres(activeOption, true, true, true),
+        title: "Top Genres",
+        refreshCallback: () => fetchTopGenres(activeOption, true, true, true),
         config: config,
         dropdown: dropdown,
     };
@@ -179,39 +183,27 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
     switch (topGenres) {
         case 300:
             return (
-                <PageHeader title={`Top Genres`} {...props}>
+                <PageHeader {...props}>
                     <Status icon="error" heading="No API Key or Username" subheading="Please enter these in the settings menu" />
                 </PageHeader>
             );
         case 200:
             return (
-                <PageHeader title="Top Genres" {...props}>
+                <PageHeader {...props}>
                     <Status icon="error" heading="Failed to Fetch Top Genres" subheading="An error occurred while fetching the data" />
                 </PageHeader>
             );
         case 100:
             return (
-                <PageHeader title={`Top Genres`} {...props}>
+                <PageHeader {...props}>
                     <Status icon="library" heading="Loading" subheading="Fetching data..." />
                 </PageHeader>
             );
     }
 
-    const parseVal = (key: string) => {
-        switch (key) {
-            case "tempo":
-                return Math.round(topGenres.features[key]) + "bpm";
-            case "popularity":
-                return Math.round(topGenres.features[key]) + "%";
-            default:
-                return Math.round(topGenres.features[key] * 100) + "%";
-        }
-    };
-
-    const statCards = [];
-    for (let key in topGenres.features) {
-        statCards.push(<StatCard stat={key[0].toUpperCase() + key.slice(1)} value={parseVal(key)} />);
-    }
+    const statCards = Object.entries(topGenres.features).map(([key, value]) => {
+        return <StatCard label={key} value={value} />
+    });
 
     const obscureTracks = topGenres.obscureTracks.map((track: Track, index: number) => (
         <TrackRow index={index + 1} {...track} uris={topGenres.obscureTracks.map(track => track.uri)} />
@@ -219,35 +211,21 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
 
     return (
         <>
-            <PageHeader title="Top Genres" {...props}>
+            <PageHeader {...props}>
                 <section className="main-shelf-shelf Shelf">
                     <GenresCard genres={topGenres.genres} total={1275} />
                     <InlineGrid special>{statCards}</InlineGrid>
                 </section>
-                <section className="main-shelf-shelf Shelf">
-                    <div className="main-shelf-header">
-                        <div className="main-shelf-topRow">
-                            <div className="main-shelf-titleWrapper">
-                                <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">Release Year Distribution</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <section>
-                        <GenresCard genres={topGenres.years} total={50} />
-                    </section>
-                </section>
-                <section className="main-shelf-shelf Shelf">
-                    <div className="main-shelf-header">
-                        <div className="main-shelf-topRow">
-                            <div className="main-shelf-titleWrapper">
-                                <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">Most Obscure Tracks</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <section>
-                        <Tracklist minified={true}>{obscureTracks}</Tracklist>
-                    </section>
-                </section>
+                <Shelf
+                    title="Release Year Distribution"
+                    children={<GenresCard genres={topGenres.years} total={50} />
+                    }
+                ></Shelf>
+                <Shelf
+                    title="Most Obscure Tracks"
+                    children={<Tracklist minified={true}>{obscureTracks}</Tracklist>
+                    }
+                ></Shelf>
             </PageHeader>
         </>
     );

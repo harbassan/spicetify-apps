@@ -1,8 +1,16 @@
 import React from "react";
 
-const scrollGrid = (event: any) => {
-    const grid = event.target.parentNode.querySelector("div");
+interface InlineGridProps {
+    special?: boolean;
+    children: any;
+};
 
+function scrollGrid(event: React.MouseEvent): void {
+    const { target } = event;
+    if (!(target instanceof HTMLElement)) return;
+
+    const grid = target.parentNode?.querySelector("div");
+    if (!grid) return;
     grid.scrollLeft += grid.clientWidth;
 
     if (grid.scrollWidth - grid.clientWidth - grid.scrollLeft <= grid.clientWidth) {
@@ -12,8 +20,12 @@ const scrollGrid = (event: any) => {
     }
 };
 
-const scrollGridLeft = (event: any) => {
-    const grid = event.target.parentNode.querySelector("div");
+function scrollGridLeft(event: React.MouseEvent): void {
+    const { target } = event;
+    if (!(target instanceof HTMLElement)) return;
+
+    const grid = target.parentNode?.querySelector("div");
+    if (!grid) return;
     grid.scrollLeft -= grid.clientWidth;
 
     if (grid.scrollLeft <= grid.clientWidth) {
@@ -23,7 +35,7 @@ const scrollGridLeft = (event: any) => {
     }
 };
 
-const InlineGrid = (props: any) => {
+function InlineGrid({ children, special }: InlineGridProps): React.ReactElement {
     return (
         <section className="stats-gridInlineSection">
             <button className="stats-scrollButton" onClick={scrollGridLeft}>
@@ -32,8 +44,8 @@ const InlineGrid = (props: any) => {
             <button className="stats-scrollButton" onClick={scrollGrid}>
                 {">"}
             </button>
-            <div className={`main-gridContainer-gridContainer stats-gridInline${props.special ? " stats-specialGrid" : ""}`} data-scroll="start">
-                {props.children}
+            <div className={`main-gridContainer-gridContainer stats-gridInline${special ? " stats-specialGrid" : ""}`} data-scroll="start">
+                {children}
             </div>
         </section>
     );

@@ -1,40 +1,40 @@
 import React from "react";
+
 import RefreshButton from "./buttons/refresh_button";
 import SettingsButton from "./buttons/settings_button";
-import { ConfigWrapper } from "../types/stats_types";
+import CreatePlaylistButton from "./buttons/create_playlist_button";
+import { ConfigWrapper, InfoToCreatePlaylist } from "../types/stats_types";
 
 interface PageHeaderProps {
     title: string;
-    callback: () => void;
+    refreshCallback: () => void;
     config: ConfigWrapper;
     dropdown: React.ReactElement;
-    createPlaylist?: () => void;
+    infoToCreatePlaylist?: InfoToCreatePlaylist;
     children: any;
 }
 
-const PageHeader = ({ title, callback, config, dropdown, createPlaylist, children }: PageHeaderProps) => {
-    const createPlaylistButton = createPlaylist && (
-        <button className="stats-createPlaylistButton" data-encore-id="buttonSecondary" aria-expanded="false" onClick={createPlaylist}>
-            {"Turn Into Playlist"}
-        </button>
-    );
+const PageHeader = ({ title, refreshCallback, config, dropdown, infoToCreatePlaylist, children }: PageHeaderProps) => {
     return (
-        <>
-            <section className="contentSpacing">
-                <div className={`collection-collection-header stats-header`}>
-                    <h1 data-encore-id="type" className="TypeElement-canon-type">
-                        {title}
-                        {createPlaylistButton ? createPlaylistButton : null}
-                    </h1>
-                    <div className="collection-searchBar-searchBar">
-                        <RefreshButton refreshCallback={callback} />
-                        <SettingsButton config={config} />
-                        {dropdown}
-                    </div>
+        <section className="contentSpacing">
+            <div className={"stats-header"}>
+                <div className="stats-header-left">
+                    <Spicetify.ReactComponent.TextComponent
+                        children={title}
+                        as="h1"
+                        variant="canon"
+                        semanticColor="textBase"
+                    ></Spicetify.ReactComponent.TextComponent>
+                    {infoToCreatePlaylist ? <CreatePlaylistButton infoToCreatePlaylist={infoToCreatePlaylist} /> : null}
                 </div>
-                <div>{children}</div>
-            </section>
-        </>
+                <div className="stats-header-right">
+                    <RefreshButton callback={refreshCallback} />
+                    <SettingsButton config={config} />
+                    {dropdown}
+                </div>
+            </div>
+            <div>{children}</div>
+        </section>
     );
 };
 

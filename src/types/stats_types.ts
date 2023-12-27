@@ -48,3 +48,8 @@ export interface ArtistCardProps extends Artist {
     freq?: number;
     id?: string;
 }
+
+export interface InfoToCreatePlaylist {
+    playlistName: string;
+    itemsUris: string[];
+}

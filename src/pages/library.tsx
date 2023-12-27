@@ -7,6 +7,7 @@ import InlineGrid from "../components/inline_grid";
 import { apiRequest, updatePageCache, fetchAudioFeatures, fetchTopAlbums, fetchTopArtists } from "../funcs";
 import Status from "../components/status";
 import PageHeader from "../components/page_header";
+import Shelf from "../components/shelf";
 import { Album, ArtistCardProps, ConfigWrapper } from "../types/stats_types";
 
 interface LibraryProps {
@@ -226,7 +227,7 @@ const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
     }, [activeOption]);
 
     const props = {
-        callback: () => fetchData(activeOption, true),
+        refreshCallback: () => fetchData(activeOption, true),
         config: config,
         dropdown: dropdown,
     };
@@ -252,21 +253,8 @@ const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
             );
     }
 
-    const parseVal = (obj: [string, number]) => {
-        switch (obj[0]) {
-            case "tempo":
-                return Math.round(obj[1]) + "bpm";
-            case "popularity":
-                return Math.round(obj[1]) + "%";
-            default:
-                return Math.round(obj[1] * 100) + "%";
-        }
-    };
-
-    const statCards: JSX.Element[] = [];
-
-    Object.entries(library.audioFeatures).forEach(obj => {
-        statCards.push(<StatCard stat={obj[0][0].toUpperCase() + obj[0].slice(1)} value={parseVal(obj)} />);
+    const statCards = Object.entries(library.audioFeatures).map(([key, value]) => {
+        return <StatCard label={key} value={value} />
     });
 
     const artistCards: JSX.Element[] = library.artists
@@ -281,55 +269,38 @@ const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
         <>
             <PageHeader title="Library Analysis" {...props}>
                 <section className="stats-libraryOverview">
-                    <StatCard stat="Total Playlists" value={library.playlistCount} />
-                    <StatCard stat="Total Tracks" value={library.trackCount} />
-                    <StatCard stat="Total Artists" value={library.artistCount} />
-                    <StatCard stat="Total Minutes" value={Math.floor(library.totalDuration / 60)} />
-                    <StatCard stat="Total Hours" value={(library.totalDuration / (60 * 60)).toFixed(1)} />
+                    <StatCard label="Total Playlists" value={library.playlistCount.toString()} />
+                    <StatCard label="Total Tracks" value={library.trackCount.toString()} />
+                    <StatCard label="Total Artists" value={library.artistCount.toString()} />
+                    <StatCard label="Total Minutes" value={(Math.floor(library.totalDuration / 60).toString())} />
+                    <StatCard label="Total Hours" value={(library.totalDuration / (60 * 60)).toFixed(1)} />
                 </section>
-                <section className="main-shelf-shelf Shelf">
-                    <div className="main-shelf-header">
-                        <div className="main-shelf-topRow">
-                            <div className="main-shelf-titleWrapper">
-                                <h2 className="TypeElement-canon-textBase-type main-shelf-title">Most Frequent Genres</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <GenresCard genres={library.genres} total={library.genresDenominator} />
-                    <InlineGrid special>{statCards}</InlineGrid>
-                </section>
-                <section className="main-shelf-shelf Shelf">
-                    <div className="main-shelf-header">
-                        <div className="main-shelf-topRow">
-                            <div className="main-shelf-titleWrapper">
-                                <h2 className="TypeElement-canon-textBase-type main-shelf-title">Most Frequent Artists</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <InlineGrid>{artistCards}</InlineGrid>
-                </section>
-                <section className="main-shelf-shelf Shelf">
-                    <div className="main-shelf-header">
-                        <div className="main-shelf-topRow">
-                            <div className="main-shelf-titleWrapper">
-                                <h2 className="TypeElement-canon-textBase-type main-shelf-title">Most Frequent Albums</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <InlineGrid>{albumCards}</InlineGrid>
-                </section>
-                <section className="main-shelf-shelf Shelf">
-                    <div className="main-shelf-header">
-                        <div className="main-shelf-topRow">
-                            <div className="main-shelf-titleWrapper">
-                                <h2 className="Type__TypeElement-sc-goli3j-0 TypeElement-canon-textBase-type main-shelf-title">Release Year Distribution</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <section>
+                <Shelf
+                    title="Most Frequent Genres"
+                    children={<>
+                        <GenresCard genres={library.genres} total={library.genresDenominator} />
+                        <InlineGrid special>{statCards}</InlineGrid>
+                    </>
+                    }
+                ></Shelf>
+                <Shelf
+                    title="Most Frequent Artists"
+                    children={
+                        <InlineGrid>{artistCards}</InlineGrid>
+                    }
+                ></Shelf>
+                <Shelf
+                    title="Most Frequent Albums"
+                    children={
+                        <InlineGrid>{albumCards}</InlineGrid>
+                    }
+                ></Shelf>
+                <Shelf
+                    title="Release Year Distribution"
+                    children={
                         <GenresCard genres={library.years} total={library.yearsDenominator} />
-                    </section>
-                </section>
+                    }
+                ></Shelf>
             </PageHeader>
         </>
     );

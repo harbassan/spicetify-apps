@@ -16,33 +16,6 @@ interface Props {
     updateAppConfig: (CONFIG: Config) => void;
 }
 
-const Toggle = (props: {
-    name: string;
-    storageKey: string;
-    enabled: boolean;
-    clickable?: boolean;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}) => {
-    const toggleId = `toggle:${props.storageKey}`;
-
-    return (
-        <label className={"toggle-wrapper"}>
-            <input
-                className={"toggle-input"}
-                type="checkbox"
-                checked={props.enabled}
-                data-storage-key={props.storageKey}
-                id={toggleId}
-                title={`Toggle for ${props.storageKey}`}
-                onChange={props.onChange}
-            />
-            <span className={"toggle-indicator-wrapper"}>
-                <span className={"toggle-indicator"}></span>
-            </span>
-        </label>
-    );
-};
-
 const TextInput = (props: {
     name: string;
     storageKey: string;
@@ -116,13 +89,10 @@ const ConfigRow = (props: {
     desc?: string;
     sectionHeader?: string;
 }) => {
-    // @ts-ignore
     const enabled = !!props.modalConfig[props.storageKey];
-    // @ts-ignore
     const value = props.modalConfig[props.storageKey];
 
     const updateItem = (storageKey: string, state: any) => {
-        // @ts-ignore
         props.modalConfig[storageKey] = state;
         console.debug(`toggling ${storageKey} to ${state}`);
         localStorage.setItem(`stats:config:${storageKey}`, String(state));
@@ -131,16 +101,16 @@ const ConfigRow = (props: {
         props.updateConfig(props.modalConfig);
     };
 
-    const settingsToggleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        updateItem(e.target.dataset.storageKey as string, e.target.checked);
+    const settingsToggleChange = (newValue: boolean, storageKey: string) => {
+        updateItem(storageKey, newValue);
     };
 
-    const settingsTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        updateItem(e.target.dataset.storageKey as string, e.target.value);
+    const settingsTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        updateItem(event.target.dataset.storageKey as string, event.target.value);
     };
 
-    const settingsDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        updateItem(e.target.dataset.storageKey as string, e.target.value);
+    const settingsDropdownChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        updateItem(event.target.dataset.storageKey as string, event.target.value);
     };
 
     const element = () => {
@@ -154,7 +124,7 @@ const ConfigRow = (props: {
                     <TextInput name={props.name} storageKey={props.storageKey} value={value} placeholder={props.placeholder} onChange={settingsTextChange} />
                 );
             default:
-                return <Toggle name={props.name} storageKey={props.storageKey} enabled={enabled} onChange={settingsToggleChange} />;
+                return <Spicetify.ReactComponent.Toggle id={`toggle:${props.storageKey}`} value={enabled} onSelected={(newValue: boolean) => { settingsToggleChange(newValue, props.storageKey) }} />;
         }
     };
 

@@ -63,7 +63,7 @@ const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
     }, [activeOption]);
 
     const props = {
-        callback: () => fetchTopAlbums(activeOption, true),
+        refreshCallback: () => fetchTopAlbums(activeOption, true),
         config: config,
         dropdown: dropdown,
     };
