@@ -28,4 +28,4 @@ const genresCard = ({ genres, total }: { genres: [string, number][]; total: numb
     return <div className={`main-card-card stats-genreCard`}>{genreLines(genresArray, total)}</div>;
 };
 
-export default React.memo(genresCard);
+export default genresCard;

@@ -5,7 +5,7 @@ import StatCard from "../components/cards/stat_card";
 import GenresCard from "../components/cards/genres_card";
 import InlineGrid from "../components/inline_grid";
 import Status from "../components/status";
-import PageHeader from "../components/page_header";
+import PageContainer from "../components/page_container";
 import TrackRow from "../components/track_row";
 import Tracklist from "../components/tracklist";
 import Shelf from "../components/shelf";
@@ -22,9 +22,11 @@ interface GenresPageProps {
     obscureTracks: Track[];
 }
 
+const { LocalStorage, CosmosAsync } = Spicetify;
+
 const GenresPage = ({ config }: { config: ConfigWrapper }) => {
     const [topGenres, setTopGenres] = React.useState<GenresPageProps | 100 | 200 | 300>(100);
-    const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
+    const [dropdown, activeOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],
         ["Past Month", "Past 6 Months", "All Time"],
         "top-genres"
@@ -32,7 +34,7 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
 
     const fetchTopGenres = async (time_range: string, force?: boolean, set: boolean = true, force_refetch?: boolean) => {
         if (!force) {
-            let storedData = Spicetify.LocalStorage.get(`stats:top-genres:${time_range}`);
+            let storedData = LocalStorage.get(`stats:top-genres:${time_range}`);
             if (storedData) {
                 setTopGenres(JSON.parse(storedData));
                 return;
@@ -40,18 +42,18 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
         }
         const start = window.performance.now();
 
-        const cacheInfo = JSON.parse(Spicetify.LocalStorage.get("stats:cache-info") as string);
+        const cacheInfo = JSON.parse(LocalStorage.get("stats:cache-info") as string);
 
         const fetchedItems = await Promise.all(
             ["artists", "tracks"].map(async (type: string, index: number) => {
                 if (cacheInfo[index] === true && !force_refetch) {
-                    return await JSON.parse(Spicetify.LocalStorage.get(`stats:top-${type}:${time_range}`) as string);
+                    return await JSON.parse(LocalStorage.get(`stats:top-${type}:${time_range}`) as string);
                 }
                 const fetchedItems = await (type === "artists" ? topArtistsReq(time_range, config) : topTracksReq(time_range, config));
                 cacheInfo[index] = true;
                 cacheInfo[2] = true;
-                Spicetify.LocalStorage.set(`stats:top-${type}:${time_range}`, JSON.stringify(fetchedItems));
-                Spicetify.LocalStorage.set("stats:cache-info", JSON.stringify(cacheInfo));
+                LocalStorage.set(`stats:top-${type}:${time_range}`, JSON.stringify(fetchedItems));
+                LocalStorage.set("stats:cache-info", JSON.stringify(cacheInfo));
                 return fetchedItems;
             })
         );
@@ -95,7 +97,7 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
 
         async function testDupe(track: Track) {
             // perform a search to get rid of duplicate tracks
-            const spotifyItem = await Spicetify.CosmosAsync.get(
+            const spotifyItem = await CosmosAsync.get(
                 `https://api.spotify.com/v1/search?q=track:${filterLink(track.name)}+artist:${filterLink(track.artists[0].name)}&type=track`
             ).then((res: any) => res.tracks?.items);
             if (!spotifyItem) return false;
@@ -159,7 +161,7 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
 
         if (set) setTopGenres({ genres: genres, features: audioFeatures, years: releaseData, obscureTracks: obscureTracks });
 
-        Spicetify.LocalStorage.set(
+        LocalStorage.set(
             `stats:top-genres:${time_range}`,
             JSON.stringify({ genres: genres, features: audioFeatures, years: releaseData, obscureTracks: obscureTracks })
         );
@@ -183,21 +185,21 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
     switch (topGenres) {
         case 300:
             return (
-                <PageHeader {...props}>
+                <PageContainer {...props}>
                     <Status icon="error" heading="No API Key or Username" subheading="Please enter these in the settings menu" />
-                </PageHeader>
+                </PageContainer>
             );
         case 200:
             return (
-                <PageHeader {...props}>
+                <PageContainer {...props}>
                     <Status icon="error" heading="Failed to Fetch Top Genres" subheading="An error occurred while fetching the data" />
-                </PageHeader>
+                </PageContainer>
             );
         case 100:
             return (
-                <PageHeader {...props}>
+                <PageContainer {...props}>
                     <Status icon="library" heading="Loading" subheading="Fetching data..." />
-                </PageHeader>
+                </PageContainer>
             );
     }
 
@@ -210,24 +212,18 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
     ));
 
     return (
-        <>
-            <PageHeader {...props}>
-                <section className="main-shelf-shelf Shelf">
-                    <GenresCard genres={topGenres.genres} total={1275} />
-                    <InlineGrid special>{statCards}</InlineGrid>
-                </section>
-                <Shelf
-                    title="Release Year Distribution"
-                    children={<GenresCard genres={topGenres.years} total={50} />
-                    }
-                ></Shelf>
-                <Shelf
-                    title="Most Obscure Tracks"
-                    children={<Tracklist minified={true}>{obscureTracks}</Tracklist>
-                    }
-                ></Shelf>
-            </PageHeader>
-        </>
+        <PageContainer {...props}>
+            <section className="main-shelf-shelf Shelf">
+                <GenresCard genres={topGenres.genres} total={1275} />
+                <InlineGrid special>{statCards}</InlineGrid>
+            </section>
+            <Shelf title="Release Year Distribution">
+                <GenresCard genres={topGenres.years} total={50} />
+            </Shelf>
+            <Shelf title="Most Obscure Tracks">
+                <Tracklist minified={true}>{obscureTracks}</Tracklist>
+            </Shelf>
+        </PageContainer>
     );
 };
 

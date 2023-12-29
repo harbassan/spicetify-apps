@@ -2,7 +2,7 @@ import React from "react";
 
 interface InlineGridProps {
     special?: boolean;
-    children: any;
+    children: React.ReactElement | React.ReactElement[];
 };
 
 function scrollGrid(event: React.MouseEvent): void {
@@ -35,7 +35,8 @@ function scrollGridLeft(event: React.MouseEvent): void {
     }
 };
 
-function InlineGrid({ children, special }: InlineGridProps): React.ReactElement {
+function InlineGrid(props: InlineGridProps): React.ReactElement<HTMLTableSectionElement> {
+    const { children, special } = props;
     return (
         <section className="stats-gridInlineSection">
             <button className="stats-scrollButton" onClick={scrollGridLeft}>
@@ -51,4 +52,4 @@ function InlineGrid({ children, special }: InlineGridProps): React.ReactElement 
     );
 };
 
-export default InlineGrid;
+export default React.memo(InlineGrid);

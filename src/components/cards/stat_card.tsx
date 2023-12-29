@@ -5,6 +5,8 @@ interface StatCardProps {
     value: number | string;
 }
 
+const { TextComponent } = Spicetify.ReactComponent;
+
 function formatValue(name: string, value: number): string {
     switch (name) {
         case "tempo":
@@ -20,21 +22,22 @@ function normalizeString(inputString: string): string {
     return inputString.charAt(0).toUpperCase() + inputString.slice(1).toLowerCase();
 }
 
-function StatCard({ label, value }: StatCardProps): React.ReactElement {
+function StatCard(props: StatCardProps): React.ReactElement<HTMLDivElement> {
+    const { label, value } = props;
     return (
         <div className="main-card-card">
-            <Spicetify.ReactComponent.TextComponent
+            <TextComponent
                 as="div"
                 semanticColor="textBase"
                 variant="alto"
                 children={typeof value === "number" ? formatValue(label, value) : value}
-            ></Spicetify.ReactComponent.TextComponent>
-            <Spicetify.ReactComponent.TextComponent
+            />
+            <TextComponent
                 as="div"
                 semanticColor="textBase"
                 variant="balladBold"
                 children={normalizeString(label)}
-            ></Spicetify.ReactComponent.TextComponent>
+            />
         </div>
     );
 };
