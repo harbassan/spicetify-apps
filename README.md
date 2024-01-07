@@ -42,7 +42,7 @@ Download the files in the [dist branch](https://github.com/harbassan/spicetify-s
 📦spicetify\CustomApps
  ┣ 📂marketplace
  ┣ etc...
- ┗ 📂stats
+ ┗ 📂spicetify-stats
  ┃ ┣ 📜extension.js
  ┃ ┣ 📜index.js
  ┃ ┣ 📜manifest.json
@@ -52,7 +52,7 @@ Download the files in the [dist branch](https://github.com/harbassan/spicetify-s
 Then run these commands to apply:
 
 ```powershell
-spicetify config custom_apps stats
+spicetify config custom_apps spicetify-stats
 spicetify apply
 ```
 
@@ -63,11 +63,11 @@ For more help on installing visit the [Spicetify Docs](https://spicetify.app/doc
 To disable the app run these commands:
 
 ```powershell
-spicetify config custom_apps stats-
+spicetify config custom_apps spicetify-stats-
 spicetify apply
 ```
 
-If you want to completely remove the app just delete the `stats` folder after running the above commands.
+If you want to completely remove the app just delete the `spicetify-stats` folder after running the above commands.
 
 ---
 
