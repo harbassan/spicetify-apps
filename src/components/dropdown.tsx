@@ -49,9 +49,9 @@ const DropdownMenu = ({ options, activeOption, switchCallback }: DropdownMenuPro
     const MenuWrapper = (props: Spicetify.ReactComponent.MenuProps) => {
         return (
             <>
-                <Spicetify.ReactComponent.Menu {...props}>
+                <Menu {...props}>
                     {optionItems}
-                </Spicetify.ReactComponent.Menu>
+                </Menu>
             </>
         );
     };
