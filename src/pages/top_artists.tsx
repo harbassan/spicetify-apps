@@ -1,9 +1,9 @@
 import React from "react";
 import useDropdownMenu from "../components/hooks/useDropdownMenu";
-import Card from "../components/cards/artist_card";
+import SpotifyCard from "../components/cards/spotify_card";
 import { apiRequest, updatePageCache, convertToSpotify } from "../funcs";
 import Status from "../components/status";
-import PageHeader from "../components/page_header";
+import PageContainer from "../components/page_container";
 import { ArtistCardProps, ConfigWrapper } from "../types/stats_types";
 
 export const topArtistsReq = async (time_range: string, config: ConfigWrapper) => {
@@ -41,8 +41,8 @@ export const topArtistsReq = async (time_range: string, config: ConfigWrapper) =
                 image: artist.images[2]
                     ? artist.images[2].url
                     : artist.images[1]
-                    ? artist.images[1].url
-                    : "https://images.squarespace-cdn.com/content/v1/55fc0004e4b069a519961e2d/1442590746571-RPGKIXWGOO671REUNMCB/image-asset.gif",
+                        ? artist.images[1].url
+                        : "https://images.squarespace-cdn.com/content/v1/55fc0004e4b069a519961e2d/1442590746571-RPGKIXWGOO671REUNMCB/image-asset.gif",
                 uri: artist.uri,
                 genres: artist.genres,
             };
@@ -93,33 +93,33 @@ const ArtistsPage = ({ config }: { config: ConfigWrapper }) => {
     switch (topArtists) {
         case 300:
             return (
-                <PageHeader {...props}>
+                <PageContainer {...props}>
                     <Status icon="error" heading="No API Key or Username" subheading="Please enter these in the settings menu" />
-                </PageHeader>
+                </PageContainer>
             );
         case 200:
             return (
-                <PageHeader {...props}>
+                <PageContainer {...props}>
                     <Status icon="error" heading="Failed to Fetch Top Artists" subheading="An error occurred while fetching the data" />
-                </PageHeader>
+                </PageContainer>
             );
         case 100:
             return (
-                <PageHeader {...props}>
+                <PageContainer {...props}>
                     <Status icon="library" heading="Loading" subheading="Fetching data..." />
-                </PageHeader>
+                </PageContainer>
             );
     }
 
     const artistCards = topArtists.map((artist, index) => (
-        <Card key={artist.id} name={artist.name} image={artist.image} uri={artist.uri} subtext={`#${index + 1} Artist`} />
+        <SpotifyCard type={artist.uri.includes("last") ? "lastfm" : "artist"} name={artist.name} imageUrl={artist.image} uri={artist.uri} subtext={`#${index + 1} Artist`} />
     ));
 
     return (
         <>
-            <PageHeader {...props}>
+            <PageContainer {...props}>
                 <div className={`main-gridContainer-gridContainer stats-grid`}>{artistCards}</div>
-            </PageHeader>
+            </PageContainer>
         </>
     );
 };

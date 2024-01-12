@@ -2,11 +2,11 @@ import React from "react";
 import useDropdownMenu from "../components/hooks/useDropdownMenu";
 import StatCard from "../components/cards/stat_card";
 import GenresCard from "../components/cards/genres_card";
-import ArtistCard from "../components/cards/artist_card";
+import SpotifyCard from "../components/cards/spotify_card";
 import InlineGrid from "../components/inline_grid";
 import { apiRequest, updatePageCache, fetchAudioFeatures, fetchTopAlbums, fetchTopArtists } from "../funcs";
 import Status from "../components/status";
-import PageHeader from "../components/page_header";
+import PageContainer from "../components/page_container";
 import Shelf from "../components/shelf";
 import { Album, ArtistCardProps, ConfigWrapper } from "../types/stats_types";
 
@@ -235,21 +235,21 @@ const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
     switch (library) {
         case 300:
             return (
-                <PageHeader title={`Library Analysis`} {...props}>
+                <PageContainer title={`Library Analysis`} {...props}>
                     <Status icon="error" heading="No Playlists In Your Library" subheading="Try adding some playlists first" />
-                </PageHeader>
+                </PageContainer>
             );
         case 200:
             return (
-                <PageHeader title={`Library Analysis`} {...props}>
+                <PageContainer title={`Library Analysis`} {...props}>
                     <Status icon="error" heading="Failed to Fetch Stats" subheading="Make an issue on Github" />
-                </PageHeader>
+                </PageContainer>
             );
         case 100:
             return (
-                <PageHeader title={`Library Analysis`} {...props}>
+                <PageContainer title={`Library Analysis`} {...props}>
                     <Status icon="library" heading="Analysing your Library" subheading="This may take a while" />
-                </PageHeader>
+                </PageContainer>
             );
     }
 
@@ -257,52 +257,39 @@ const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
         return <StatCard label={key} value={value} />
     });
 
-    const artistCards: JSX.Element[] = library.artists
+    const artistCards = library.artists
         .slice(0, 10)
-        .map((artist: ArtistCardProps) => <ArtistCard name={artist.name} image={artist.image} uri={artist.uri} subtext={`Appears in ${artist.freq} tracks`} />);
+        .map((artist) => {
+            return <SpotifyCard type="artist" name={artist.name} imageUrl={artist.image} uri={artist.uri} subtext={`Appears in ${artist.freq} tracks`} />
+        });
 
-    const albumCards: React.JSX.Element[] = library.albums.map((album: Album) => {
-        return <ArtistCard name={album.name} image={album.image} uri={album.uri} subtext={`Appears in ${album.freq} tracks`} />;
+    const albumCards = library.albums.map((album) => {
+        return <SpotifyCard type="album" name={album.name} imageUrl={album.image} uri={album.uri} subtext={`Appears in ${album.freq} tracks`} />;
     });
 
     return (
-        <>
-            <PageHeader title="Library Analysis" {...props}>
-                <section className="stats-libraryOverview">
-                    <StatCard label="Total Playlists" value={library.playlistCount.toString()} />
-                    <StatCard label="Total Tracks" value={library.trackCount.toString()} />
-                    <StatCard label="Total Artists" value={library.artistCount.toString()} />
-                    <StatCard label="Total Minutes" value={(Math.floor(library.totalDuration / 60).toString())} />
-                    <StatCard label="Total Hours" value={(library.totalDuration / (60 * 60)).toFixed(1)} />
-                </section>
-                <Shelf
-                    title="Most Frequent Genres"
-                    children={<>
-                        <GenresCard genres={library.genres} total={library.genresDenominator} />
-                        <InlineGrid special>{statCards}</InlineGrid>
-                    </>
-                    }
-                ></Shelf>
-                <Shelf
-                    title="Most Frequent Artists"
-                    children={
-                        <InlineGrid>{artistCards}</InlineGrid>
-                    }
-                ></Shelf>
-                <Shelf
-                    title="Most Frequent Albums"
-                    children={
-                        <InlineGrid>{albumCards}</InlineGrid>
-                    }
-                ></Shelf>
-                <Shelf
-                    title="Release Year Distribution"
-                    children={
-                        <GenresCard genres={library.years} total={library.yearsDenominator} />
-                    }
-                ></Shelf>
-            </PageHeader>
-        </>
+        <PageContainer title="Library Analysis" {...props}>
+            <section className="stats-libraryOverview">
+                <StatCard label="Total Playlists" value={library.playlistCount.toString()} />
+                <StatCard label="Total Tracks" value={library.trackCount.toString()} />
+                <StatCard label="Total Artists" value={library.artistCount.toString()} />
+                <StatCard label="Total Minutes" value={(Math.floor(library.totalDuration / 60).toString())} />
+                <StatCard label="Total Hours" value={(library.totalDuration / (60 * 60)).toFixed(1)} />
+            </section>
+            <Shelf title="Most Frequent Genres">
+                <GenresCard genres={library.genres} total={library.genresDenominator} />
+                <InlineGrid special>{statCards}</InlineGrid>
+            </Shelf>
+            <Shelf title="Most Frequent Artists">
+                <InlineGrid>{artistCards}</InlineGrid>
+            </Shelf>
+            <Shelf title="Most Frequent Albums">
+                <InlineGrid>{albumCards}</InlineGrid>
+            </Shelf>
+            <Shelf title="Release Year Distribution">
+                <GenresCard genres={library.years} total={library.yearsDenominator} />
+            </Shelf>
+        </PageContainer>
     );
 };
 

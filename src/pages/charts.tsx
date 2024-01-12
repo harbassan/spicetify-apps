@@ -3,10 +3,10 @@ import React from "react";
 import Status from "../components/status";
 import useDropdownMenu from "../components/hooks/useDropdownMenu";
 import { apiRequest, checkLiked, convertToSpotify, updatePageCache } from "../funcs";
-import ArtistCard from "../components/cards/artist_card";
+import SpotifyCard from "../components/cards/spotify_card";
 import TrackRow from "../components/track_row";
 import Tracklist from "../components/tracklist";
-import PageHeader from "../components/page_header";
+import PageContainer from "../components/page_container";
 import { ArtistCardProps, ConfigWrapper, Track } from "../types/stats_types";
 
 const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
@@ -70,34 +70,34 @@ const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
     switch (chartData) {
         case 200:
             return (
-                <PageHeader {...props}>
+                <PageContainer {...props}>
                     <Status icon="error" heading="No API Key" subheading="Please enter your Last.fm API key in the settings menu." />
-                </PageHeader>
+                </PageContainer>
             );
         case 500:
             return (
-                <PageHeader {...props}>
+                <PageContainer {...props}>
                     <Status icon="error" heading="Error" subheading="An error occurred while fetching the data." />
-                </PageHeader>
+                </PageContainer>
             );
         case 100:
             return (
-                <PageHeader {...props}>
+                <PageContainer {...props}>
                     <Status icon="library" heading="Loading" subheading="Fetching data from Last.fm..." />
-                </PageHeader>
+                </PageContainer>
             );
     }
 
     // @ts-ignore
     if (!chartData[0]?.album) {
         const artistCards = chartData.map((artist, index) => (
-            <ArtistCard key={artist.id} name={artist.name} image={artist.image} uri={artist.uri} subtext={`#${index + 1} Artist`} />
+            <SpotifyCard type="lastfm" name={artist.name} imageUrl={artist.image} uri={artist.uri} subtext={`#${index + 1} Artist`} />
         ));
         props.title = `Charts - Top Artists`;
         return (
-            <PageHeader {...props}>
+            <PageContainer {...props}>
                 <div className={`main-gridContainer-gridContainer stats-grid`}>{artistCards}</div>
-            </PageHeader>
+            </PageContainer>
         );
     } else {
         const date = new Date().toLocaleDateString('en-US', {
@@ -114,11 +114,11 @@ const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
 
         props.title = `Charts - Top Tracks`;
         return (
-            <PageHeader {...props} infoToCreatePlaylist={infoToCreatePlaylist}>
+            <PageContainer {...props} infoToCreatePlaylist={infoToCreatePlaylist}>
                 <Tracklist>{trackRows}</Tracklist>
-            </PageHeader>
+            </PageContainer>
         );
     }
 };
 
-export default ChartsPage;
+export default React.memo(ChartsPage);

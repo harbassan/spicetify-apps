@@ -1,10 +1,12 @@
 import React from "react";
 import useDropdownMenu from "../components/hooks/useDropdownMenu";
-import Card from "../components/cards/artist_card";
+import SpotifyCard from "../components/cards/spotify_card";
 import { apiRequest, updatePageCache, convertToSpotify } from "../funcs";
 import Status from "../components/status";
-import PageHeader from "../components/page_header";
+import PageContainer from "../components/page_container";
 import { Album, ConfigWrapper } from "../types/stats_types";
+
+const { LocalStorage } = Spicetify;
 
 export const topAlbumsReq = async (time_range: string, config: ConfigWrapper) => {
     if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) {
@@ -31,7 +33,7 @@ export const topAlbumsReq = async (time_range: string, config: ConfigWrapper) =>
 
 const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
     const [topAlbums, setTopAlbums] = React.useState<Album[] | 100 | 200 | 300>(100);
-    const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
+    const [dropdown, activeOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],
         ["Past Month", "Past 6 Months", "All Time"],
         `top-albums`
@@ -39,7 +41,7 @@ const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
 
     const fetchTopAlbums = async (time_range: string, force?: boolean, set: boolean = true) => {
         if (!force) {
-            let storedData = Spicetify.LocalStorage.get(`stats:top-albums:${time_range}`);
+            let storedData = LocalStorage.get(`stats:top-albums:${time_range}`);
             if (storedData) {
                 setTopAlbums(JSON.parse(storedData));
                 return;
@@ -50,7 +52,7 @@ const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
         const topAlbums = await topAlbumsReq(time_range, config);
 
         if (set) setTopAlbums(topAlbums);
-        Spicetify.LocalStorage.set(`stats:top-albums:${time_range}`, JSON.stringify(topAlbums));
+        LocalStorage.set(`stats:top-albums:${time_range}`, JSON.stringify(topAlbums));
         console.log("total albums fetch time:", window.performance.now() - start);
     };
 
@@ -71,34 +73,32 @@ const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
     switch (topAlbums) {
         case 300:
             return (
-                <PageHeader title={`Top Albums`} {...props}>
+                <PageContainer title={`Top Albums`} {...props}>
                     <Status icon="error" heading="No API Key or Username" subheading="Please enter these in the settings menu" />
-                </PageHeader>
+                </PageContainer>
             );
         case 200:
             return (
-                <PageHeader title={`Top Albums`} {...props}>
+                <PageContainer title={`Top Albums`} {...props}>
                     <Status icon="error" heading="Failed to Fetch Top Artists" subheading="An error occurred while fetching the data" />
-                </PageHeader>
+                </PageContainer>
             );
         case 100:
             return (
-                <PageHeader title={`Top Albums`} {...props}>
+                <PageContainer title={`Top Albums`} {...props}>
                     <Status icon="library" heading="Loading" subheading="Fetching data..." />
-                </PageHeader>
+                </PageContainer>
             );
     }
 
     const albumCards = topAlbums.map((album, index) => (
-        <Card key={album.id} name={album.name} image={album.image} uri={album.uri} subtext={`#${index + 1} Album`} />
+        <SpotifyCard type="lastfm" name={album.name} imageUrl={album.image} uri={album.uri} subtext={`#${index + 1} Album`} />
     ));
 
     return (
-        <>
-            <PageHeader title="Top Albums" {...props}>
-                <div className={`main-gridContainer-gridContainer stats-grid`}>{albumCards}</div>
-            </PageHeader>
-        </>
+        <PageContainer title="Top Albums" {...props}>
+            <div className={`main-gridContainer-gridContainer stats-grid`}>{albumCards}</div>
+        </PageContainer>
     );
 };
 

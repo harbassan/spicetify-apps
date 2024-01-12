@@ -1,22 +1,25 @@
 import React from "react";
 
 interface ShelfProps {
-    title?: string
-    children: React.ReactElement
+    title: string
+    children: React.ReactElement | React.ReactElement[]
 }
 
-function Shelf({ title, children }: ShelfProps): React.ReactElement {
+const { TextComponent } = Spicetify.ReactComponent;
+
+function Shelf(props: ShelfProps): React.ReactElement {
+    const { title, children } = props;
     return (
         <section className="main-shelf-shelf Shelf">
             <div className="main-shelf-header">
                 <div className="main-shelf-topRow">
                     <div className="main-shelf-titleWrapper">
-                        <Spicetify.ReactComponent.TextComponent
+                        <TextComponent
                             children={title}
                             as="h2"
                             variant="canon"
                             semanticColor="textBase"
-                        ></Spicetify.ReactComponent.TextComponent>
+                        />
                     </div>
                 </div>
             </div>
@@ -27,4 +30,4 @@ function Shelf({ title, children }: ShelfProps): React.ReactElement {
     )
 }
 
-export default Shelf;
+export default React.memo(Shelf);

@@ -10,9 +10,11 @@ const activeStyle = {
     backgroundColor: "rgba(var(--spice-rgb-selected-row),.1)",
 };
 
+const { IconComponent, Menu, ContextMenu } = Spicetify.ReactComponent;
+
 const Icon = (props: Spicetify.ReactComponent.IconComponentProps) => {
     return (
-        <Spicetify.ReactComponent.IconComponent
+        <IconComponent
             {...props}
             className="Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small"
             data-encore-id="icon"
@@ -21,7 +23,7 @@ const Icon = (props: Spicetify.ReactComponent.IconComponentProps) => {
             width="16"
         >
             <path d="M15.53 2.47a.75.75 0 0 1 0 1.06L4.907 14.153.47 9.716a.75.75 0 0 1 1.06-1.06l3.377 3.376L14.47 2.47a.75.75 0 0 1 1.06 0z"></path>
-        </Spicetify.ReactComponent.IconComponent>
+        </IconComponent>
     );
 };
 
@@ -47,19 +49,20 @@ const DropdownMenu = ({ options, activeOption, switchCallback }: DropdownMenuPro
     const MenuWrapper = (props: Spicetify.ReactComponent.MenuProps) => {
         return (
             <>
-                <Spicetify.ReactComponent.Menu {...props}>{optionItems}</Spicetify.ReactComponent.Menu>
+                <Menu {...props}>
+                    {optionItems}
+                </Menu>
             </>
         );
     };
 
     return (
         <>
-            <Spicetify.ReactComponent.ContextMenu menu={<MenuWrapper />} trigger="click">
+            <ContextMenu menu={<MenuWrapper />} trigger="click">
                 <button
                     className="x-sortBox-sortDropdown"
                     type="button"
                     role="combobox"
-                    aria-controls="sortboxlist-29ad4489-2ff4-4a03-8c0c-ffc6f90c2fed"
                     aria-expanded="false"
                 >
                     <span className="TypeElement-mesto-type" data-encore-id="type">
@@ -77,7 +80,7 @@ const DropdownMenu = ({ options, activeOption, switchCallback }: DropdownMenuPro
                         <path d="m14 6-6 6-6-6h12z"></path>
                     </svg>
                 </button>
-            </Spicetify.ReactComponent.ContextMenu>
+            </ContextMenu>
         </>
     );
 };

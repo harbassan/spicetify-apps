@@ -2,11 +2,13 @@ import React from "react";
 
 import TrackRow from "../components/track_row";
 import Status from "../components/status";
-import PageHeader from "../components/page_header";
+import PageContainer from "../components/page_container";
 import Tracklist from "../components/tracklist";
 import useDropdownMenu from "../components/hooks/useDropdownMenu";
 import { apiRequest, updatePageCache, convertToSpotify, checkLiked } from "../funcs";
 import { ConfigWrapper, Track } from "../types/stats_types";
+
+const { LocalStorage } = Spicetify;
 
 export const topTracksReq = async (time_range: string, config: ConfigWrapper) => {
     if (config.CONFIG["use-lastfm"] === true) {
@@ -85,7 +87,7 @@ const TracksPage = ({ config }: { config: ConfigWrapper }) => {
 
     const fetchTopTracks = async (time_range: string, force?: boolean, set: boolean = true) => {
         if (!force) {
-            let storedData = Spicetify.LocalStorage.get(`stats:top-tracks:${time_range}`);
+            let storedData = LocalStorage.get(`stats:top-tracks:${time_range}`);
             if (storedData) {
                 setTopTracks(JSON.parse(storedData));
                 return;
@@ -99,7 +101,7 @@ const TracksPage = ({ config }: { config: ConfigWrapper }) => {
 
         if (set) setTopTracks(topTracks);
 
-        Spicetify.LocalStorage.set(`stats:top-tracks:${time_range}`, JSON.stringify(topTracks));
+        LocalStorage.set(`stats:top-tracks:${time_range}`, JSON.stringify(topTracks));
         console.log("total tracks fetch time:", window.performance.now() - start);
     };
 
@@ -121,21 +123,21 @@ const TracksPage = ({ config }: { config: ConfigWrapper }) => {
     switch (topTracks) {
         case 300:
             return (
-                <PageHeader {...props}>
+                <PageContainer {...props}>
                     <Status icon="error" heading="No API Key or Username" subheading="Please enter these in the settings menu" />
-                </PageHeader>
+                </PageContainer>
             );
         case 200:
             return (
-                <PageHeader {...props}>
+                <PageContainer {...props}>
                     <Status icon="error" heading="Failed to Fetch Top Tracks" subheading="An error occurred while fetching the data" />
-                </PageHeader>
+                </PageContainer>
             );
         case 100:
             return (
-                <PageHeader {...props}>
+                <PageContainer {...props}>
                     <Status icon="library" heading="Loading" subheading="Fetching data..." />
-                </PageHeader>
+                </PageContainer>
             );
     }
 
@@ -146,9 +148,9 @@ const TracksPage = ({ config }: { config: ConfigWrapper }) => {
     const trackRows = topTracks.map((track: Track, index) => <TrackRow index={index + 1} {...track} uris={topTracks.map(track => track.uri)} />);
 
     return (
-        <PageHeader {...props} infoToCreatePlaylist={infoToCreatePlaylist}>
+        <PageContainer {...props} infoToCreatePlaylist={infoToCreatePlaylist}>
             <Tracklist>{trackRows}</Tracklist>
-        </PageHeader>
+        </PageContainer>
     );
 };
 

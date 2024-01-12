@@ -5,26 +5,29 @@ import SettingsButton from "./buttons/settings_button";
 import CreatePlaylistButton from "./buttons/create_playlist_button";
 import { ConfigWrapper, InfoToCreatePlaylist } from "../types/stats_types";
 
-interface PageHeaderProps {
+interface PageContainerProps {
     title: string;
     refreshCallback: () => void;
     config: ConfigWrapper;
     dropdown: React.ReactElement;
     infoToCreatePlaylist?: InfoToCreatePlaylist;
-    children: any;
+    children: React.ReactElement | React.ReactElement[];
 }
 
-const PageHeader = ({ title, refreshCallback, config, dropdown, infoToCreatePlaylist, children }: PageHeaderProps) => {
+const { TextComponent } = Spicetify.ReactComponent;
+
+function PageContainer(props: PageContainerProps) {
+    const { title, refreshCallback, config, dropdown, infoToCreatePlaylist, children } = props;
     return (
         <section className="contentSpacing">
             <div className={"stats-header"}>
                 <div className="stats-header-left">
-                    <Spicetify.ReactComponent.TextComponent
+                    <TextComponent
                         children={title}
                         as="h1"
                         variant="canon"
                         semanticColor="textBase"
-                    ></Spicetify.ReactComponent.TextComponent>
+                    />
                     {infoToCreatePlaylist ? <CreatePlaylistButton infoToCreatePlaylist={infoToCreatePlaylist} /> : null}
                 </div>
                 <div className="stats-header-right">
@@ -38,4 +41,4 @@ const PageHeader = ({ title, refreshCallback, config, dropdown, infoToCreatePlay
     );
 };
 
-export default React.memo(PageHeader);
+export default React.memo(PageContainer);
