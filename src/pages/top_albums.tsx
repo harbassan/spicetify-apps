@@ -31,7 +31,7 @@ export const topAlbumsReq = async (time_range: string, config: ConfigWrapper) =>
 
 const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
     const { LocalStorage } = Spicetify;
-    
+
     const [topAlbums, setTopAlbums] = React.useState<Album[] | 100 | 200 | 300>(100);
     const [dropdown, activeOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],
@@ -92,7 +92,7 @@ const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
     }
 
     const albumCards = topAlbums.map((album, index) => (
-        <SpotifyCard type="lastfm" name={album.name} imageUrl={album.image} uri={album.uri} subtext={`#${index + 1} Album`} />
+        <SpotifyCard type="lastfm" uri={album.uri} header={album.name} subheader={`#${index + 1} Album`} imageUrl={album.image} />
     ));
 
     return (

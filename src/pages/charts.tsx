@@ -91,7 +91,7 @@ const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
     // @ts-ignore
     if (!chartData[0]?.album) {
         const artistCards = chartData.map((artist, index) => (
-            <SpotifyCard type="lastfm" name={artist.name} imageUrl={artist.image} uri={artist.uri} subtext={`#${index + 1} Artist`} />
+            <SpotifyCard type="lastfm" uri={artist.uri} header={artist.name} subheader={`#${index + 1} Artist`} imageUrl={artist.image}/>
         ));
         props.title = `Charts - Top Artists`;
         return (

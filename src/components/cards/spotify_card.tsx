@@ -2,16 +2,16 @@ import React from "react";
 
 interface SpotifyCardProps {
     type: "artist" | "album" | "lastfm";
-    name: string;
     uri: string;
+    header: string;
+    subheader: string;
     imageUrl: string;
-    subtext: string;
 };
 
 function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement> {
     const { Cards, TextComponent, ArtistMenu, AlbumMenu, ContextMenu } = Spicetify.ReactComponent;
     const { Default: Card, CardImage } = Cards;
-    const { type, name, uri, imageUrl, subtext } = props;
+    const { type, header, uri, imageUrl, subheader } = props;
 
     const Menu = () => {
         switch (type) {
@@ -29,7 +29,7 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
         <ContextMenu menu={<Menu />} trigger="right-click">
             <Card
                 featureIdentifier={type}
-                headerText={name}
+                headerText={header}
                 renderCardImage={
                     () =>
                         <CardImage
@@ -38,6 +38,7 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
                                 url: imageUrl,
                                 width: 640
                             }]}
+                            isCircular={type === "artist"}
                         />
                 }
                 renderSubHeaderContent={
@@ -46,7 +47,7 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
                             as="div"
                             variant="mesto"
                             semanticColor="textSubdued"
-                            children={subtext}
+                            children={subheader}
                         />
                 }
                 uri={uri}
