@@ -22,9 +22,9 @@ interface GenresPageProps {
     obscureTracks: Track[];
 }
 
-const { LocalStorage, CosmosAsync } = Spicetify;
-
 const GenresPage = ({ config }: { config: ConfigWrapper }) => {
+    const { LocalStorage, CosmosAsync } = Spicetify;
+
     const [topGenres, setTopGenres] = React.useState<GenresPageProps | 100 | 200 | 300>(100);
     const [dropdown, activeOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],

@@ -22,12 +22,11 @@ interface LibraryProps {
     albums: Album[];
 }
 
-const { ReactComponent, ReactQuery, Platform, _platform } = Spicetify;
-const { History, ReduxStore } = Platform;
-const { QueryClientProvider, QueryClient } = ReactQuery;
-const { Router, Route, Routes, PlatformProvider, StoreProvider } = ReactComponent;
-
 const PlaylistPage = ({ uri }: { uri: string }) => {
+    const { ReactComponent, ReactQuery, Platform: { History } } = Spicetify;
+    const { QueryClientProvider, QueryClient } = ReactQuery;
+    const { Router, Route, Routes, PlatformProvider, StoreProvider } = ReactComponent;
+
     const [library, setLibrary] = React.useState<LibraryProps | 100 | 200>(100);
 
     const fetchData = async () => {
@@ -134,9 +133,8 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
         return <SpotifyCard type="album" name={album.name} imageUrl={album.image} uri={album.uri} subtext={`Appears in ${album.freq} tracks`} />;
     });
 
-    const client = new QueryClient();
     return (
-        <QueryClientProvider client={client}>
+        <QueryClientProvider client={new QueryClient()}>
             <Router
                 location={{
                     hash: "",

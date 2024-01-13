@@ -8,11 +8,11 @@ interface SpotifyCardProps {
     subtext: string;
 };
 
-const { Cards, TextComponent, ArtistMenu, AlbumMenu, ContextMenu } = Spicetify.ReactComponent;
-
 function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement> {
-    const { type, name, uri, imageUrl, subtext } = props;
+    const { Cards, TextComponent, ArtistMenu, AlbumMenu, ContextMenu } = Spicetify.ReactComponent;
     const { Default: Card, CardImage } = Cards;
+    const { type, name, uri, imageUrl, subtext } = props;
+
     const Menu = () => {
         switch (type) {
             case "artist":

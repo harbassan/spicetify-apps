@@ -6,8 +6,6 @@ import Status from "../components/status";
 import PageContainer from "../components/page_container";
 import { Album, ConfigWrapper } from "../types/stats_types";
 
-const { LocalStorage } = Spicetify;
-
 export const topAlbumsReq = async (time_range: string, config: ConfigWrapper) => {
     if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) {
         return 300;
@@ -32,6 +30,8 @@ export const topAlbumsReq = async (time_range: string, config: ConfigWrapper) =>
 };
 
 const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
+    const { LocalStorage } = Spicetify;
+    
     const [topAlbums, setTopAlbums] = React.useState<Album[] | 100 | 200 | 300>(100);
     const [dropdown, activeOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],

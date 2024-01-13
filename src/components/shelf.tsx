@@ -5,10 +5,10 @@ interface ShelfProps {
     children: React.ReactElement | React.ReactElement[]
 }
 
-const { TextComponent } = Spicetify.ReactComponent;
-
 function Shelf(props: ShelfProps): React.ReactElement {
+    const { TextComponent } = Spicetify.ReactComponent;
     const { title, children } = props;
+    
     return (
         <section className="main-shelf-shelf Shelf">
             <div className="main-shelf-header">

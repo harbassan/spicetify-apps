@@ -6,11 +6,10 @@ interface CreatePlaylistButtonProps {
     infoToCreatePlaylist: InfoToCreatePlaylist;
 };
 
-const { ReactComponent, Platform, showNotification } = Spicetify;
-const { TooltipWrapper, ButtonSecondary } = ReactComponent;
-const { RootlistAPI, PlaylistAPI } = Platform;
-
 async function createPlaylistAsync(infoToCreatePlaylist: InfoToCreatePlaylist): Promise<void> {
+    const { Platform, showNotification } = Spicetify;
+    const { RootlistAPI, PlaylistAPI } = Platform;
+
     try {
         const { playlistName, itemsUris } = infoToCreatePlaylist;
         const playlistUri = await RootlistAPI.createPlaylist(playlistName, { before: 'start' });
@@ -22,7 +21,9 @@ async function createPlaylistAsync(infoToCreatePlaylist: InfoToCreatePlaylist): 
 };
 
 function CreatePlaylistButton(props: CreatePlaylistButtonProps): React.ReactElement<HTMLButtonElement> {
+    const { TooltipWrapper, ButtonSecondary } = Spicetify.ReactComponent;
     const { infoToCreatePlaylist } = props;
+
     return (
         <TooltipWrapper label={"Turn Into Playlist"} renderInline={true} placement="top">
             <ButtonSecondary
