@@ -90,9 +90,10 @@ const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
 
     // @ts-ignore
     if (!chartData[0]?.album) {
-        const artistCards = chartData.map((artist, index) => (
-            <SpotifyCard type="lastfm" uri={artist.uri} header={artist.name} subheader={`#${index + 1} Artist`} imageUrl={artist.image}/>
-        ));
+        const artistCards = chartData.map((artist, index) => {
+            const type = artist.uri.startsWith("https") ? "lastfm" : "artist";
+            return <SpotifyCard type={type} uri={artist.uri} header={artist.name} subheader={`#${index + 1} Artist`} imageUrl={artist.image}/>
+        });
         props.title = `Charts - Top Artists`;
         return (
             <PageContainer {...props}>
