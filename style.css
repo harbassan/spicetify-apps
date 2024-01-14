@@ -1,4 +1,4 @@
-/* ../../AppData/Local/Temp/tmp-6912-LESOepgMxajG/18ca59b28c22/navBar.module.css */
+/* ../../AppData/Local/Temp/tmp-6812-j7fELC0nsK0p/18d07bccc462/navBar.module.css */
 .navBar-module__topBarHeaderItem___v29bR_stats {
   -webkit-app-region: no-drag;
   display: inline-block;
@@ -46,18 +46,10 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   padding: 0;
 }
 
-/* ../../AppData/Local/Temp/tmp-6912-LESOepgMxajG/18ca59b275b0/app.css */
+/* ../../AppData/Local/Temp/tmp-6812-j7fELC0nsK0p/18d07bccaf30/app.css */
 .stats-grid {
   --grid-gap: 24px;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
-}
-.stats-refreshButton {
-  width: 32px;
-  height: 32px;
-}
-.collection-searchBar-searchBar {
-  display: flex;
-  gap: 8px;
 }
 .stats-specialGrid {
   grid-template-columns: repeat(11, 180px) !important;
@@ -117,64 +109,34 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
 .stats-scrollButton:hover {
   background-color: var(--spice-card);
 }
-.stats-createPlaylistButton {
-  margin-left: 24px;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  font-family: var(--font-family, CircularSp, CircularSp-Arab, CircularSp-Hebr, CircularSp-Cyrl, CircularSp-Grek, CircularSp-Deva, var(--fallback-fonts, sans-serif));
-  background-color: transparent;
-  border-radius: 500px;
-  cursor: pointer;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  text-transform: none;
-  touch-action: manipulation;
-  transition-duration: 33ms;
-  transition-property:
-    background-color,
-    border-color,
-    color,
-    box-shadow,
-    filter,
-    transform;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
-  vertical-align: middle;
-  transform: translate3d(0px, 0px, 0px);
-  padding-block: 3px;
-  padding-inline: 15px;
-  border: 1px solid var(--essential-subdued, #878787);
-  color: var(--text-base, #000000);
-  min-block-size: 32px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.stats-createPlaylistButton:hover {
-  transform: scale(1.04);
-  border-color: var(--essential-base, #000000);
-}
 .stats-header {
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
   align-content: space-between;
   align-items: center;
-  color: var(--spice-text);
   display: flex;
   justify-content: space-between;
   margin: 16px 0;
+}
+.stats-header-right,
+.stats-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 50%;
+}
+.stats-header-right {
+  justify-content: flex-end;
+}
+.stats-header-left {
+  justify-content: flex-start;
 }
 .stats-tracklistHeader > div {
   display: flex;
   -webkit-app-region: no-drag;
   gap: 20px;
   align-items: center;
+}
+.stats-make-playlist-button {
+  margin-inline-start: 12px;
 }
 .stats-genreCard {
   display: flex;
@@ -208,14 +170,6 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   color: var(--spice-text);
   font-size: 0.875rem;
 }
-.stats-cardValue {
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--spice-text);
-}
-.stats-cardText {
-  color: var(--spice-text);
-}
 .new-update {
   background-color: var(--spice-player);
   color: var(--spice-text);
@@ -238,17 +192,11 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   fill: currentColor;
 }
 
-/* ../../AppData/Local/Temp/tmp-6912-LESOepgMxajG/18ca59b28921/settings_modal.css */
+/* ../../AppData/Local/Temp/tmp-6812-j7fELC0nsK0p/18d07bccc261/settings_modal.css */
 #stats-config-container {
   gap: 10px;
   display: flex;
   flex-direction: column;
-}
-#stats-config-container .toggle-wrapper {
-  display: inline-flex;
-  position: relative;
-  align-items: center;
-  cursor: pointer;
 }
 #stats-config-container .section-header {
   box-sizing: border-box;
@@ -269,55 +217,6 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
 #stats-config-container .disabled {
   opacity: 0;
   pointer-events: none;
-}
-#stats-config-container .toggle-input {
-  opacity: 0;
-  pointer-events: none;
-  position: absolute;
-}
-#stats-config-container .toggle-input:checked ~ .toggle-indicator-wrapper {
-  background-color: var(--spice-text);
-}
-#stats-config-container .toggle-input:checked ~ .toggle-indicator-wrapper .toggle-indicator {
-  background-color: #fff;
-  left: auto;
-  right: 2px;
-  right: 3px;
-}
-#stats-config-container .toggle-input:hover ~ .toggle-indicator-wrapper {
-  filter: brightness(1.3);
-}
-#stats-config-container .toggle-input:hover:checked ~ .toggle-indicator-wrapper {
-  filter: brightness(1.15);
-}
-#stats-config-container .toggle-input:active:not([disabled]) ~ .toggle-indicator-wrapper .toggle-indicator {
-  width: 20px;
-}
-#stats-config-container .toggle-indicator-wrapper {
-  background-color: #535353;
-  border-radius: 24px;
-  height: 24px;
-  position: relative;
-  width: 42px;
-}
-#stats-config-container .toggle-indicator {
-  background: #fff;
-  border-radius: inherit;
-  height: 20px;
-  left: 2px;
-  position: absolute;
-  top: 2px;
-  transition:
-    background-color,
-    left,
-    right,
-    width 0.1s ease;
-  width: 20px;
-  height: 18px;
-  width: 18px;
-  top: 3px;
-  left: 3px;
-  background: var(--spice-shadow) !important;
 }
 #stats-config-container .text-input {
   background: rgba(var(--spice-rgb-selected-row), 0.1);
