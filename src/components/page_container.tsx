@@ -14,10 +14,10 @@ interface PageContainerProps {
     children: React.ReactElement | React.ReactElement[];
 }
 
-const { TextComponent } = Spicetify.ReactComponent;
-
 function PageContainer(props: PageContainerProps) {
+    const { TextComponent } = Spicetify.ReactComponent;
     const { title, refreshCallback, config, dropdown, infoToCreatePlaylist, children } = props;
+    
     return (
         <section className="contentSpacing">
             <div className={"stats-header"}>

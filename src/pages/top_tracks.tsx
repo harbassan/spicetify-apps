@@ -8,8 +8,6 @@ import useDropdownMenu from "../components/hooks/useDropdownMenu";
 import { apiRequest, updatePageCache, convertToSpotify, checkLiked } from "../funcs";
 import { ConfigWrapper, Track } from "../types/stats_types";
 
-const { LocalStorage } = Spicetify;
-
 export const topTracksReq = async (time_range: string, config: ConfigWrapper) => {
     if (config.CONFIG["use-lastfm"] === true) {
         if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) {
@@ -78,6 +76,8 @@ export const topTracksReq = async (time_range: string, config: ConfigWrapper) =>
 };
 
 const TracksPage = ({ config }: { config: ConfigWrapper }) => {
+    const { LocalStorage } = Spicetify;
+
     const [topTracks, setTopTracks] = React.useState<Track[] | 100 | 200 | 300>(100);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
         ["short_term", "medium_term", "long_term"],

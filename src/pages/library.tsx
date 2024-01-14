@@ -260,11 +260,11 @@ const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
     const artistCards = library.artists
         .slice(0, 10)
         .map((artist) => {
-            return <SpotifyCard type="artist" name={artist.name} imageUrl={artist.image} uri={artist.uri} subtext={`Appears in ${artist.freq} tracks`} />
+            return <SpotifyCard type="artist" uri={artist.uri} header={artist.name} subheader={`Appears in ${artist.freq} tracks`} imageUrl={artist.image} />
         });
 
     const albumCards = library.albums.map((album) => {
-        return <SpotifyCard type="album" name={album.name} imageUrl={album.image} uri={album.uri} subtext={`Appears in ${album.freq} tracks`} />;
+        return <SpotifyCard type="album" uri={album.uri} header={album.name} subheader={`Appears in ${album.freq} tracks`} imageUrl={album.image} />;
     });
 
     return (

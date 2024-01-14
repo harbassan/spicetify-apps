@@ -112,7 +112,7 @@ const ArtistsPage = ({ config }: { config: ConfigWrapper }) => {
     }
 
     const artistCards = topArtists.map((artist, index) => (
-        <SpotifyCard type={artist.uri.includes("last") ? "lastfm" : "artist"} name={artist.name} imageUrl={artist.image} uri={artist.uri} subtext={`#${index + 1} Artist`} />
+        <SpotifyCard type={artist.uri.includes("last") ? "lastfm" : "artist"} uri={artist.uri} header={artist.name} subheader={`#${index + 1} Artist`} imageUrl={artist.image} />
     ));
 
     return (
