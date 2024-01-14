@@ -539,7 +539,7 @@ var stats = (() => {
   var playlist_default = import_react7.default.memo(PlaylistPage);
 
   // package.json
-  var version = "0.3.0";
+  var version = "0.3.1";
 
   // src/constants.ts
   var STATS_VERSION = version;

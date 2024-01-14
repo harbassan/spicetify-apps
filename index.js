@@ -105,7 +105,7 @@ var stats = (() => {
   });
   var optionsMenu_default = OptionsMenu;
 
-  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-6812-j7fELC0nsK0p\18d07bccc462\navBar.module.css
+  // postcss-module:C:\Users\user\AppData\Local\Temp\tmp-11964-wBAOqZhOo4po\18d07cb0fbf2\navBar.module.css
   var navBar_module_default = { "topBarHeaderItem": "navBar-module__topBarHeaderItem___v29bR_stats", "topBarHeaderItemLink": "navBar-module__topBarHeaderItemLink___VeyBY_stats", "topBarActive": "navBar-module__topBarActive___-qYPu_stats", "topBarNav": "navBar-module__topBarNav___1OtdR_stats", "optionsMenuDropBox": "navBar-module__optionsMenuDropBox___tD9mA_stats" };
 
   // node_modules/spcr-navigation-bar/navBar.tsx
@@ -2136,7 +2136,7 @@ var stats = (() => {
   var top_albums_default = import_react23.default.memo(AlbumsPage);
 
   // package.json
-  var version = "0.3.0";
+  var version = "0.3.1";
 
   // src/constants.ts
   var STATS_VERSION = version;
