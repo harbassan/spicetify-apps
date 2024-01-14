@@ -91,9 +91,10 @@ const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
             );
     }
 
-    const albumCards = topAlbums.map((album, index) => (
-        <SpotifyCard type="lastfm" uri={album.uri} header={album.name} subheader={`#${index + 1} Album`} imageUrl={album.image} />
-    ));
+    const albumCards = topAlbums.map((album, index) => {
+        const type = album.uri.startsWith("https") ? "lastfm" : "album";
+        return <SpotifyCard type={type} uri={album.uri} header={album.name} subheader={`#${index + 1} Album`} imageUrl={album.image} />
+    });
 
     return (
         <PageContainer title="Top Albums" {...props}>
