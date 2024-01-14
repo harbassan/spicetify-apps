@@ -34,6 +34,18 @@
 
 ---
 
+### Top Albums (w/ Last.fm Sync Only)
+
+![preview](previews/top_albums.png)
+
+---
+
+### Last.fm Daily Charts
+
+![preview](previews/top_charts.png)
+
+---
+
 ### Manual Installation
 
 Download the files in the [dist branch](https://github.com/harbassan/spicetify-stats/archive/refs/heads/dist.zip) and rename the unzipped folder to `stats`, and then place that folder into your `CustomApps` folder in the `spicetify` directory. It should be similair to this:
