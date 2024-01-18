@@ -1,58 +1,41 @@
 import React from "react";
 import useDropdownMenu from "../components/hooks/useDropdownMenu";
 import SpotifyCard from "../components/cards/spotify_card";
-import { apiRequest, updatePageCache, convertToSpotify } from "../funcs";
+import { apiRequest, convertAlbumData, updatePageCache } from "../funcs";
 import Status from "../components/status";
 import PageContainer from "../components/page_container";
 import { Album, ConfigWrapper } from "../types/stats_types";
+import { LASTFM } from "../endpoints";
 
 export const topAlbumsReq = async (time_range: string, config: ConfigWrapper) => {
-    if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) {
-        return 300;
-    }
+    if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) return 300;
 
-    const lastfmperiods: Record<string, string> = {
-        short_term: "1month",
-        medium_term: "6month",
-        long_term: "overall",
-    };
+    const { ["lastfm-user"]: user, ["api-key"]: key } = config.CONFIG;
+    const response = await apiRequest("lastfm", LASTFM.topalbums(user, key, time_range));
 
-    const response = await apiRequest(
-        "lastfm",
-        `https://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=${config.CONFIG["lastfm-user"]}&api_key=${config.CONFIG["api-key"]}&format=json&period=${lastfmperiods[time_range]}`
-    );
+    if (!response) return 200;
 
-    if (!response) {
-        return 200;
-    }
-
-    return await convertToSpotify(response.topalbums.album, "albums");
+    return await convertAlbumData(response.topalbums.album);
 };
 
 const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
     const { LocalStorage } = Spicetify;
 
     const [topAlbums, setTopAlbums] = React.useState<Album[] | 100 | 200 | 300>(100);
-    const [dropdown, activeOption] = useDropdownMenu(
-        ["short_term", "medium_term", "long_term"],
-        ["Past Month", "Past 6 Months", "All Time"],
-        `top-albums`
-    );
+    const [dropdown, activeOption] = useDropdownMenu(["short_term", "medium_term", "long_term"], ["Past Month", "Past 6 Months", "All Time"], `top-albums`);
 
     const fetchTopAlbums = async (time_range: string, force?: boolean, set: boolean = true) => {
         if (!force) {
             let storedData = LocalStorage.get(`stats:top-albums:${time_range}`);
-            if (storedData) {
-                setTopAlbums(JSON.parse(storedData));
-                return;
-            }
+            if (storedData) return setTopAlbums(JSON.parse(storedData));
         }
 
         const start = window.performance.now();
-        const topAlbums = await topAlbumsReq(time_range, config);
 
+        const topAlbums = await topAlbumsReq(time_range, config);
         if (set) setTopAlbums(topAlbums);
         LocalStorage.set(`stats:top-albums:${time_range}`, JSON.stringify(topAlbums));
+
         console.log("total albums fetch time:", window.performance.now() - start);
     };
 
@@ -93,7 +76,7 @@ const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
 
     const albumCards = topAlbums.map((album, index) => {
         const type = album.uri.startsWith("https") ? "lastfm" : "album";
-        return <SpotifyCard type={type} uri={album.uri} header={album.name} subheader={`#${index + 1} Album`} imageUrl={album.image} />
+        return <SpotifyCard type={type} uri={album.uri} header={album.name} subheader={`#${index + 1} Album`} imageUrl={album.image} />;
     });
 
     return (

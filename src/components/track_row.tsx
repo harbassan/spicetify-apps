@@ -35,7 +35,7 @@ const LikedIcon = ({ active, uri }: { active: boolean; uri: string }) => {
 
     const toggleLike = () => {
         if (liked) {
-            Spicetify.Platform.LibraryAPI.remove(uri)
+            Spicetify.Platform.LibraryAPI.remove(uri);
         } else {
             Spicetify.Platform.LibraryAPI.add(uri);
         }
@@ -121,7 +121,7 @@ const TrackRow = (props: TrackRowProps) => {
                         style={{ height: 56 }}
                     >
                         <div className="main-trackList-rowSectionIndex" role="gridcell" aria-colindex={1} tabIndex={-1}>
-                            {/* needs uri prop to work with playlist-labels */}
+                            {/* @ts-ignore - needs uri prop to work with playlist-labels extension*/}
                             <div uri={props.uri} className="main-trackList-rowMarker">
                                 <span className="TypeElement-ballad-type main-trackList-number" data-encore-id="type">
                                     {props.index}

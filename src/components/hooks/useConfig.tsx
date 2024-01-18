@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import SettingsModal from "../settings_modal";
 import { Config } from "../../types/stats_types";
 

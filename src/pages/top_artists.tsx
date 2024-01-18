@@ -1,48 +1,33 @@
 import React from "react";
 import useDropdownMenu from "../components/hooks/useDropdownMenu";
 import SpotifyCard from "../components/cards/spotify_card";
-import { apiRequest, updatePageCache, convertToSpotify } from "../funcs";
+import { apiRequest, convertArtistData, updatePageCache } from "../funcs";
 import Status from "../components/status";
 import PageContainer from "../components/page_container";
 import { ArtistCardProps, ConfigWrapper } from "../types/stats_types";
+import { PLACEHOLDER, LASTFM, SPOTIFY } from "../endpoints";
 
 export const topArtistsReq = async (time_range: string, config: ConfigWrapper) => {
     if (config.CONFIG["use-lastfm"] === true) {
-        if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) {
-            return 300;
-        }
+        if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) return 300;
 
-        const lastfmperiods: Record<string, string> = {
-            short_term: "1month",
-            medium_term: "6month",
-            long_term: "overall",
-        };
+        const { ["lastfm-user"]: user, ["api-key"]: key } = config.CONFIG;
+        const response = await apiRequest("lastfm", LASTFM.topartists(user, key, time_range));
 
-        const response = await apiRequest(
-            "lastfm",
-            `https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${config.CONFIG["lastfm-user"]}&api_key=${config.CONFIG["api-key"]}&format=json&period=${lastfmperiods[time_range]}`
-        );
+        if (!response) return 200;
 
-        if (!response) {
-            return 200;
-        }
-
-        return await convertToSpotify(response.topartists.artist, "artists");
+        return await convertArtistData(response.topartists.artist);
     } else {
-        const response = await apiRequest("topArtists", `https://api.spotify.com/v1/me/top/artists?limit=50&offset=0&time_range=${time_range}`);
+        const response = await apiRequest("topArtists", SPOTIFY.topartists(time_range));
 
-        if (!response) {
-            return 200;
-        }
+        if (!response) return 200;
+
         return response.items.map((artist: any) => {
+            const image = artist.images[2]?.url || artist.images[1]?.url || PLACEHOLDER;
             return {
                 id: artist.id,
                 name: artist.name,
-                image: artist.images[2]
-                    ? artist.images[2].url
-                    : artist.images[1]
-                        ? artist.images[1].url
-                        : "https://images.squarespace-cdn.com/content/v1/55fc0004e4b069a519961e2d/1442590746571-RPGKIXWGOO671REUNMCB/image-asset.gif",
+                image,
                 uri: artist.uri,
                 genres: artist.genres,
             };
@@ -61,17 +46,15 @@ const ArtistsPage = ({ config }: { config: ConfigWrapper }) => {
     const fetchTopArtists = async (time_range: string, force?: boolean, set: boolean = true) => {
         if (!force) {
             let storedData = Spicetify.LocalStorage.get(`stats:top-artists:${time_range}`);
-            if (storedData) {
-                setTopArtists(JSON.parse(storedData));
-                return;
-            }
+            if (storedData) return setTopArtists(JSON.parse(storedData));
         }
 
         const start = window.performance.now();
-        const topArtists = await topArtistsReq(time_range, config);
 
+        const topArtists = await topArtistsReq(time_range, config);
         if (set) setTopArtists(topArtists);
         Spicetify.LocalStorage.set(`stats:top-artists:${time_range}`, JSON.stringify(topArtists));
+
         console.log("total artists fetch time:", window.performance.now() - start);
     };
 
@@ -112,7 +95,13 @@ const ArtistsPage = ({ config }: { config: ConfigWrapper }) => {
     }
 
     const artistCards = topArtists.map((artist, index) => (
-        <SpotifyCard type={artist.uri.includes("last") ? "lastfm" : "artist"} uri={artist.uri} header={artist.name} subheader={`#${index + 1} Artist`} imageUrl={artist.image} />
+        <SpotifyCard
+            type={artist.uri.includes("last") ? "lastfm" : "artist"}
+            uri={artist.uri}
+            header={artist.name}
+            subheader={`#${index + 1} Artist`}
+            imageUrl={artist.image}
+        />
     ));
 
     return (

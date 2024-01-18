@@ -8,6 +8,7 @@ import InlineGrid from "../components/inline_grid";
 import Shelf from "../components/shelf";
 import { apiRequest, fetchAudioFeatures, fetchTopArtists, fetchTopAlbums } from "../funcs";
 import { Album, ArtistCardProps } from "../types/stats_types";
+import { SPOTIFY } from "../endpoints";
 
 interface LibraryProps {
     audioFeatures: Record<string, number>;
@@ -23,9 +24,11 @@ interface LibraryProps {
 }
 
 const PlaylistPage = ({ uri }: { uri: string }) => {
-    const { ReactComponent, ReactQuery, Platform, _platform} = Spicetify;
+    // @ts-expect-error
+    const { ReactComponent, ReactQuery, Platform, _platform } = Spicetify;
     const { History, ReduxStore } = Platform;
     const { QueryClientProvider, QueryClient } = ReactQuery;
+    // @ts-expect-error
     const { Router, Route, Routes, PlatformProvider, StoreProvider } = ReactComponent;
 
     const [library, setLibrary] = React.useState<LibraryProps | 100 | 200>(100);
@@ -33,7 +36,7 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
     const fetchData = async () => {
         const start = window.performance.now();
 
-        const playlistMeta = await apiRequest("playlistMeta", `sp://core-playlist/v1/playlist/${uri}`);
+        const playlistMeta = await apiRequest("playlistMeta", SPOTIFY.playlist(uri));
         if (!playlistMeta) {
             setLibrary(200);
             return;
@@ -123,14 +126,14 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
     }
 
     const statCards = Object.entries(library.audioFeatures).map(([key, value]) => {
-        return <StatCard label={key} value={value} />
+        return <StatCard label={key} value={value} />;
     });
 
-    const artistCards = library.artists.map((artist) => {
-        return <SpotifyCard type="artist" uri={artist.uri} header={artist.name} subheader={`Appears in ${artist.freq} tracks`} imageUrl={artist.image} />
+    const artistCards = library.artists.map(artist => {
+        return <SpotifyCard type="artist" uri={artist.uri} header={artist.name} subheader={`Appears in ${artist.freq} tracks`} imageUrl={artist.image} />;
     });
 
-    const albumCards = library.albums.map((album) => {
+    const albumCards = library.albums.map(album => {
         return <SpotifyCard type="album" uri={album.uri} header={album.name} subheader={`Appears in ${album.freq} tracks`} imageUrl={album.image} />;
     });
 
@@ -140,33 +143,37 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
                 location={{
                     pathname: "/",
                 }}
-                navigator={History}>
+                navigator={History}
+            >
                 <StoreProvider store={ReduxStore}>
                     <PlatformProvider platform={_platform}>
                         <Routes>
-                            <Route path="/" element={
-                                <div className="stats-page encore-dark-theme encore-base-set">
-                                    <section className="stats-libraryOverview">
-                                        <StatCard label="Total Tracks" value={library.trackCount.toString()} />
-                                        <StatCard label="Total Artists" value={library.artistCount.toString()} />
-                                        <StatCard label="Total Minutes" value={(Math.floor(library.totalDuration / 60)).toString()} />
-                                        <StatCard label="Total Hours" value={(library.totalDuration / (60 * 60)).toFixed(1)} />
-                                    </section>
-                                    <Shelf title="Most Frequent Genres">
-                                        <GenresCard genres={library.genres} total={library.genresDenominator} />
-                                        <InlineGrid special>{statCards}</InlineGrid>
-                                    </Shelf>
-                                    <Shelf title="Most Frequent Artists">
-                                        <InlineGrid>{artistCards}</InlineGrid>
-                                    </Shelf>
-                                    <Shelf title="Most Frequent Albums">
-                                        <InlineGrid>{albumCards}</InlineGrid>
-                                    </Shelf>
-                                    <Shelf title="Release Year Distribution">
-                                        <GenresCard genres={library.years} total={library.yearsDenominator} />
-                                    </Shelf>
-                                </div>
-                            } />
+                            <Route
+                                path="/"
+                                element={
+                                    <div className="stats-page encore-dark-theme encore-base-set">
+                                        <section className="stats-libraryOverview">
+                                            <StatCard label="Total Tracks" value={library.trackCount.toString()} />
+                                            <StatCard label="Total Artists" value={library.artistCount.toString()} />
+                                            <StatCard label="Total Minutes" value={Math.floor(library.totalDuration / 60).toString()} />
+                                            <StatCard label="Total Hours" value={(library.totalDuration / (60 * 60)).toFixed(1)} />
+                                        </section>
+                                        <Shelf title="Most Frequent Genres">
+                                            <GenresCard genres={library.genres} total={library.genresDenominator} />
+                                            <InlineGrid special>{statCards}</InlineGrid>
+                                        </Shelf>
+                                        <Shelf title="Most Frequent Artists">
+                                            <InlineGrid>{artistCards}</InlineGrid>
+                                        </Shelf>
+                                        <Shelf title="Most Frequent Albums">
+                                            <InlineGrid>{albumCards}</InlineGrid>
+                                        </Shelf>
+                                        <Shelf title="Release Year Distribution">
+                                            <GenresCard genres={library.years} total={library.yearsDenominator} />
+                                        </Shelf>
+                                    </div>
+                                }
+                            />
                         </Routes>
                     </PlatformProvider>
                 </StoreProvider>

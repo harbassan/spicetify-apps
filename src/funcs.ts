@@ -1,4 +1,10 @@
+import { PLACEHOLDER, SPOTIFY } from "./endpoints";
 import { Album, ArtistCardProps } from "./types/stats_types";
+
+export function filter(str: string): string {
+    const normalizedStr = str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return normalizedStr.replace(/[^a-zA-Z0-9\-._~:/?#[\]@!$&()*+,;= ]/g, "").replace(/ /g, "+");
+}
 
 export const updatePageCache = (i: any, callback: Function, activeOption: string, lib: any = false) => {
     let cacheInfo = Spicetify.LocalStorage.get("stats:cache-info");
@@ -56,8 +62,7 @@ export const fetchAudioFeatures = async (ids: string[]) => {
 
     // Send multiple simultaneous requests using Promise.all()
     const promises = batches.map((batch, index) => {
-        const url = `https://api.spotify.com/v1/audio-features?ids=${batch.join(",")}`;
-        return apiRequest("audioFeaturesBatch" + index, url, 5, false);
+        return apiRequest(`audioFeaturesBatch${index}`, SPOTIFY.audiofeatures(batch.join(",")), 5, false);
     });
 
     const responses = await Promise.all(promises);
@@ -80,17 +85,15 @@ export const fetchTopAlbums = async (albums: Record<string, number>, cachedAlbum
     let release_years: Record<string, number> = {};
     let total_album_tracks = 0;
 
+    const cachedAlbumsSet = new Set(cachedAlbums?.map(album => album.uri));
+
     let top_albums: Album[] = <Album[]>await Promise.all(
         album_keys.map(async (albumID: string) => {
             let albumMeta;
+
             // loop through and see if the album is already cached
-            if (cachedAlbums) {
-                for (let i = 0; i < cachedAlbums.length; i++) {
-                    if (cachedAlbums[i].uri === `spotify:album:${albumID}`) {
-                        albumMeta = cachedAlbums[i];
-                        break;
-                    }
-                }
+            if (cachedAlbums && cachedAlbumsSet.has(`spotify:album:${albumID}`)) {
+                albumMeta = cachedAlbums.find(album => album.uri === `spotify:album:${albumID}`);
             }
 
             if (!albumMeta) {
@@ -108,7 +111,7 @@ export const fetchTopAlbums = async (albums: Record<string, number>, cachedAlbum
                 }
             }
 
-            const releaseYear: string = albumMeta?.release_year || albumMeta.data.albumUnion.date.isoString.slice(0, 4);
+            const releaseYear = albumMeta?.release_year || albumMeta.data.albumUnion.date.isoString.slice(0, 4);
 
             release_years[releaseYear] = (release_years[releaseYear] || 0) + albums[albumID];
             total_album_tracks += albums[albumID];
@@ -116,7 +119,7 @@ export const fetchTopAlbums = async (albums: Record<string, number>, cachedAlbum
             return {
                 name: albumMeta.name || albumMeta.data.albumUnion.name,
                 uri: albumMeta.uri || albumMeta.data.albumUnion.uri,
-                image: albumMeta.image || albumMeta.data.albumUnion.coverArt.sources[0]?.url || "https://commons.wikimedia.org/wiki/File:Black_square.jpg",
+                image: albumMeta.image || albumMeta.data.albumUnion.coverArt.sources[0]?.url || PLACEHOLDER,
                 release_year: releaseYear,
                 freq: albums[albumID],
             };
@@ -138,7 +141,7 @@ export const fetchTopArtists = async (artists: Record<string, number>) => {
     let genres: Record<string, number> = {};
     let total_genre_tracks = 0;
 
-    const artistsMeta = await apiRequest("artistsMetadata", `https://api.spotify.com/v1/artists?ids=${artist_keys.join(",")}`);
+    const artistsMeta = await apiRequest("artistsMetadata", SPOTIFY.artists(artist_keys.join(",")));
 
     let top_artists: ArtistCardProps[] = artistsMeta?.artists?.map((artist: any) => {
         if (!artist) return null;
@@ -151,7 +154,7 @@ export const fetchTopArtists = async (artists: Record<string, number>) => {
         return {
             name: artist.name,
             uri: artist.uri,
-            image: artist.images[2]?.url || "https://commons.wikimedia.org/wiki/File:Black_square.jpg",
+            image: artist.images[2]?.url || PLACEHOLDER,
             freq: artists[artist.id],
         };
     });
@@ -163,66 +166,16 @@ export const fetchTopArtists = async (artists: Record<string, number>) => {
     return [top_artists, top_genres, total_genre_tracks];
 };
 
-export function filterLink(str: string): string {
-    const normalizedStr = str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    return normalizedStr.replace(/[^a-zA-Z0-9\-._~:/?#[\]@!$&()*+,;= ]/g, "").replace(/ /g, "+");
-}
-
-export const convertToSpotify = async (data: any[], type: string) => {
+export const convertTrackData = async (data: any[]) => {
     return await Promise.all(
         data.map(async (item: any) => {
-            if (type === "artists") {
-                const spotifyItem = await Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/search?q=${filterLink(item.name)}&type=artist`).then(
-                    (res: any) => res.artists?.items[0]
-                );
-                if (!spotifyItem) {
-                    console.log(`https://api.spotify.com/v1/search?q=${filterLink(item.name)}&type=artist`);
-                    return {
-                        name: item.name,
-                        image: item.image[0]["#text"],
-                        uri: item.url,
-                        id: item.mbid,
-                    };
-                }
-                return {
-                    name: item.name,
-                    image: spotifyItem.images[0].url,
-                    uri: spotifyItem.uri,
-                    id: spotifyItem.id,
-                    genres: spotifyItem.genres,
-                };
-            }
+            const spotifyItem = await Spicetify.CosmosAsync.get(SPOTIFY.search(item.name, item.artist.name)).then((res: any) => res.tracks?.items[0]);
 
-            if (type === "albums") {
-                const spotifyItem = await Spicetify.CosmosAsync.get(
-                    `https://api.spotify.com/v1/search?q=${filterLink(item.name)}+artist:${filterLink(item.artist.name)}&type=album`
-                ).then((res: any) => res.albums?.items[0]);
-                if (!spotifyItem) {
-                    console.log(`https://api.spotify.com/v1/search?q=${filterLink(item.name)}+artist:${filterLink(item.artist.name)}&type=album`);
-                    return {
-                        name: item.name,
-                        image: item.image[2]["#text"],
-                        uri: item.url,
-                        id: item.mbid,
-                    };
-                }
-                return {
-                    name: item.name,
-                    image: spotifyItem.images[0].url,
-                    uri: spotifyItem.uri,
-                    id: spotifyItem.id,
-                };
-            }
-
-            // type === "track"
-            const spotifyItem = await Spicetify.CosmosAsync.get(
-                `https://api.spotify.com/v1/search?q=track:${filterLink(item.name)}+artist:${filterLink(item.artist.name)}&type=track`
-            ).then((res: any) => res.tracks?.items[0]);
             if (!spotifyItem) {
-                console.log(`https://api.spotify.com/v1/search?q=track:${filterLink(item.name)}+artist:${filterLink(item.artist.name)}&type=track`);
+                console.log(`couldn't find track: ${item.name} by ${item.artist.name}`);
                 return {
                     name: item.name,
-                    image: item.image[0]["#text"],
+                    image: PLACEHOLDER,
                     uri: item.url,
                     artists: [{ name: item.artist.name, uri: item.artist.url }],
                     duration: 0,
@@ -232,6 +185,7 @@ export const convertToSpotify = async (data: any[], type: string) => {
                     album_uri: item.url,
                 };
             }
+
             return {
                 name: item.name,
                 image: spotifyItem.album.images[0].url,
@@ -249,6 +203,57 @@ export const convertToSpotify = async (data: any[], type: string) => {
     );
 };
 
+export const convertAlbumData = async (data: any[]) => {
+    return await Promise.all(
+        data.map(async (item: any) => {
+            const spotifyItem = await Spicetify.CosmosAsync.get(SPOTIFY.searchalbum(item.name, item.artist.name)).then((res: any) => res.albums?.items[0]);
+
+            if (!spotifyItem) {
+                console.log(`couldn't find album: ${item.name} by ${item.artist.name}`);
+                return {
+                    name: item.name,
+                    image: PLACEHOLDER,
+                    uri: item.url,
+                    id: item.mbid,
+                };
+            }
+
+            return {
+                name: item.name,
+                image: spotifyItem.images[0].url,
+                uri: spotifyItem.uri,
+                id: spotifyItem.id,
+            };
+        })
+    );
+};
+
+export const convertArtistData = async (data: any[]) => {
+    return await Promise.all(
+        data.map(async (item: any) => {
+            const spotifyItem = await Spicetify.CosmosAsync.get(SPOTIFY.searchartist(item.name)).then((res: any) => res.artists?.items[0]);
+
+            if (!spotifyItem) {
+                console.log(`couldn't find artist: ${item.name}`);
+                return {
+                    name: item.name,
+                    image: PLACEHOLDER,
+                    uri: item.url,
+                    id: item.mbid,
+                };
+            }
+
+            return {
+                name: item.name,
+                image: spotifyItem.images[0].url,
+                uri: spotifyItem.uri,
+                id: spotifyItem.id,
+                genres: spotifyItem.genres,
+            };
+        })
+    );
+};
+
 export const checkLiked = async (tracks: string[]) => {
     const nullIndexes: number[] = [];
     tracks.forEach((track, index) => {
@@ -257,7 +262,8 @@ export const checkLiked = async (tracks: string[]) => {
         }
     });
 
-    const apiResponse = (await apiRequest("checkLiked", `https://api.spotify.com/v1/me/tracks/contains?ids=${tracks.filter(e => e).join(",")}`)) as any;
+    const apiResponse = await apiRequest("checkLiked", SPOTIFY.queryliked(tracks.filter(e => e).join(",")));
+    if (!apiResponse) return;
 
     const response = [];
     let nullIndexesIndex = 0;

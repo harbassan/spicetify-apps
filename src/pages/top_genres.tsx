@@ -12,8 +12,9 @@ import Shelf from "../components/shelf";
 
 import { topArtistsReq } from "./top_artists";
 import { topTracksReq } from "./top_tracks";
-import { fetchAudioFeatures, filterLink, updatePageCache } from "../funcs";
+import { apiRequest, fetchAudioFeatures, updatePageCache } from "../funcs";
 import { ConfigWrapper, Track } from "../types/stats_types";
+import { SPOTIFY } from "../endpoints";
 
 interface GenresPageProps {
     genres: [string, number][];
@@ -23,22 +24,15 @@ interface GenresPageProps {
 }
 
 const GenresPage = ({ config }: { config: ConfigWrapper }) => {
-    const { LocalStorage, CosmosAsync } = Spicetify;
+    const { LocalStorage } = Spicetify;
 
     const [topGenres, setTopGenres] = React.useState<GenresPageProps | 100 | 200 | 300>(100);
-    const [dropdown, activeOption] = useDropdownMenu(
-        ["short_term", "medium_term", "long_term"],
-        ["Past Month", "Past 6 Months", "All Time"],
-        "top-genres"
-    );
+    const [dropdown, activeOption] = useDropdownMenu(["short_term", "medium_term", "long_term"], ["Past Month", "Past 6 Months", "All Time"], "top-genres");
 
     const fetchTopGenres = async (time_range: string, force?: boolean, set: boolean = true, force_refetch?: boolean) => {
         if (!force) {
             let storedData = LocalStorage.get(`stats:top-genres:${time_range}`);
-            if (storedData) {
-                setTopGenres(JSON.parse(storedData));
-                return;
-            }
+            if (storedData) return setTopGenres(JSON.parse(storedData));
         }
         const start = window.performance.now();
 
@@ -97,9 +91,7 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
 
         async function testDupe(track: Track) {
             // perform a search to get rid of duplicate tracks
-            const spotifyItem = await CosmosAsync.get(
-                `https://api.spotify.com/v1/search?q=track:${filterLink(track.name)}+artist:${filterLink(track.artists[0].name)}&type=track`
-            ).then((res: any) => res.tracks?.items);
+            const spotifyItem = await apiRequest("track", SPOTIFY.search(track.name, track.artists[0].name), 1, false).then((res: any) => res.tracks?.items);
             if (!spotifyItem) return false;
             return spotifyItem.some((item: any) => {
                 return item.name === track.name && item.popularity > track.popularity;
@@ -204,7 +196,7 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
     }
 
     const statCards = Object.entries(topGenres.features).map(([key, value]) => {
-        return <StatCard label={key} value={value} />
+        return <StatCard label={key} value={value} />;
     });
 
     const obscureTracks = topGenres.obscureTracks.map((track: Track, index: number) => (
