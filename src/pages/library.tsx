@@ -10,6 +10,8 @@ import PageContainer from "../components/page_container";
 import Shelf from "../components/shelf";
 import { Album, ArtistCardProps, ConfigWrapper } from "../types/stats_types";
 import { SPOTIFY } from "../endpoints";
+import RefreshButton from "../components/buttons/refresh_button";
+import SettingsButton from "../components/buttons/settings_button";
 
 interface LibraryProps {
     audioFeatures: Record<string, number>;
@@ -224,28 +226,30 @@ const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
         fetchData(activeOption);
     }, [activeOption]);
 
-    const props = {
-        refreshCallback: () => fetchData(activeOption, true),
-        config: config,
-        dropdown: dropdown,
+    const refresh = () => {
+        fetchData(activeOption, true);
     };
 
+    const props = {
+        title: "Library Analysis",
+        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton config={config} />],
+    };
     switch (library) {
         case 300:
             return (
-                <PageContainer title={`Library Analysis`} {...props}>
+                <PageContainer {...props}>
                     <Status icon="error" heading="No Playlists In Your Library" subheading="Try adding some playlists first" />
                 </PageContainer>
             );
         case 200:
             return (
-                <PageContainer title={`Library Analysis`} {...props}>
+                <PageContainer {...props}>
                     <Status icon="error" heading="Failed to Fetch Stats" subheading="Make an issue on Github" />
                 </PageContainer>
             );
         case 100:
             return (
-                <PageContainer title={`Library Analysis`} {...props}>
+                <PageContainer {...props}>
                     <Status icon="library" heading="Analysing your Library" subheading="This may take a while" />
                 </PageContainer>
             );
@@ -264,7 +268,7 @@ const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
     });
 
     return (
-        <PageContainer title="Library Analysis" {...props}>
+        <PageContainer {...props}>
             <section className="stats-libraryOverview">
                 <StatCard label="Total Playlists" value={library.playlistCount.toString()} />
                 <StatCard label="Total Tracks" value={library.trackCount.toString()} />

@@ -9,6 +9,8 @@ import Tracklist from "../components/tracklist";
 import PageContainer from "../components/page_container";
 import { ArtistCardProps, ConfigWrapper, Track } from "../types/stats_types";
 import { LASTFM } from "../endpoints";
+import RefreshButton from "../components/buttons/refresh_button";
+import SettingsButton from "../components/buttons/settings_button";
 
 const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
     const [chartData, setChartData] = React.useState<Track[] | ArtistCardProps[] | 100 | 200 | 500>(100);
@@ -51,13 +53,14 @@ const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
         fetchChartData(activeOption);
     }, [activeOption]);
 
-    const props = {
-        title: `Charts -  Top ${activeOption.charAt(0).toUpperCase()}${activeOption.slice(1)}`,
-        refreshCallback: () => fetchChartData(activeOption, true),
-        config: config,
-        dropdown: dropdown,
+    const refresh = () => {
+        fetchChartData(activeOption, true);
     };
 
+    const props = {
+        title: "Top Albums",
+        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton config={config} />],
+    };
     switch (chartData) {
         case 200:
             return (

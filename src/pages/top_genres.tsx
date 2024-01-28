@@ -15,6 +15,8 @@ import { topTracksReq } from "./top_tracks";
 import { apiRequest, fetchAudioFeatures, updatePageCache } from "../funcs";
 import { ConfigWrapper, Track } from "../types/stats_types";
 import { SPOTIFY } from "../endpoints";
+import RefreshButton from "../components/buttons/refresh_button";
+import SettingsButton from "../components/buttons/settings_button";
 
 interface GenresPageProps {
     genres: [string, number][];
@@ -167,11 +169,13 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
         fetchTopGenres(activeOption);
     }, [activeOption]);
 
+    const refresh = () => {
+        fetchTopGenres(activeOption, true);
+    };
+
     const props = {
         title: "Top Genres",
-        refreshCallback: () => fetchTopGenres(activeOption, true, true, true),
-        config: config,
-        dropdown: dropdown,
+        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton config={config} />],
     };
 
     switch (topGenres) {
@@ -213,7 +217,7 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
                 <GenresCard genres={topGenres.years} total={50} />
             </Shelf>
             <Shelf title="Most Obscure Tracks">
-                <Tracklist minified={true}>{obscureTracks}</Tracklist>
+                <Tracklist minified>{obscureTracks}</Tracklist>
             </Shelf>
         </PageContainer>
     );

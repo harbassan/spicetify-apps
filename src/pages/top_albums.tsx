@@ -6,6 +6,8 @@ import Status from "../components/status";
 import PageContainer from "../components/page_container";
 import { Album, ConfigWrapper } from "../types/stats_types";
 import { LASTFM } from "../endpoints";
+import RefreshButton from "../components/buttons/refresh_button";
+import SettingsButton from "../components/buttons/settings_button";
 
 export const topAlbumsReq = async (time_range: string, config: ConfigWrapper) => {
     if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) return 300;
@@ -47,28 +49,31 @@ const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
         fetchTopAlbums(activeOption);
     }, [activeOption]);
 
+    const refresh = () => {
+        fetchTopAlbums(activeOption, true);
+    };
+
     const props = {
-        refreshCallback: () => fetchTopAlbums(activeOption, true),
-        config: config,
-        dropdown: dropdown,
+        title: "Top Albums",
+        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton config={config} />],
     };
 
     switch (topAlbums) {
         case 300:
             return (
-                <PageContainer title={`Top Albums`} {...props}>
+                <PageContainer {...props}>
                     <Status icon="error" heading="No API Key or Username" subheading="Please enter these in the settings menu" />
                 </PageContainer>
             );
         case 200:
             return (
-                <PageContainer title={`Top Albums`} {...props}>
+                <PageContainer {...props}>
                     <Status icon="error" heading="Failed to Fetch Top Artists" subheading="An error occurred while fetching the data" />
                 </PageContainer>
             );
         case 100:
             return (
-                <PageContainer title={`Top Albums`} {...props}>
+                <PageContainer {...props}>
                     <Status icon="library" heading="Loading" subheading="Fetching data..." />
                 </PageContainer>
             );
@@ -80,7 +85,7 @@ const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
     });
 
     return (
-        <PageContainer title="Top Albums" {...props}>
+        <PageContainer {...props}>
             <div className={`main-gridContainer-gridContainer stats-grid`}>{albumCards}</div>
         </PageContainer>
     );

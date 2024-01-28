@@ -8,6 +8,8 @@ import useDropdownMenu from "../components/hooks/useDropdownMenu";
 import { apiRequest, updatePageCache, checkLiked, convertTrackData } from "../funcs";
 import { ConfigWrapper, Track } from "../types/stats_types";
 import { LASTFM, SPOTIFY, PLACEHOLDER } from "../endpoints";
+import RefreshButton from "../components/buttons/refresh_button";
+import SettingsButton from "../components/buttons/settings_button";
 
 export const topTracksReq = async (time_range: string, config: ConfigWrapper) => {
     if (config.CONFIG["use-lastfm"] === true) {
@@ -86,11 +88,13 @@ const TracksPage = ({ config }: { config: ConfigWrapper }) => {
         fetchTopTracks(activeOption);
     }, [activeOption]);
 
+    const refresh = () => {
+        fetchTopTracks(activeOption, true);
+    };
+
     const props = {
         title: "Top Tracks",
-        refreshCallback: () => fetchTopTracks(activeOption, true),
-        config: config,
-        dropdown: dropdown,
+        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton config={config} />],
     };
 
     switch (topTracks) {
@@ -118,6 +122,7 @@ const TracksPage = ({ config }: { config: ConfigWrapper }) => {
         playlistName: `Top Songs - ${activeOption}`,
         itemsUris: topTracks.map(track => track.uri),
     };
+
     const trackRows = topTracks.map((track: Track, index) => <TrackRow index={index + 1} {...track} uris={topTracks.map(track => track.uri)} />);
 
     return (

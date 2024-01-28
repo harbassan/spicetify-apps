@@ -6,6 +6,8 @@ import Status from "../components/status";
 import PageContainer from "../components/page_container";
 import { ArtistCardProps, ConfigWrapper } from "../types/stats_types";
 import { PLACEHOLDER, LASTFM, SPOTIFY } from "../endpoints";
+import SettingsButton from "../components/buttons/settings_button";
+import RefreshButton from "../components/buttons/refresh_button";
 
 export const topArtistsReq = async (time_range: string, config: ConfigWrapper) => {
     if (config.CONFIG["use-lastfm"] === true) {
@@ -66,11 +68,13 @@ const ArtistsPage = ({ config }: { config: ConfigWrapper }) => {
         fetchTopArtists(activeOption);
     }, [activeOption]);
 
+    const refresh = () => {
+        fetchTopArtists(activeOption, true);
+    };
+
     const props = {
         title: "Top Artists",
-        refreshCallback: () => fetchTopArtists(activeOption, true),
-        config: config,
-        dropdown: dropdown,
+        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton config={config} />],
     };
 
     switch (topArtists) {
