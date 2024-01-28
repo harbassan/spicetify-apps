@@ -22,7 +22,7 @@ const PageContainer = (props: PageContainerProps) => {
                 </div>
                 <div className="stats-header-right">{headerEls}</div>
             </div>
-            <div>{children}</div>
+            <div className={"stats-content"}>{children}</div>
         </section>
     );
 };

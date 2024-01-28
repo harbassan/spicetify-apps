@@ -38,10 +38,9 @@
     display: flex;
     gap: 24px;
     align-items: center;
-    margin-bottom: 16px;
 }
 
-.stats-page {
+.stats-content {
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -64,6 +63,7 @@
 
     &:hover {
         background-color: var(--spice-card);
+        color: var(--spice-text);
     }
 }
 
@@ -160,4 +160,8 @@
     width: 40px;
     height: 40px;
     fill: currentColor;
+}
+
+.stats-genreCard + .stats-gridInlineSection {
+    margin-top: 3px;
 }
