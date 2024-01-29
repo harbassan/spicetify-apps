@@ -1,4 +1,4 @@
-#stats-config-container {
+.config-container {
   gap: 10px;
   display: flex;
   flex-direction: column;
@@ -81,5 +81,9 @@
 .setting-row {
   display: flex;
   justify-content: space-between;
+}
+
+.playback-progressbar {
+  width: 200px;
 }
 }

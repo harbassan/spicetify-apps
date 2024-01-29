@@ -1,3 +1,7 @@
+declare global {
+    var SpicetifyStats: any;
+}
+
 export interface Config extends Record<string, any> {
     "api-key": string | null;
     "lastfm-user": string | null;
