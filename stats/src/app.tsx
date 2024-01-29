@@ -11,15 +11,6 @@ import { STATS_VERSION, LATEST_RELEASE } from "./constants";
 import "./styles/app.scss";
 import "../../shared/config/config_modal.scss";
 
-const pages: Record<string, React.ReactElement> = {
-    ["Artists"]: <ArtistsPage />,
-    ["Tracks"]: <TracksPage />,
-    ["Albums"]: <AlbumsPage />,
-    ["Genres"]: <GenresPage />,
-    ["Library"]: <LibraryPage />,
-    ["Charts"]: <ChartsPage />,
-};
-
 const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
     fetch(LATEST_RELEASE)
         .then((res) => res.json())
@@ -47,6 +38,15 @@ const App = () => {
     const configWrapper = {
         CONFIG: config,
         launchModal,
+    };
+
+    const pages: Record<string, React.ReactElement> = {
+        ["Artists"]: <ArtistsPage config={configWrapper} />,
+        ["Tracks"]: <TracksPage config={configWrapper} />,
+        ["Albums"]: <AlbumsPage config={configWrapper} />,
+        ["Genres"]: <GenresPage config={configWrapper} />,
+        ["Library"]: <LibraryPage config={configWrapper} />,
+        ["Charts"]: <ChartsPage config={configWrapper} />,
     };
 
     const tabPages = ["Artists", "Tracks", "Albums", "Genres", "Library", "Charts"].filter(
@@ -81,7 +81,7 @@ const App = () => {
                 </div>
             )}
             {navBar}
-            {React.cloneElement(pages[activeLink], { config: configWrapper })}
+            {pages[activeLink]}
         </>
     );
 };
