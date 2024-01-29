@@ -1,24 +1,24 @@
 {
-  "name": "spicetify-library",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "build": "spicetify-creator",
-    "build-local": "spicetify-creator --out=dist --minify",
-    "watch": "spicetify-creator --watch"
-  },
-  "license": "MIT",
-  "devDependencies": {
-    "@types/react": "^18.0.33",
-    "@types/react-dom": "^18.0.11",
-    "spicetify-creator": "^1.0.17"
-  },
-  "dependencies": {
-    "spcr-navigation-bar": "^0.0.2",
-    "uuid": "^9.0.1"
-  },
-  "description": "---",
-  "main": "index.js",
-  "keywords": [],
-  "author": ""
+    "name": "spicetify-library",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "build": "spicetify-creator",
+        "build-local": "spicetify-creator --out=dist --minify",
+        "watch": "spicetify-creator --watch"
+    },
+    "license": "MIT",
+    "devDependencies": {
+        "@types/react": "^18.0.33",
+        "@types/react-dom": "^18.0.11",
+        "spicetify-creator": "^1.0.17"
+    },
+    "dependencies": {
+        "spcr-navigation-bar": "^0.0.2",
+        "uuid": "^9.0.1"
+    },
+    "description": "---",
+    "main": "index.js",
+    "keywords": [],
+    "author": ""
 }

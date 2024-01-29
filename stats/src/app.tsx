@@ -49,7 +49,9 @@ const App = () => {
         launchModal,
     };
 
-    const tabPages = ["Artists", "Tracks", "Albums", "Genres", "Library", "Charts"].filter((page) => configWrapper.CONFIG[`show-${page.toLowerCase()}`]);
+    const tabPages = ["Artists", "Tracks", "Albums", "Genres", "Library", "Charts"].filter(
+        (page) => configWrapper.CONFIG[`show-${page.toLowerCase()}`]
+    );
 
     const [navBar, activeLink, setActiveLink] = useNavigationBar(tabPages);
     const [hasPageSwitched, setHasPageSwitched] = React.useState(false); // TODO: edit spcr-navigation-bar to include initial active link
@@ -73,7 +75,9 @@ const App = () => {
         <>
             {newUpdate && (
                 <div className="new-update">
-                    New app update available! Visit <a href="https://github.com/harbassan/spicetify-stats/releases">harbassan/spicetify-stats</a> to install.
+                    New app update available! Visit{" "}
+                    <a href="https://github.com/harbassan/spicetify-stats/releases">harbassan/spicetify-stats</a> to
+                    install.
                 </div>
             )}
             {navBar}

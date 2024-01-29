@@ -3,7 +3,7 @@ import React from "react";
 interface InlineGridProps {
     special?: boolean;
     children: React.ReactElement | React.ReactElement[];
-};
+}
 
 function scrollGrid(event: React.MouseEvent): void {
     const { target } = event;
@@ -18,7 +18,7 @@ function scrollGrid(event: React.MouseEvent): void {
     } else {
         grid.setAttribute("data-scroll", "both");
     }
-};
+}
 
 function scrollGridLeft(event: React.MouseEvent): void {
     const { target } = event;
@@ -33,7 +33,7 @@ function scrollGridLeft(event: React.MouseEvent): void {
     } else {
         grid.setAttribute("data-scroll", "both");
     }
-};
+}
 
 function InlineGrid(props: InlineGridProps): React.ReactElement<HTMLTableSectionElement> {
     const { children, special } = props;
@@ -45,11 +45,14 @@ function InlineGrid(props: InlineGridProps): React.ReactElement<HTMLTableSection
             <button className="stats-scrollButton" onClick={scrollGrid}>
                 {">"}
             </button>
-            <div className={`main-gridContainer-gridContainer stats-gridInline${special ? " stats-specialGrid" : ""}`} data-scroll="start">
+            <div
+                className={`main-gridContainer-gridContainer stats-gridInline${special ? " stats-specialGrid" : ""}`}
+                data-scroll="start"
+            >
                 {children}
             </div>
         </section>
     );
-};
+}
 
 export default React.memo(InlineGrid);

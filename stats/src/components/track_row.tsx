@@ -47,7 +47,10 @@ const LikedIcon = ({ active, uri }: { active: boolean; uri: string }) => {
     }, [active]);
 
     return (
-        <Spicetify.ReactComponent.TooltipWrapper label={liked ? `Remove from Your Library` : "Save to Your Library"} placement="top">
+        <Spicetify.ReactComponent.TooltipWrapper
+            label={liked ? `Remove from Your Library` : "Save to Your Library"}
+            placement="top"
+        >
             <button
                 type="button"
                 role="switch"
@@ -55,7 +58,9 @@ const LikedIcon = ({ active, uri }: { active: boolean; uri: string }) => {
                 aria-label="Remove from Your Library"
                 onClick={toggleLike}
                 className={
-                    liked ? "main-addButton-button main-trackList-rowHeartButton main-addButton-active" : "main-addButton-button main-trackList-rowHeartButton"
+                    liked
+                        ? "main-addButton-button main-trackList-rowHeartButton main-addButton-active"
+                        : "main-addButton-button main-trackList-rowHeartButton"
                 }
                 tabIndex={-1}
             >
@@ -81,7 +86,11 @@ const LikedIcon = ({ active, uri }: { active: boolean; uri: string }) => {
     );
 };
 
-const DraggableComponent = ({ uri, title, ...props }: { uri: string; title: string } & React.HTMLProps<HTMLDivElement>) => {
+const DraggableComponent = ({
+    uri,
+    title,
+    ...props
+}: { uri: string; title: string } & React.HTMLProps<HTMLDivElement>) => {
     const dragHandler = Spicetify.ReactHook.DragHandler?.([uri], title);
     return (
         <div onDragStart={dragHandler} draggable="true" {...props}>
@@ -96,7 +105,7 @@ interface AlbumMenuProps extends Spicetify.ReactComponent.MenuProps {
 }
 
 function playAndQueue(uri: string, uris: string[]) {
-    uris = uris.filter(u => !u.includes("last"));
+    uris = uris.filter((u) => !u.includes("last"));
     uris = uris.concat(uris.splice(0, uris.indexOf(uri)));
     queue(uris);
 }
@@ -114,10 +123,10 @@ const TrackRow = (props: TrackRowProps) => {
                 <div role="row" aria-rowindex={2} aria-selected="false">
                     <DraggableComponent
                         uri={props.uri}
-                        title={`${props.name} • ${props.artists.map(artist => artist.name).join(", ")}`}
+                        title={`${props.name} • ${props.artists.map((artist) => artist.name).join(", ")}`}
                         className="main-trackList-trackListRow main-trackList-trackListRowGrid"
                         role="presentation"
-                        onClick={event => event.detail === 2 && playAndQueue(props.uri, props.uris)}
+                        onClick={(event) => event.detail === 2 && playAndQueue(props.uri, props.uris)}
                         style={{ height: 56 }}
                     >
                         <div className="main-trackList-rowSectionIndex" role="gridcell" aria-colindex={1} tabIndex={-1}>
@@ -127,7 +136,9 @@ const TrackRow = (props: TrackRowProps) => {
                                     {props.index}
                                 </span>
                                 <Spicetify.ReactComponent.TooltipWrapper
-                                    label={`Play ${props.name} by ${props.artists.map(artist => artist.name).join(", ")}`}
+                                    label={`Play ${props.name} by ${props.artists
+                                        .map((artist) => artist.name)
+                                        .join(", ")}`}
                                     placement="top"
                                 >
                                     <button
@@ -179,20 +190,37 @@ const TrackRow = (props: TrackRowProps) => {
                                 </span>
                             </div>
                         </div>
-                        <div className="main-trackList-rowSectionVariable" role="gridcell" aria-colindex={3} tabIndex={-1}>
+                        <div
+                            className="main-trackList-rowSectionVariable"
+                            role="gridcell"
+                            aria-colindex={3}
+                            tabIndex={-1}
+                        >
                             <span data-encore-id="type" className="TypeElement-mesto TypeElement-mesto-type">
-                                <a draggable="true" className="standalone-ellipsis-one-line" dir="auto" href={props.album_uri} tabIndex={-1}>
+                                <a
+                                    draggable="true"
+                                    className="standalone-ellipsis-one-line"
+                                    dir="auto"
+                                    href={props.album_uri}
+                                    tabIndex={-1}
+                                >
                                     {props.album}
                                 </a>
                             </span>
                         </div>
                         <div className="main-trackList-rowSectionEnd" role="gridcell" aria-colindex={5} tabIndex={-1}>
                             {<LikedIcon active={props.liked || false} uri={props.uri} />}
-                            <div className="TypeElement-mesto-textSubdued TypeElement-mesto-textSubdued-type main-trackList-rowDuration" data-encore-id="type">
+                            <div
+                                className="TypeElement-mesto-textSubdued TypeElement-mesto-textSubdued-type main-trackList-rowDuration"
+                                data-encore-id="type"
+                            >
                                 {Spicetify.Player.formatTime(props.duration)}
                             </div>
 
-                            <Spicetify.ReactComponent.ContextMenu menu={<MenuWrapper uri={props.uri} />} trigger="click">
+                            <Spicetify.ReactComponent.ContextMenu
+                                menu={<MenuWrapper uri={props.uri} />}
+                                trigger="click"
+                            >
                                 <button
                                     type="button"
                                     aria-haspopup="menu"
@@ -201,7 +229,9 @@ const TrackRow = (props: TrackRowProps) => {
                                     tabIndex={-1}
                                 >
                                     <Spicetify.ReactComponent.TooltipWrapper
-                                        label={`More options for ${props.name} by ${props.artists.map(artist => artist.name).join(", ")}`}
+                                        label={`More options for ${props.name} by ${props.artists
+                                            .map((artist) => artist.name)
+                                            .join(", ")}`}
                                         placement="top"
                                     >
                                         <span>

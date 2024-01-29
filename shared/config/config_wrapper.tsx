@@ -10,7 +10,10 @@ class ConfigWrapper {
 
     constructor(modalStructure: ModalStructureProps, key: string) {
         const config = modalStructure.map((modalStructureRow) => {
-            const value = ConfigWrapper.getLocalStorageDataFromKey(`${key}:config:${modalStructureRow.key}`, modalStructureRow.def);
+            const value = ConfigWrapper.getLocalStorageDataFromKey(
+                `${key}:config:${modalStructureRow.key}`,
+                modalStructureRow.def
+            );
             modalStructureRow.callback?.(value);
             return { [modalStructureRow.key]: value };
         });
@@ -26,7 +29,14 @@ class ConfigWrapper {
             Spicetify.PopupModal.display({
                 title: `${key.charAt(0).toUpperCase() + key.slice(1)} Settings`,
                 // @ts-ignore
-                content: <ConfigModal config={this.Config} structure={modalStructure} key={key} updateAppConfig={updateConfig} />,
+                content: (
+                    <ConfigModal
+                        config={this.Config}
+                        structure={modalStructure}
+                        key={key}
+                        updateAppConfig={updateConfig}
+                    />
+                ),
                 isLarge: true,
             });
         };

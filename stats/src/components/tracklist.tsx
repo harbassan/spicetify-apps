@@ -2,28 +2,68 @@ import React from "react";
 
 const Tracklist = ({ minified = false, children }: any) => {
     return (
-        <div role="grid" aria-rowcount={minified ? 5 : 50} aria-colcount={4} className="main-trackList-trackList main-trackList-indexable" tabIndex={0}>
+        <div
+            role="grid"
+            aria-rowcount={minified ? 5 : 50}
+            aria-colcount={4}
+            className="main-trackList-trackList main-trackList-indexable"
+            tabIndex={0}
+        >
             {!minified && (
                 <div className="main-trackList-trackListHeader" role="presentation">
-                    <div className="main-trackList-trackListHeaderRow main-trackList-trackListRowGrid" role="row" aria-rowindex={1}>
-                        <div className="main-trackList-rowSectionIndex" role="columnheader" aria-colindex={1} aria-sort="none" tabIndex={-1}>
+                    <div
+                        className="main-trackList-trackListHeaderRow main-trackList-trackListRowGrid"
+                        role="row"
+                        aria-rowindex={1}
+                    >
+                        <div
+                            className="main-trackList-rowSectionIndex"
+                            role="columnheader"
+                            aria-colindex={1}
+                            aria-sort="none"
+                            tabIndex={-1}
+                        >
                             #
                         </div>
-                        <div className="main-trackList-rowSectionStart" role="columnheader" aria-colindex={2} aria-sort="none" tabIndex={-1}>
+                        <div
+                            className="main-trackList-rowSectionStart"
+                            role="columnheader"
+                            aria-colindex={2}
+                            aria-sort="none"
+                            tabIndex={-1}
+                        >
                             <button className="main-trackList-column main-trackList-sortable" tabIndex={-1}>
-                                <span className="TypeElement-mesto-type standalone-ellipsis-one-line" data-encore-id="type">
+                                <span
+                                    className="TypeElement-mesto-type standalone-ellipsis-one-line"
+                                    data-encore-id="type"
+                                >
                                     Title
                                 </span>
                             </button>
                         </div>
-                        <div className="main-trackList-rowSectionVariable" role="columnheader" aria-colindex={3} aria-sort="none" tabIndex={-1}>
+                        <div
+                            className="main-trackList-rowSectionVariable"
+                            role="columnheader"
+                            aria-colindex={3}
+                            aria-sort="none"
+                            tabIndex={-1}
+                        >
                             <button className="main-trackList-column main-trackList-sortable" tabIndex={-1}>
-                                <span className="TypeElement-mesto-type standalone-ellipsis-one-line" data-encore-id="type">
+                                <span
+                                    className="TypeElement-mesto-type standalone-ellipsis-one-line"
+                                    data-encore-id="type"
+                                >
                                     Album
                                 </span>
                             </button>
                         </div>
-                        <div className="main-trackList-rowSectionEnd" role="columnheader" aria-colindex={5} aria-sort="none" tabIndex={-1}>
+                        <div
+                            className="main-trackList-rowSectionEnd"
+                            role="columnheader"
+                            aria-colindex={5}
+                            aria-sort="none"
+                            tabIndex={-1}
+                        >
                             <Spicetify.ReactComponent.TooltipWrapper label={"Duration"} placement="top">
                                 <button
                                     aria-label="Duration"

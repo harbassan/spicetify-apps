@@ -13,10 +13,14 @@ export const updatePageCache = (i: any, callback: Function, activeOption: string
     let cacheInfoArray = JSON.parse(cacheInfo);
     if (!cacheInfoArray[i]) {
         if (!lib) {
-            ["short_term", "medium_term", "long_term"].filter(option => option !== activeOption).forEach(option => callback(option, true, false));
+            ["short_term", "medium_term", "long_term"]
+                .filter((option) => option !== activeOption)
+                .forEach((option) => callback(option, true, false));
         }
         if (lib === "charts") {
-            ["artists", "tracks"].filter(option => option !== activeOption).forEach(option => callback(option, true, false));
+            ["artists", "tracks"]
+                .filter((option) => option !== activeOption)
+                .forEach((option) => callback(option, true, false));
         }
         callback(activeOption, true);
         cacheInfoArray[i] = true;
@@ -42,7 +46,7 @@ export const apiRequest = async (name: string, url: string, timeout = 5, log = t
                 console.log("stats -", name, "request failed:", e);
                 console.log("stats -", name, "retrying...");
             }
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            await new Promise((resolve) => setTimeout(resolve, 5000));
             return apiRequest(name, url, timeout - 1);
         }
     }
@@ -52,7 +56,7 @@ export const fetchAudioFeatures = async (ids: string[]) => {
     const batchSize = 100;
     const batches = [];
 
-    ids = ids.filter(id => id.match(/^[a-zA-Z0-9]{22}$/));
+    ids = ids.filter((id) => id.match(/^[a-zA-Z0-9]{22}$/));
 
     // Split ids into batches of batchSize
     for (let i = 0; i < ids.length; i += batchSize) {
@@ -78,14 +82,14 @@ export const fetchAudioFeatures = async (ids: string[]) => {
 
 export const fetchTopAlbums = async (albums: Record<string, number>, cachedAlbums?: Album[]) => {
     let album_keys = Object.keys(albums)
-        .filter(id => id.match(/^[a-zA-Z0-9]{22}$/))
+        .filter((id) => id.match(/^[a-zA-Z0-9]{22}$/))
         .sort((a, b) => albums[b] - albums[a])
         .slice(0, 100);
 
     let release_years: Record<string, number> = {};
     let total_album_tracks = 0;
 
-    const cachedAlbumsSet = new Set(cachedAlbums?.map(album => album.uri));
+    const cachedAlbumsSet = new Set(cachedAlbums?.map((album) => album.uri));
 
     let top_albums: Album[] = <Album[]>await Promise.all(
         album_keys.map(async (albumID: string) => {
@@ -93,7 +97,7 @@ export const fetchTopAlbums = async (albums: Record<string, number>, cachedAlbum
 
             // loop through and see if the album is already cached
             if (cachedAlbums && cachedAlbumsSet.has(`spotify:album:${albumID}`)) {
-                albumMeta = cachedAlbums.find(album => album.uri === `spotify:album:${albumID}`);
+                albumMeta = cachedAlbums.find((album) => album.uri === `spotify:album:${albumID}`);
             }
 
             if (!albumMeta) {
@@ -126,7 +130,7 @@ export const fetchTopAlbums = async (albums: Record<string, number>, cachedAlbum
         })
     );
 
-    top_albums = top_albums.filter(el => el != null).slice(0, 10);
+    top_albums = top_albums.filter((el) => el != null).slice(0, 10);
     return [top_albums, Object.entries(release_years), total_album_tracks];
 };
 
@@ -134,7 +138,7 @@ export const fetchTopArtists = async (artists: Record<string, number>) => {
     if (Object.keys(artists).length === 0) return [[], [], 0];
 
     let artist_keys: string[] = Object.keys(artists)
-        .filter(id => id.match(/^[a-zA-Z0-9]{22}$/))
+        .filter((id) => id.match(/^[a-zA-Z0-9]{22}$/))
         .sort((a, b) => artists[b] - artists[a])
         .slice(0, 50);
 
@@ -159,7 +163,7 @@ export const fetchTopArtists = async (artists: Record<string, number>) => {
         };
     });
 
-    top_artists = top_artists.filter(el => el != null).slice(0, 10);
+    top_artists = top_artists.filter((el) => el != null).slice(0, 10);
     const top_genres = Object.entries(genres)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 10);
@@ -169,7 +173,9 @@ export const fetchTopArtists = async (artists: Record<string, number>) => {
 export const convertTrackData = async (data: any[]) => {
     return await Promise.all(
         data.map(async (item: any) => {
-            const spotifyItem = await Spicetify.CosmosAsync.get(SPOTIFY.search(item.name, item.artist.name)).then((res: any) => res.tracks?.items[0]);
+            const spotifyItem = await Spicetify.CosmosAsync.get(SPOTIFY.search(item.name, item.artist.name)).then(
+                (res: any) => res.tracks?.items[0]
+            );
 
             if (!spotifyItem) {
                 console.log(`couldn't find track: ${item.name} by ${item.artist.name}`);
@@ -206,7 +212,9 @@ export const convertTrackData = async (data: any[]) => {
 export const convertAlbumData = async (data: any[]) => {
     return await Promise.all(
         data.map(async (item: any) => {
-            const spotifyItem = await Spicetify.CosmosAsync.get(SPOTIFY.searchalbum(item.name, item.artist.name)).then((res: any) => res.albums?.items[0]);
+            const spotifyItem = await Spicetify.CosmosAsync.get(SPOTIFY.searchalbum(item.name, item.artist.name)).then(
+                (res: any) => res.albums?.items[0]
+            );
 
             if (!spotifyItem) {
                 console.log(`couldn't find album: ${item.name} by ${item.artist.name}`);
@@ -231,7 +239,9 @@ export const convertAlbumData = async (data: any[]) => {
 export const convertArtistData = async (data: any[]) => {
     return await Promise.all(
         data.map(async (item: any) => {
-            const spotifyItem = await Spicetify.CosmosAsync.get(SPOTIFY.searchartist(item.name)).then((res: any) => res.artists?.items[0]);
+            const spotifyItem = await Spicetify.CosmosAsync.get(SPOTIFY.searchartist(item.name)).then(
+                (res: any) => res.artists?.items[0]
+            );
 
             if (!spotifyItem) {
                 console.log(`couldn't find artist: ${item.name}`);
@@ -262,7 +272,7 @@ export const checkLiked = async (tracks: string[]) => {
         }
     });
 
-    const apiResponse = await apiRequest("checkLiked", SPOTIFY.queryliked(tracks.filter(e => e).join(",")));
+    const apiResponse = await apiRequest("checkLiked", SPOTIFY.queryliked(tracks.filter((e) => e).join(",")));
     if (!apiResponse) return;
 
     const response = [];
@@ -313,7 +323,10 @@ export async function queue(list: any, context = null) {
 
     if (context) {
         const { sessionId } = Spicetify.Platform.PlayerAPI.getState();
-        Spicetify.Platform.PlayerAPI.updateContext(sessionId, { uri: `spotify:user:${Spicetify.Platform.LibraryAPI._currentUsername}:top:tracks`, url: "" });
+        Spicetify.Platform.PlayerAPI.updateContext(sessionId, {
+            uri: `spotify:user:${Spicetify.Platform.LibraryAPI._currentUsername}:top:tracks`,
+            url: "",
+        });
     }
 
     Spicetify.Player.next();

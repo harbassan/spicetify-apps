@@ -61,7 +61,12 @@ class SpicetifyStats {
 window.SpicetifyStats = new SpicetifyStats();
 
 (function stats() {
-    const {PopupModal, LocalStorage, Topbar, Platform: { History }} = Spicetify;
+    const {
+        PopupModal,
+        LocalStorage,
+        Topbar,
+        Platform: { History },
+    } = Spicetify;
 
     if (!PopupModal || !LocalStorage || !Topbar || !History) {
         setTimeout(stats, 300);

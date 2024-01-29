@@ -17,10 +17,12 @@ function CheckIcon() {
         <Spicetify.ReactComponent.IconComponent
             iconSize="16"
             semanticColor="textBase"
-            dangerouslySetInnerHTML={{ __html: '<svg xmlns="http://www.w3.org/2000/svg"><path d="M15.53 2.47a.75.75 0 0 1 0 1.06L4.907 14.153.47 9.716a.75.75 0 0 1 1.06-1.06l3.377 3.376L14.47 2.47a.75.75 0 0 1 1.06 0z"/></svg>' }}
+            dangerouslySetInnerHTML={{
+                __html: '<svg xmlns="http://www.w3.org/2000/svg"><path d="M15.53 2.47a.75.75 0 0 1 0 1.06L4.907 14.153.47 9.716a.75.75 0 0 1 1.06-1.06l3.377 3.376L14.47 2.47a.75.75 0 0 1 1.06 0z"/></svg>',
+            }}
         />
     );
-};
+}
 
 const MenuItem = (props: MenuItemProps) => {
     const { ReactComponent } = Spicetify;
@@ -47,26 +49,17 @@ const DropdownMenu = (props: DropdownMenuProps) => {
     const { ContextMenu, Menu, IconComponent, TextComponent } = Spicetify.ReactComponent;
     const { options, activeOption, switchCallback } = props;
 
-    const optionItems = options.map(option => {
+    const optionItems = options.map((option) => {
         return <MenuItem option={option} isActive={option === activeOption} switchCallback={switchCallback} />;
     });
 
     const MenuWrapper = (props: Spicetify.ReactComponent.MenuProps) => {
-        return (
-            <Menu {...props}>
-                {optionItems}
-            </Menu>
-        );
+        return <Menu {...props}>{optionItems}</Menu>;
     };
 
     return (
         <ContextMenu menu={<MenuWrapper />} trigger="click">
-            <button
-                className="x-sortBox-sortDropdown"
-                type="button"
-                role="combobox"
-                aria-expanded="false"
-            >
+            <button className="x-sortBox-sortDropdown" type="button" role="combobox" aria-expanded="false">
                 <TextComponent variant="mesto" semanticColor="textSubdued">
                     {activeOption}
                 </TextComponent>

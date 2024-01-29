@@ -1,9 +1,9 @@
 [
-  {
-    "name": "Statistics",
-    "description": "See your top artists, tracks, genres and an analysis of your music library.",
-    "preview": "stats/previews/top_genres.png",
-    "readme": "stats/README.md",
-    "tags": ["stats"]
-  }
+    {
+        "name": "Statistics",
+        "description": "See your top artists, tracks, genres and an analysis of your music library.",
+        "preview": "stats/previews/top_genres.png",
+        "readme": "stats/README.md",
+        "tags": ["stats"]
+    }
 ]

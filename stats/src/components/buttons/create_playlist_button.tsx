@@ -4,7 +4,7 @@ import { InfoToCreatePlaylist } from "../../types/stats_types";
 
 interface CreatePlaylistButtonProps {
     infoToCreatePlaylist: InfoToCreatePlaylist;
-};
+}
 
 async function createPlaylistAsync(infoToCreatePlaylist: InfoToCreatePlaylist): Promise<void> {
     const { Platform, showNotification } = Spicetify;
@@ -12,13 +12,13 @@ async function createPlaylistAsync(infoToCreatePlaylist: InfoToCreatePlaylist): 
 
     try {
         const { playlistName, itemsUris } = infoToCreatePlaylist;
-        const playlistUri = await RootlistAPI.createPlaylist(playlistName, { before: 'start' });
-        await PlaylistAPI.add(playlistUri, itemsUris, { before: 'start' });
+        const playlistUri = await RootlistAPI.createPlaylist(playlistName, { before: "start" });
+        await PlaylistAPI.add(playlistUri, itemsUris, { before: "start" });
     } catch (error) {
         console.error(error);
         showNotification("Failed to create playlist", true, 1000);
     }
-};
+}
 
 function CreatePlaylistButton(props: CreatePlaylistButtonProps): React.ReactElement<HTMLButtonElement> {
     const { TooltipWrapper, ButtonSecondary } = Spicetify.ReactComponent;
@@ -36,6 +36,6 @@ function CreatePlaylistButton(props: CreatePlaylistButtonProps): React.ReactElem
             />
         </TooltipWrapper>
     );
-};
+}
 
 export default CreatePlaylistButton;
