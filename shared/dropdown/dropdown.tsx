@@ -63,11 +63,6 @@ const DropdownMenu = (props: DropdownMenuProps) => {
                 <TextComponent variant="mesto" semanticColor="textSubdued">
                     {activeOption}
                 </TextComponent>
-                {/* <IconComponent
-                    iconSize="16"
-                    semanticColor="textSubdued"
-                    dangerouslySetInnerHTML={{ __html: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M14 6-6 6-6-6h12z"/></svg>' }}
-                /> */}
                 <svg
                     role="img"
                     height="16"

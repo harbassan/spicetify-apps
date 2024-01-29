@@ -1,6 +1,6 @@
 import React from "react";
 
-import useDropdownMenu from "../../../shared/hooks/useDropdownMenu";
+import useDropdownMenu from "../../../shared/dropdown/useDropdownMenu";
 import StatCard from "../components/cards/stat_card";
 import GenresCard from "../components/cards/genres_card";
 import InlineGrid from "../components/inline_grid";

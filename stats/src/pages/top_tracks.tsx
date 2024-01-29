@@ -4,7 +4,7 @@ import TrackRow from "../components/track_row";
 import Status from "../../../shared/components/status";
 import PageContainer from "../../../shared/components/page_container";
 import Tracklist from "../components/tracklist";
-import useDropdownMenu from "../../../shared/hooks/useDropdownMenu";
+import useDropdownMenu from "../../../shared/dropdown/useDropdownMenu";
 import { apiRequest, updatePageCache, checkLiked, convertTrackData } from "../funcs";
 import { ConfigWrapper, Track } from "../types/stats_types";
 import { LASTFM, SPOTIFY, PLACEHOLDER } from "../endpoints";

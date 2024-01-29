@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import DropdownMenu from "../components/dropdown";
+import DropdownMenu from "./dropdown";
 
 const useDropdownMenu = (
     options: string[],

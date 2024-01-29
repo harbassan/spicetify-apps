@@ -1,7 +1,7 @@
 import React from "react";
 
 import Status from "../../../shared/components/status";
-import useDropdownMenu from "../../../shared/hooks/useDropdownMenu";
+import useDropdownMenu from "../../../shared/dropdown/useDropdownMenu";
 import { apiRequest, checkLiked, convertArtistData, convertTrackData, updatePageCache } from "../funcs";
 import SpotifyCard from "../../../shared/components/spotify_card";
 import TrackRow from "../components/track_row";

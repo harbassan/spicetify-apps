@@ -16,7 +16,7 @@ type SharedProps = {
     callback?: (value: any) => void;
 };
 
-export type ModalStructureRowProps = SharedProps &
+type ModalStructureRowProps = SharedProps &
     (
         | { type: "toggle" /* other props for toggle */ }
         | { type: "text"; placeholder?: string /* other props for text */ }

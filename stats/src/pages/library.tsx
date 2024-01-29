@@ -1,5 +1,5 @@
 import React from "react";
-import useDropdownMenu from "../../../shared/hooks/useDropdownMenu";
+import useDropdownMenu from "../../../shared/dropdown/useDropdownMenu";
 import StatCard from "../components/cards/stat_card";
 import GenresCard from "../components/cards/genres_card";
 import SpotifyCard from "../../../shared/components/spotify_card";

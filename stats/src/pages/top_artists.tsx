@@ -1,5 +1,5 @@
 import React from "react";
-import useDropdownMenu from "../../../shared/hooks/useDropdownMenu";
+import useDropdownMenu from "../../../shared/dropdown/useDropdownMenu";
 import SpotifyCard from "../../../shared/components/spotify_card";
 import { apiRequest, convertArtistData, updatePageCache } from "../funcs";
 import Status from "../../../shared/components/status";
