@@ -37,13 +37,15 @@ export const topArtistsReq = async (time_range: string, config: ConfigWrapper) =
     }
 };
 
+const DropdownOptions = [
+    { id: "short_term", name: "Past Month" },
+    { id: "medium_term", name: "Past 6 Months" },
+    { id: "long_term", name: "All Time" },
+];
+
 const ArtistsPage = ({ config }: { config: ConfigWrapper }) => {
     const [topArtists, setTopArtists] = React.useState<ArtistCardProps[] | 100 | 200 | 300>(100);
-    const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
-        ["short_term", "medium_term", "long_term"],
-        ["Past Month", "Past 6 Months", "All Time"],
-        `top-artists`
-    );
+    const [dropdown, activeOption, setActiveOption] = useDropdownMenu(DropdownOptions, "stats:top-artists");
 
     const fetchTopArtists = async (time_range: string, force?: boolean, set: boolean = true) => {
         if (!force) {
@@ -61,15 +63,15 @@ const ArtistsPage = ({ config }: { config: ConfigWrapper }) => {
     };
 
     React.useEffect(() => {
-        updatePageCache(0, fetchTopArtists, activeOption);
+        updatePageCache(0, fetchTopArtists, activeOption.id);
     }, []);
 
     React.useEffect(() => {
-        fetchTopArtists(activeOption);
+        fetchTopArtists(activeOption.id);
     }, [activeOption]);
 
     const refresh = () => {
-        fetchTopArtists(activeOption, true);
+        fetchTopArtists(activeOption.id, true);
     };
 
     const props = {

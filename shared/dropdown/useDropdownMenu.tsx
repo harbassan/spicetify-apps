@@ -1,28 +1,36 @@
 import React, { useState } from "react";
 import DropdownMenu from "./dropdown";
 
-const useDropdownMenu = (
-    options: string[],
-    displayOptions: string[],
-    storageVariable: string
-): [JSX.Element, string, (link: string) => void] => {
-    const initialOption = Spicetify.LocalStorage.get(`stats:${storageVariable}:active-option`);
+interface OptionProps {
+    id: string;
+    name: string;
+}
+
+// don't know why type inference doesn't work when consuming this hook
+type ReturnType = [
+    dropdown: React.JSX.Element,
+    activeOption: OptionProps,
+    setActiveOption: React.Dispatch<React.SetStateAction<OptionProps>>,
+    setAvailableOptions: React.Dispatch<React.SetStateAction<OptionProps[]>>
+];
+
+const useDropdownMenu = (options: OptionProps[], storageVariable: string) => {
+    const initialOptionID = storageVariable && Spicetify.LocalStorage.get(`${storageVariable}:active-option`);
+    const initialOption = initialOptionID && options.find((e) => e.id === initialOptionID);
     const [activeOption, setActiveOption] = useState(initialOption || options[0]);
+    const [availableOptions, setAvailableOptions] = useState(options);
     const dropdown = (
         <DropdownMenu
-            options={displayOptions}
-            activeOption={displayOptions[options.indexOf(activeOption)]}
-            switchCallback={(option: string) => {
-                setActiveOption(options[displayOptions.indexOf(option)]);
-                Spicetify.LocalStorage.set(
-                    `stats:${storageVariable}:active-option`,
-                    options[displayOptions.indexOf(option)]
-                );
+            options={availableOptions}
+            activeOption={activeOption}
+            switchCallback={(option) => {
+                setActiveOption(option);
+                if (storageVariable) Spicetify.LocalStorage.set(`${storageVariable}:active-option`, option.id);
             }}
         />
     );
 
-    return [dropdown, activeOption, setActiveOption];
+    return [dropdown, activeOption, setActiveOption, setAvailableOptions] as ReturnType;
 };
 
 export default useDropdownMenu;

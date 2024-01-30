@@ -12,13 +12,14 @@ import { LASTFM } from "../endpoints";
 import RefreshButton from "../components/buttons/refresh_button";
 import SettingsButton from "../../../shared/components/settings_button";
 
+const DropdownOptions = [
+    { id: "artists", name: "Top Artists" },
+    { id: "tracks", name: "Top Tracks" },
+];
+
 const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
     const [chartData, setChartData] = React.useState<Track[] | ArtistCardProps[] | 100 | 200 | 500>(100);
-    const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
-        ["artists", "tracks"],
-        ["Top Artists", "Top Tracks"],
-        "charts"
-    );
+    const [dropdown, activeOption, setActiveOption] = useDropdownMenu(DropdownOptions, "stats:charts");
 
     async function fetchChartData(type: string, force?: boolean, set: boolean = true) {
         if (!force) {
@@ -50,15 +51,15 @@ const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
     }
 
     React.useEffect(() => {
-        updatePageCache(4, fetchChartData, activeOption, "charts");
+        updatePageCache(4, fetchChartData, activeOption.id, "charts");
     }, []);
 
     React.useEffect(() => {
-        fetchChartData(activeOption);
+        fetchChartData(activeOption.id);
     }, [activeOption]);
 
     const refresh = () => {
-        fetchChartData(activeOption, true);
+        fetchChartData(activeOption.id, true);
     };
 
     const props = {

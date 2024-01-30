@@ -25,15 +25,17 @@ interface GenresPageProps {
     obscureTracks: Track[];
 }
 
+const DropdownOptions = [
+    { id: "short_term", name: "Past Month" },
+    { id: "medium_term", name: "Past 6 Months" },
+    { id: "long_term", name: "All Time" },
+];
+
 const GenresPage = ({ config }: { config: ConfigWrapper }) => {
     const { LocalStorage } = Spicetify;
 
     const [topGenres, setTopGenres] = React.useState<GenresPageProps | 100 | 200 | 300>(100);
-    const [dropdown, activeOption] = useDropdownMenu(
-        ["short_term", "medium_term", "long_term"],
-        ["Past Month", "Past 6 Months", "All Time"],
-        "top-genres"
-    );
+    const [dropdown, activeOption] = useDropdownMenu(DropdownOptions, "stats:top-genres");
 
     const fetchTopGenres = async (
         time_range: string,
@@ -193,15 +195,15 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
     };
 
     React.useEffect(() => {
-        updatePageCache(2, fetchTopGenres, activeOption);
+        updatePageCache(2, fetchTopGenres, activeOption.id);
     }, []);
 
     React.useEffect(() => {
-        fetchTopGenres(activeOption);
+        fetchTopGenres(activeOption.id);
     }, [activeOption]);
 
     const refresh = () => {
-        fetchTopGenres(activeOption, true);
+        fetchTopGenres(activeOption.id, true);
     };
 
     const props = {

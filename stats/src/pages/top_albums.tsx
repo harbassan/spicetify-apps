@@ -20,15 +20,17 @@ export const topAlbumsReq = async (time_range: string, config: ConfigWrapper) =>
     return await convertAlbumData(response.topalbums.album);
 };
 
+const DropdownOptions = [
+    { id: "short_term", name: "Past Month" },
+    { id: "medium_term", name: "Past 6 Months" },
+    { id: "long_term", name: "All Time" },
+];
+
 const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
     const { LocalStorage } = Spicetify;
 
     const [topAlbums, setTopAlbums] = React.useState<Album[] | 100 | 200 | 300>(100);
-    const [dropdown, activeOption] = useDropdownMenu(
-        ["short_term", "medium_term", "long_term"],
-        ["Past Month", "Past 6 Months", "All Time"],
-        `top-albums`
-    );
+    const [dropdown, activeOption] = useDropdownMenu(DropdownOptions, "stats:top-albums");
 
     const fetchTopAlbums = async (time_range: string, force?: boolean, set: boolean = true) => {
         if (!force) {
@@ -46,15 +48,15 @@ const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
     };
 
     React.useEffect(() => {
-        updatePageCache(5, fetchTopAlbums, activeOption);
+        updatePageCache(5, fetchTopAlbums, activeOption.id);
     }, []);
 
     React.useEffect(() => {
-        fetchTopAlbums(activeOption);
+        fetchTopAlbums(activeOption.id);
     }, [activeOption]);
 
     const refresh = () => {
-        fetchTopAlbums(activeOption, true);
+        fetchTopAlbums(activeOption.id, true);
     };
 
     const props = {

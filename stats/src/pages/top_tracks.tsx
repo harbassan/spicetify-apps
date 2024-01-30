@@ -62,15 +62,17 @@ export const topTracksReq = async (time_range: string, config: ConfigWrapper) =>
     });
 };
 
+const DropdownOptions = [
+    { id: "short_term", name: "Past Month" },
+    { id: "medium_term", name: "Past 6 Months" },
+    { id: "long_term", name: "All Time" },
+];
+
 const TracksPage = ({ config }: { config: ConfigWrapper }) => {
     const { LocalStorage } = Spicetify;
 
     const [topTracks, setTopTracks] = React.useState<Track[] | 100 | 200 | 300>(100);
-    const [dropdown, activeOption] = useDropdownMenu(
-        ["short_term", "medium_term", "long_term"],
-        ["Past Month", "Past 6 Months", "All Time"],
-        "top-tracks"
-    );
+    const [dropdown, activeOption] = useDropdownMenu(DropdownOptions, "stats:top-tracks");
 
     const fetchTopTracks = async (time_range: string, force?: boolean, set: boolean = true) => {
         if (!force) {
@@ -88,15 +90,15 @@ const TracksPage = ({ config }: { config: ConfigWrapper }) => {
     };
 
     React.useEffect(() => {
-        updatePageCache(1, fetchTopTracks, activeOption);
+        updatePageCache(1, fetchTopTracks, activeOption.id);
     }, []);
 
     React.useEffect(() => {
-        fetchTopTracks(activeOption);
+        fetchTopTracks(activeOption.id);
     }, [activeOption]);
 
     const refresh = () => {
-        fetchTopTracks(activeOption, true);
+        fetchTopTracks(activeOption.id, true);
     };
 
     const props = {

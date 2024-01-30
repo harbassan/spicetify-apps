@@ -27,13 +27,14 @@ interface LibraryProps {
     yearsDenominator: number;
 }
 
+const DropdownOptions = [
+    { id: "owned", name: "My Playlists" },
+    { id: "all", name: "All Playlists" },
+];
+
 const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
     const [library, setLibrary] = React.useState<LibraryProps | 100 | 200 | 300>(100);
-    const [dropdown, activeOption, setActiveOption] = useDropdownMenu(
-        ["owned", "all"],
-        ["My Playlists", "All Playlists"],
-        "library"
-    );
+    const [dropdown, activeOption, setActiveOption] = useDropdownMenu(DropdownOptions, "stats:library");
 
     const fetchData = async (option: string, force?: boolean, set: boolean = true) => {
         try {
@@ -234,15 +235,15 @@ const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
     };
 
     React.useEffect(() => {
-        updatePageCache(3, fetchData, activeOption, true);
+        updatePageCache(3, fetchData, activeOption.id, true);
     }, []);
 
     React.useEffect(() => {
-        fetchData(activeOption);
+        fetchData(activeOption.id);
     }, [activeOption]);
 
     const refresh = () => {
-        fetchData(activeOption, true);
+        fetchData(activeOption.id, true);
     };
 
     const props = {

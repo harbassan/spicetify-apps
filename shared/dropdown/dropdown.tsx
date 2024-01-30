@@ -1,15 +1,20 @@
 import React from "react";
 
+interface Option {
+    id: string;
+    name: string;
+}
+
 interface DropdownMenuProps {
-    options: string[];
-    activeOption: string;
-    switchCallback: (option: string) => void;
+    options: Option[];
+    activeOption: Option;
+    switchCallback: (option: Option) => void;
 }
 
 interface MenuItemProps {
-    option: string;
+    option: Option;
     isActive: boolean;
-    switchCallback: (option: string) => void;
+    switchCallback: (option: Option) => void;
 }
 
 function CheckIcon() {
@@ -40,13 +45,13 @@ const MenuItem = (props: MenuItemProps) => {
             trailingIcon={isActive ? <CheckIcon /> : undefined}
             style={isActive ? activeStyle : undefined}
         >
-            {option}
+            {option.name}
         </ReactComponent.MenuItem>
     );
 };
 
 const DropdownMenu = (props: DropdownMenuProps) => {
-    const { ContextMenu, Menu, IconComponent, TextComponent } = Spicetify.ReactComponent;
+    const { ContextMenu, Menu, TextComponent } = Spicetify.ReactComponent;
     const { options, activeOption, switchCallback } = props;
 
     const optionItems = options.map((option) => {
@@ -61,7 +66,7 @@ const DropdownMenu = (props: DropdownMenuProps) => {
         <ContextMenu menu={<MenuWrapper />} trigger="click">
             <button className="x-sortBox-sortDropdown" type="button" role="combobox" aria-expanded="false">
                 <TextComponent variant="mesto" semanticColor="textSubdued">
-                    {activeOption}
+                    {activeOption.name}
                 </TextComponent>
                 <svg
                     role="img"
