@@ -9,11 +9,12 @@ import { PLACEHOLDER, LASTFM, SPOTIFY } from "../endpoints";
 import SettingsButton from "@shared/components/settings_button";
 import RefreshButton from "../components/buttons/refresh_button";
 
-export const topArtistsReq = async (time_range: string, config: ConfigWrapper) => {
-    if (config.CONFIG["use-lastfm"] === true) {
-        if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) return 300;
+export const topArtistsReq = async (time_range: string, configWrapper: ConfigWrapper) => {
+    const { config } = configWrapper;
+    if (config["use-lastfm"] === true) {
+        if (!config["api-key"] || !config["lastfm-user"]) return 300;
 
-        const { ["lastfm-user"]: user, ["api-key"]: key } = config.CONFIG;
+        const { ["lastfm-user"]: user, ["api-key"]: key } = config;
         const response = await apiRequest("lastfm", LASTFM.topartists(user, key, time_range));
 
         if (!response) return 200;
@@ -43,7 +44,7 @@ const DropdownOptions = [
     { id: "long_term", name: "All Time" },
 ];
 
-const ArtistsPage = ({ config }: { config: ConfigWrapper }) => {
+const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
     const [topArtists, setTopArtists] = React.useState<ArtistCardProps[] | 100 | 200 | 300>(100);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(DropdownOptions, "stats:top-artists");
 
@@ -55,7 +56,7 @@ const ArtistsPage = ({ config }: { config: ConfigWrapper }) => {
 
         const start = window.performance.now();
 
-        const topArtists = await topArtistsReq(time_range, config);
+        const topArtists = await topArtistsReq(time_range, configWrapper);
         if (set) setTopArtists(topArtists);
         Spicetify.LocalStorage.set(`stats:top-artists:${time_range}`, JSON.stringify(topArtists));
 
@@ -76,7 +77,7 @@ const ArtistsPage = ({ config }: { config: ConfigWrapper }) => {
 
     const props = {
         title: "Top Artists",
-        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton config={config} />],
+        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton configWrapper={configWrapper} />],
     };
 
     switch (topArtists) {

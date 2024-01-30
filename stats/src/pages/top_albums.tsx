@@ -9,10 +9,11 @@ import { LASTFM } from "../endpoints";
 import RefreshButton from "../components/buttons/refresh_button";
 import SettingsButton from "@shared/components/settings_button";
 
-export const topAlbumsReq = async (time_range: string, config: ConfigWrapper) => {
-    if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) return 300;
+export const topAlbumsReq = async (time_range: string, configWrapper: ConfigWrapper) => {
+    const { config } = configWrapper;
+    if (!config["api-key"] || !config["lastfm-user"]) return 300;
 
-    const { ["lastfm-user"]: user, ["api-key"]: key } = config.CONFIG;
+    const { ["lastfm-user"]: user, ["api-key"]: key } = config;
     const response = await apiRequest("lastfm", LASTFM.topalbums(user, key, time_range));
 
     if (!response) return 200;
@@ -26,7 +27,7 @@ const DropdownOptions = [
     { id: "long_term", name: "All Time" },
 ];
 
-const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
+const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
     const { LocalStorage } = Spicetify;
 
     const [topAlbums, setTopAlbums] = React.useState<Album[] | 100 | 200 | 300>(100);
@@ -40,7 +41,7 @@ const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
 
         const start = window.performance.now();
 
-        const topAlbums = await topAlbumsReq(time_range, config);
+        const topAlbums = await topAlbumsReq(time_range, configWrapper);
         if (set) setTopAlbums(topAlbums);
         LocalStorage.set(`stats:top-albums:${time_range}`, JSON.stringify(topAlbums));
 
@@ -61,7 +62,7 @@ const AlbumsPage = ({ config }: { config: ConfigWrapper }) => {
 
     const props = {
         title: "Top Albums",
-        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton config={config} />],
+        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton configWrapper={configWrapper} />],
     };
 
     switch (topAlbums) {

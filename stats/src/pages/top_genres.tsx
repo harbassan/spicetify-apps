@@ -31,7 +31,7 @@ const DropdownOptions = [
     { id: "long_term", name: "All Time" },
 ];
 
-const GenresPage = ({ config }: { config: ConfigWrapper }) => {
+const GenresPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
     const { LocalStorage } = Spicetify;
 
     const [topGenres, setTopGenres] = React.useState<GenresPageProps | 100 | 200 | 300>(100);
@@ -57,8 +57,8 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
                     return await JSON.parse(LocalStorage.get(`stats:top-${type}:${time_range}`) as string);
                 }
                 const fetchedItems = await (type === "artists"
-                    ? topArtistsReq(time_range, config)
-                    : topTracksReq(time_range, config));
+                    ? topArtistsReq(time_range, configWrapper)
+                    : topTracksReq(time_range, configWrapper));
                 cacheInfo[index] = true;
                 cacheInfo[2] = true;
                 LocalStorage.set(`stats:top-${type}:${time_range}`, JSON.stringify(fetchedItems));
@@ -208,7 +208,7 @@ const GenresPage = ({ config }: { config: ConfigWrapper }) => {
 
     const props = {
         title: "Top Genres",
-        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton config={config} />],
+        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton configWrapper={configWrapper} />],
     };
 
     switch (topGenres) {

@@ -17,7 +17,7 @@ const DropdownOptions = [
     { id: "tracks", name: "Top Tracks" },
 ];
 
-const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
+const ChartsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
     const [chartData, setChartData] = React.useState<Track[] | ArtistCardProps[] | 100 | 200 | 500>(100);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(DropdownOptions, "stats:charts");
 
@@ -27,7 +27,7 @@ const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
             if (storedData) return setChartData(JSON.parse(storedData));
         }
 
-        const api_key = config.CONFIG["api-key"];
+        const api_key = configWrapper.config["api-key"];
         if (!api_key) return setChartData(200);
 
         const response = await apiRequest("charts", LASTFM.charts(api_key, type));
@@ -64,7 +64,7 @@ const ChartsPage = ({ config }: { config: ConfigWrapper }) => {
 
     const props = {
         title: "Top Albums",
-        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton config={config} />],
+        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton configWrapper={configWrapper} />],
     };
     switch (chartData) {
         case 200:

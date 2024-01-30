@@ -1,9 +1,8 @@
 import React from "react";
-
-import { ConfigWrapper } from "../../stats/src/types/stats_types";
+import { ConfigWrapperProps } from "@shared/config/config_types";
 
 interface SettingsButtonProps {
-    config: ConfigWrapper;
+    configWrapper: ConfigWrapperProps;
 }
 
 function SettingsIcon(): React.ReactElement<SVGElement> {
@@ -20,13 +19,13 @@ function SettingsIcon(): React.ReactElement<SVGElement> {
 
 function SettingsButton(props: SettingsButtonProps): React.ReactElement<HTMLButtonElement> {
     const { TooltipWrapper, ButtonTertiary } = Spicetify.ReactComponent;
-    const { config } = props;
+    const { configWrapper } = props;
 
     return (
         <TooltipWrapper label="Settings" renderInline={true} placement="top">
             <ButtonTertiary
                 buttonSize="sm"
-                onClick={config.launchModal}
+                onClick={configWrapper.launchModal}
                 aria-label="Settings"
                 iconOnly={SettingsIcon}
             />

@@ -14,7 +14,7 @@ export interface Config extends Record<string, any> {
 }
 
 export interface ConfigWrapper {
-    CONFIG: Config;
+    config: Config;
     launchModal: () => void;
 }
 

@@ -36,21 +36,21 @@ const App = () => {
     };
 
     const configWrapper = {
-        CONFIG: config,
+        config: config,
         launchModal,
     };
 
     const pages: Record<string, React.ReactElement> = {
-        ["Artists"]: <ArtistsPage config={configWrapper} />,
-        ["Tracks"]: <TracksPage config={configWrapper} />,
-        ["Albums"]: <AlbumsPage config={configWrapper} />,
-        ["Genres"]: <GenresPage config={configWrapper} />,
-        ["Library"]: <LibraryPage config={configWrapper} />,
-        ["Charts"]: <ChartsPage config={configWrapper} />,
+        ["Artists"]: <ArtistsPage configWrapper={configWrapper} />,
+        ["Tracks"]: <TracksPage configWrapper={configWrapper} />,
+        ["Albums"]: <AlbumsPage configWrapper={configWrapper} />,
+        ["Genres"]: <GenresPage configWrapper={configWrapper} />,
+        ["Library"]: <LibraryPage configWrapper={configWrapper} />,
+        ["Charts"]: <ChartsPage configWrapper={configWrapper} />,
     };
 
     const tabPages = ["Artists", "Tracks", "Albums", "Genres", "Library", "Charts"].filter(
-        (page) => configWrapper.CONFIG[`show-${page.toLowerCase()}`]
+        (page) => configWrapper.config[`show-${page.toLowerCase()}`]
     );
 
     const [navBar, activeLink, setActiveLink] = useNavigationBar(tabPages);

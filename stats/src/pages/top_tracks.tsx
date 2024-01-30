@@ -11,11 +11,12 @@ import { LASTFM, SPOTIFY, PLACEHOLDER } from "../endpoints";
 import RefreshButton from "../components/buttons/refresh_button";
 import SettingsButton from "@shared/components/settings_button";
 
-export const topTracksReq = async (time_range: string, config: ConfigWrapper) => {
-    if (config.CONFIG["use-lastfm"] === true) {
-        if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) return 300;
+export const topTracksReq = async (time_range: string, configWrapper: ConfigWrapper) => {
+    const { config } = configWrapper;
+    if (config["use-lastfm"] === true) {
+        if (!config["api-key"] || !config["lastfm-user"]) return 300;
 
-        const { ["lastfm-user"]: user, ["api-key"]: key } = config.CONFIG;
+        const { ["lastfm-user"]: user, ["api-key"]: key } = config;
         const lastfmData = await apiRequest("lastfm", LASTFM.toptracks(user, key, time_range));
 
         if (!lastfmData) return 200;
@@ -68,7 +69,7 @@ const DropdownOptions = [
     { id: "long_term", name: "All Time" },
 ];
 
-const TracksPage = ({ config }: { config: ConfigWrapper }) => {
+const TracksPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
     const { LocalStorage } = Spicetify;
 
     const [topTracks, setTopTracks] = React.useState<Track[] | 100 | 200 | 300>(100);
@@ -82,7 +83,7 @@ const TracksPage = ({ config }: { config: ConfigWrapper }) => {
 
         const start = window.performance.now();
 
-        const topTracks = await topTracksReq(time_range, config);
+        const topTracks = await topTracksReq(time_range, configWrapper);
         if (set) setTopTracks(topTracks);
         LocalStorage.set(`stats:top-tracks:${time_range}`, JSON.stringify(topTracks));
 
@@ -103,7 +104,7 @@ const TracksPage = ({ config }: { config: ConfigWrapper }) => {
 
     const props = {
         title: "Top Tracks",
-        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton config={config} />],
+        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton configWrapper={configWrapper} />],
     };
 
     switch (topTracks) {

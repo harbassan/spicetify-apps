@@ -32,7 +32,7 @@ const DropdownOptions = [
     { id: "all", name: "All Playlists" },
 ];
 
-const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
+const LibraryPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
     const [library, setLibrary] = React.useState<LibraryProps | 100 | 200 | 300>(100);
     const [dropdown, activeOption, setActiveOption] = useDropdownMenu(DropdownOptions, "stats:library");
 
@@ -248,7 +248,7 @@ const LibraryPage = ({ config }: { config: ConfigWrapper }) => {
 
     const props = {
         title: "Library Analysis",
-        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton config={config} />],
+        headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton configWrapper={configWrapper} />],
     };
     switch (library) {
         case 300:
