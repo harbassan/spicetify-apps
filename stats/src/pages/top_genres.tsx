@@ -1,11 +1,11 @@
 import React from "react";
 
-import useDropdownMenu from "../../../shared/dropdown/useDropdownMenu";
+import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import StatCard from "../components/cards/stat_card";
 import GenresCard from "../components/cards/genres_card";
 import InlineGrid from "../components/inline_grid";
-import Status from "../../../shared/components/status";
-import PageContainer from "../../../shared/components/page_container";
+import Status from "@shared/components/status";
+import PageContainer from "@shared/components/page_container";
 import TrackRow from "../components/track_row";
 import Tracklist from "../components/tracklist";
 import Shelf from "../components/shelf";
@@ -16,7 +16,7 @@ import { apiRequest, fetchAudioFeatures, updatePageCache } from "../funcs";
 import { ConfigWrapper, Track } from "../types/stats_types";
 import { SPOTIFY } from "../endpoints";
 import RefreshButton from "../components/buttons/refresh_button";
-import SettingsButton from "../../../shared/components/settings_button";
+import SettingsButton from "@shared/components/settings_button";
 
 interface GenresPageProps {
     genres: [string, number][];

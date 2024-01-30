@@ -1,7 +1,7 @@
 import React from "react";
 import PlaylistPage from "../pages/playlist";
 import { STATS_VERSION } from "../constants";
-import ConfigWrapper from "../../../shared/config/config_wrapper";
+import ConfigWrapper from "@shared/config/config_wrapper";
 
 // contruct global class for stats methods
 class SpicetifyStats {

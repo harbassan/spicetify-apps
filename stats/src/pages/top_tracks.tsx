@@ -1,15 +1,15 @@
 import React from "react";
 
 import TrackRow from "../components/track_row";
-import Status from "../../../shared/components/status";
-import PageContainer from "../../../shared/components/page_container";
+import Status from "@shared/components/status";
+import PageContainer from "@shared/components/page_container";
 import Tracklist from "../components/tracklist";
-import useDropdownMenu from "../../../shared/dropdown/useDropdownMenu";
+import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import { apiRequest, updatePageCache, checkLiked, convertTrackData } from "../funcs";
 import { ConfigWrapper, Track } from "../types/stats_types";
 import { LASTFM, SPOTIFY, PLACEHOLDER } from "../endpoints";
 import RefreshButton from "../components/buttons/refresh_button";
-import SettingsButton from "../../../shared/components/settings_button";
+import SettingsButton from "@shared/components/settings_button";
 
 export const topTracksReq = async (time_range: string, config: ConfigWrapper) => {
     if (config.CONFIG["use-lastfm"] === true) {

@@ -2,8 +2,8 @@ import React from "react";
 
 import StatCard from "../components/cards/stat_card";
 import GenresCard from "../components/cards/genres_card";
-import SpotifyCard from "../../../shared/components/spotify_card";
-import Status from "../../../shared/components/status";
+import SpotifyCard from "@shared/components/spotify_card";
+import Status from "@shared/components/status";
 import InlineGrid from "../components/inline_grid";
 import Shelf from "../components/shelf";
 import { apiRequest, fetchAudioFeatures, fetchTopArtists, fetchTopAlbums } from "../funcs";

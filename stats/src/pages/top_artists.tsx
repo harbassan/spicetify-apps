@@ -1,12 +1,12 @@
 import React from "react";
-import useDropdownMenu from "../../../shared/dropdown/useDropdownMenu";
-import SpotifyCard from "../../../shared/components/spotify_card";
+import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
+import SpotifyCard from "@shared/components/spotify_card";
 import { apiRequest, convertArtistData, updatePageCache } from "../funcs";
-import Status from "../../../shared/components/status";
-import PageContainer from "../../../shared/components/page_container";
+import Status from "@shared/components/status";
+import PageContainer from "@shared/components/page_container";
 import { ArtistCardProps, ConfigWrapper } from "../types/stats_types";
 import { PLACEHOLDER, LASTFM, SPOTIFY } from "../endpoints";
-import SettingsButton from "../../../shared/components/settings_button";
+import SettingsButton from "@shared/components/settings_button";
 import RefreshButton from "../components/buttons/refresh_button";
 
 export const topArtistsReq = async (time_range: string, config: ConfigWrapper) => {

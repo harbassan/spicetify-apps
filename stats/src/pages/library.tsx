@@ -1,17 +1,17 @@
 import React from "react";
-import useDropdownMenu from "../../../shared/dropdown/useDropdownMenu";
+import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import StatCard from "../components/cards/stat_card";
 import GenresCard from "../components/cards/genres_card";
-import SpotifyCard from "../../../shared/components/spotify_card";
+import SpotifyCard from "@shared/components/spotify_card";
 import InlineGrid from "../components/inline_grid";
 import { apiRequest, updatePageCache, fetchAudioFeatures, fetchTopAlbums, fetchTopArtists } from "../funcs";
-import Status from "../../../shared/components/status";
-import PageContainer from "../../../shared/components/page_container";
+import Status from "@shared/components/status";
+import PageContainer from "@shared/components/page_container";
 import Shelf from "../components/shelf";
 import { Album, ArtistCardProps, ConfigWrapper } from "../types/stats_types";
 import { SPOTIFY } from "../endpoints";
 import RefreshButton from "../components/buttons/refresh_button";
-import SettingsButton from "../../../shared/components/settings_button";
+import SettingsButton from "@shared/components/settings_button";
 
 interface LibraryProps {
     audioFeatures: Record<string, number>;

@@ -12,6 +12,10 @@
       "ES2022",
       "DOM"
     ],
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["./shared/*"]
+    },
   },
   "include": [
     "./*/src/**/*", "./shared/**/*"]

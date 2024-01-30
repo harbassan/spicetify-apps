@@ -1,13 +1,13 @@
 import React from "react";
-import useDropdownMenu from "../../../shared/dropdown/useDropdownMenu";
-import SpotifyCard from "../../../shared/components/spotify_card";
+import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
+import SpotifyCard from "@shared/components/spotify_card";
 import { apiRequest, convertAlbumData, updatePageCache } from "../funcs";
-import Status from "../../../shared/components/status";
-import PageContainer from "../../../shared/components/page_container";
+import Status from "@shared/components/status";
+import PageContainer from "@shared/components/page_container";
 import { Album, ConfigWrapper } from "../types/stats_types";
 import { LASTFM } from "../endpoints";
 import RefreshButton from "../components/buttons/refresh_button";
-import SettingsButton from "../../../shared/components/settings_button";
+import SettingsButton from "@shared/components/settings_button";
 
 export const topAlbumsReq = async (time_range: string, config: ConfigWrapper) => {
     if (!config.CONFIG["api-key"] || !config.CONFIG["lastfm-user"]) return 300;
