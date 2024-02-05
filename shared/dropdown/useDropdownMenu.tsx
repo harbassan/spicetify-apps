@@ -14,7 +14,7 @@ type ReturnType = [
     setAvailableOptions: React.Dispatch<React.SetStateAction<OptionProps[]>>
 ];
 
-const useDropdownMenu = (options: OptionProps[], storageVariable: string) => {
+const useDropdownMenu = (options: OptionProps[], storageVariable?: string) => {
     const initialOptionID = storageVariable && Spicetify.LocalStorage.get(`${storageVariable}:active-option`);
     const initialOption = initialOptionID && options.find((e) => e.id === initialOptionID);
     const [activeOption, setActiveOption] = useState(initialOption || options[0]);

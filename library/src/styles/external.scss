@@ -1,0 +1,97 @@
+// hide sidebar heading element
+body:not(.show-ylx-filters) .main-yourLibraryX-filterArea:not(:has(> .main-yourLibraryX-libraryFilter)),
+.main-yourLibraryX-header:not(:has(> .main-yourLibraryX-headerContent > .main-yourLibraryX-collapseButton > button:nth-child(2))),
+// hide back button and default collapse button
+.main-yourLibraryX-collapseButton > button:first-child,
+.main-yourLibraryX-headerContent > button {
+    display: none;
+}
+
+// adjust sidebar padding
+.main-yourLibraryX-library {
+    padding-top: 8px;
+}
+.main-yourLibraryX-header {
+    margin-top: -8px;
+}
+
+// hide sort-by text
+.main-yourLibraryX-librarySortWrapper button span:first-child {
+    display: none;
+}
+
+// push sort button to the right within its flex parent
+.main-yourLibraryX-librarySortWrapper {
+    margin-left: auto;
+}
+
+// hide weird button effect
+.toggle-filters-button > button:after,
+.collapse-button > button:after,
+.expand-button > button:after {
+    display: none;
+}
+
+
+
+// expand button positioning
+.expand-button {
+    display: flex;
+    align-items:center;
+    z-index: 1;
+    margin-left: 5px;
+}
+.expand-button > button {
+    visibility: hidden;
+    margin: 0 5px;
+}
+li.main-yourLibraryX-navItem[data-id='/library'] {
+    display: flex;
+}
+li.main-yourLibraryX-navItem[data-id='/library'] > a {
+    flex-grow: 1;
+}
+
+// ylx button styling
+.toggle-filters-button > button,
+.collapse-button > button,
+.main-yourLibraryX-librarySortWrapper > button {
+    padding: 0;
+}
+.toggle-filters-button,
+.collapse-button,
+.main-yourLibraryX-librarySortWrapper {
+    display: flex;
+    flex-basis:32px;
+    justify-content: center;
+    min-width: 24px;
+    flex-shrink: 10;
+}
+.main-yourLibraryX-librarySortWrapper > button > span:nth-child(2) {
+    margin: 0;
+}
+
+// remove resize bar hover effect
+.LayoutResizer__resize-bar {
+    opacity: 0 !important;
+}
+
+
+.Root__nav-bar {
+    // fix search bar expansion
+    .x-filterBox-expandedOrHasFilter .x-filterBox-filterInput {
+        width: 100%;
+    }
+    .x-filterBox-expandedOrHasFilter {
+        flex-grow: 1;
+        margin-right: 5px;
+    }
+
+    // expand button visibility
+    &:has(> .LayoutResizer__resize-bar:hover) .expand-button > button,
+    .expand-button:hover > button {
+        visibility: visible;
+        height: 32px;
+        background-color: black;
+    }
+}

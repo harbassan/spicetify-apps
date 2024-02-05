@@ -1,7 +1,7 @@
 import React from "react";
 
 interface SpotifyCardProps {
-    type: "artist" | "album" | "lastfm";
+    type: "artist" | "album" | "lastfm" | "playlist" | "folder" | "show";
     uri: string;
     header: string;
     subheader: string;
@@ -10,8 +10,10 @@ interface SpotifyCardProps {
 
 function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement> {
     // @ts-ignore
-    const { Cards, TextComponent, ArtistMenu, AlbumMenu, ContextMenu } = Spicetify.ReactComponent;
+    const { Cards, TextComponent, ArtistMenu, AlbumMenu, PodcastShowMenu, PlaylistMenu, ContextMenu } =
+        Spicetify.ReactComponent;
     const { Default: Card, CardImage } = Cards;
+    const { createHref, push } = Spicetify.Platform.History;
     const { type, header, uri, imageUrl, subheader } = props;
 
     const Menu = () => {
@@ -20,6 +22,10 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
                 return <ArtistMenu uri={uri} />;
             case "album":
                 return <AlbumMenu uri={uri} />;
+            case "playlist":
+                return <PlaylistMenu uri={uri} />;
+            case "show":
+                return <PodcastShowMenu uri={uri} />;
             default:
                 return <></>;
         }
@@ -27,6 +33,18 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
     const lastfmProps =
         type === "lastfm"
             ? { onClick: () => window.open(uri, "_blank"), isPlayable: false, delegateNavigation: true }
+            : {};
+
+    const folderProps =
+        type === "folder"
+            ? {
+                  delegateNavigation: true,
+                  onClick: () => {
+                      // send the user to the folder page
+                      createHref({ pathname: `/library/folder/${uri}` });
+                      push({ pathname: `/library/folder/${uri}` });
+                  },
+              }
             : {};
 
     return (
@@ -51,6 +69,7 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
                 )}
                 uri={uri}
                 {...lastfmProps}
+                {...folderProps}
             />
         </ContextMenu>
     );

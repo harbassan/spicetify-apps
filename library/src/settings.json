@@ -1,0 +1,6 @@
+{
+  "displayName": "Your Library",
+  "nameId": "library",
+  "icon": "styles/icon_unfilled.svg",
+  "activeIcon": "styles/icon_filled.svg"
+}
