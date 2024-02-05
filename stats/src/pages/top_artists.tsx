@@ -122,7 +122,7 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
     return (
         <>
             <PageContainer {...props}>
-                <div className={`main-gridContainer-gridContainer stats-grid`}>{artistCards}</div>
+                <div className={`main-gridContainer-gridContainer grid`}>{artistCards}</div>
             </PageContainer>
         </>
     );

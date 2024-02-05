@@ -1,167 +1,108 @@
-.stats-grid {
-    --grid-gap: 24px;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
-}
-
-.stats-specialGrid {
-    grid-template-columns: repeat(11, 180px) !important;
-}
-
-.stats-gridInline {
-    --grid-gap: 24px;
-    grid-template-columns: repeat(10, 180px) !important;
-    overflow-x: hidden;
-    scroll-behavior: smooth;
-    margin-top: 5px;
-}
-
-[data-scroll="both"] {
-    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-}
-[data-scroll="end"] {
-    mask-image: linear-gradient(to right, transparent, black 10%);
-}
-[data-scroll="start"] {
-    mask-image: linear-gradient(to right, black 90%, transparent);
-}
-
-.stats-loadingWrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 60vh;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.stats-libraryOverview {
-    display: flex;
-    gap: 24px;
-    align-items: center;
-}
-
-.stats-content {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.stats-trackPageTitle {
-    display: flex;
-    gap: 24px;
-    align-items: center;
-}
-
-.stats-scrollButton {
-    width: 40px;
-    border-radius: 8px;
-    border: none;
-    padding: 0;
-    margin-right: 5px;
-    background-color: var(--spice-player);
-    color: var(--spice-subtext);
-
-    &:hover {
-        background-color: var(--spice-card);
+#stats-app {
+    .stats-gridInline {
+        --grid-gap: 24px;
+        grid-template-columns: repeat(10, 180px) !important;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+        margin-top: 5px;
+    }
+    
+    [data-scroll="both"] {
+        mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    }
+    [data-scroll="end"] {
+        mask-image: linear-gradient(to right, transparent, black 10%);
+    }
+    [data-scroll="start"] {
+        mask-image: linear-gradient(to right, black 90%, transparent);
+    }
+    
+    .stats-libraryOverview {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+    }
+    
+    .stats-trackPageTitle {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+    }
+    
+    .stats-scrollButton {
+        width: 40px;
+        border-radius: 8px;
+        border: none;
+        padding: 0;
+        margin-right: 5px;
+        background-color: var(--spice-player);
+        color: var(--spice-subtext);
+    
+        &:hover {
+            background-color: var(--spice-card);
+            color: var(--spice-text);
+        }
+    }
+    
+    .stats-tracklistHeader > div {
+        display: flex;
+        -webkit-app-region: no-drag;
+        gap: 20px;
+        align-items: center;
+    }
+    
+    .stats-make-playlist-button {
+        margin-inline-start: 12px;
+    }
+    
+    .stats-genreCard {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 16px;
+        border-radius: 8px;
+        background: var(--spice-player);
+        position: relative;
+    }
+    
+    .stats-genreRow {
+        width: 100%;
+        height: 20px;
+        display: flex;
+        gap: 10px;
+    }
+    
+    .stats-genreRowFill {
+        background: var(--spice-button);
+        height: 100%;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .stats-genreText {
+        color: var(--spice-player);
+        font-size: 0.875rem;
+        margin-left: 7px;
+        font-weight: bold;
+    }
+    
+    .stats-genreValue {
         color: var(--spice-text);
+        font-size: 0.875rem;
+    }
+    
+    .GenericModal[aria-label="Playlist Stats"] .main-embedWidgetGenerator-container {
+        width: 80vw;
+        height: 80vh;
+        background-color: var(--spice-main);
+    }
+    .GenericModal[aria-label="Playlist Stats"] .main-shelf-title {
+        color: var(--spice-text);
+    }
+    
+    .stats-genreCard + .stats-gridInlineSection {
+        margin-top: 3px;
     }
 }
 
-.stats-header {
-    align-content: space-between;
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    margin: 16px 0;
-}
-
-.stats-header-right, .stats-header-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 50%;
-}
-
-.stats-header-right {
-    justify-content: flex-end;
-}
-
-.stats-header-left {
-    justify-content: flex-start;
-}
-
-.stats-tracklistHeader > div {
-    display: flex;
-    -webkit-app-region: no-drag;
-    gap: 20px;
-    align-items: center;
-}
-
-.stats-make-playlist-button {
-    margin-inline-start: 12px;
-}
-
-.stats-genreCard {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 16px;
-    border-radius: 8px;
-    background: var(--spice-player);
-    position: relative;
-}
-
-.stats-genreRow {
-    width: 100%;
-    height: 20px;
-    display: flex;
-    gap: 10px;
-}
-
-.stats-genreRowFill {
-    background: var(--spice-button);
-    height: 100%;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-}
-
-.stats-genreText {
-    color: var(--spice-player);
-    font-size: 0.875rem;
-    margin-left: 7px;
-    font-weight: bold;
-}
-
-.stats-genreValue {
-    color: var(--spice-text);
-    font-size: 0.875rem;
-}
-
-.new-update {
-    background-color: var(--spice-player);
-    color: var(--spice-text);
-    border-radius: 8px;
-    padding: 2px 12px;
-    margin: 0 24px;
-    border: 0px;
-}
-
-.GenericModal[aria-label="Playlist Stats"] .main-embedWidgetGenerator-container {
-    width: 80vw;
-    height: 80vh;
-    background-color: var(--spice-main);
-}
-.GenericModal[aria-label="Playlist Stats"] .main-shelf-title {
-    color: var(--spice-text);
-}
-
-.status-icon {
-    width: 40px;
-    height: 40px;
-    fill: currentColor;
-}
-
-.stats-genreCard + .stats-gridInlineSection {
-    margin-top: 3px;
-}

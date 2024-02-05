@@ -1,0 +1,57 @@
+.grid {
+    --grid-gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+}
+
+.loadingWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    flex-direction: column;
+    gap: 16px;
+
+    .status-icon {
+        width: 40px;
+        height: 40px;
+        fill: currentColor;
+    }
+}
+
+.page-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.page-header {
+    align-content: space-between;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin: 16px 0;
+
+    .header-right, .header-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 50%;
+    }
+    
+    .header-right {
+        justify-content: flex-end;
+    }
+    
+    .header-left {
+        justify-content: flex-start;
+    }
+}
+
+.new-update {
+    background-color: var(--spice-player);
+    color: var(--spice-text);
+    border-radius: 8px;
+    padding: 2px 12px;
+    margin: 0 24px;
+    border: 0px;
+}

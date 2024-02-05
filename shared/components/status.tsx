@@ -37,7 +37,7 @@ const Status = (props: { icon: "error" | "library"; heading: string; subheading:
 
     return isVisible ? (
         <>
-            <div className="stats-loadingWrapper">
+            <div className="loadingWrapper">
                 {props.icon === "error" ? <ErrorIcon /> : <LibraryIcon />}
                 <h1>{props.heading}</h1>
                 <h3>{props.subheading}</h3>

@@ -171,7 +171,7 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
                             <Route
                                 path="/"
                                 element={
-                                    <div className="stats-content encore-dark-theme encore-base-set">
+                                    <div className="page-content encore-dark-theme encore-base-set">
                                         <section className="stats-libraryOverview">
                                             <StatCard label="Total Tracks" value={library.trackCount.toString()} />
                                             <StatCard label="Total Artists" value={library.artistCount.toString()} />

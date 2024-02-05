@@ -10,6 +10,7 @@ import { STATS_VERSION, LATEST_RELEASE } from "./constants";
 
 import "./styles/app.scss";
 import "../../shared/config/config_modal.scss";
+import "../../shared/shared.scss";
 
 const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
     fetch(LATEST_RELEASE)
@@ -72,7 +73,8 @@ const App = () => {
     }
 
     return (
-        <>
+        <div id="stats-app">
+            {navBar}
             {newUpdate && (
                 <div className="new-update">
                     New app update available! Visit{" "}
@@ -80,9 +82,8 @@ const App = () => {
                     install.
                 </div>
             )}
-            {navBar}
             {pages[activeLink]}
-        </>
+        </div>
     );
 };
 

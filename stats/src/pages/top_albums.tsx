@@ -109,7 +109,7 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
     return (
         <PageContainer {...props}>
-            <div className={`main-gridContainer-gridContainer stats-grid`}>{albumCards}</div>
+            <div className={`main-gridContainer-gridContainer grid`}>{albumCards}</div>
         </PageContainer>
     );
 };

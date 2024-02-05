@@ -108,7 +108,7 @@ const ChartsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
         props.title = `Charts - Top Artists`;
         return (
             <PageContainer {...props}>
-                <div className={`main-gridContainer-gridContainer stats-grid`}>{artistCards}</div>
+                <div className={`main-gridContainer-gridContainer grid`}>{artistCards}</div>
             </PageContainer>
         );
     } else {
