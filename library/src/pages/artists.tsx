@@ -6,6 +6,7 @@ import Status from "@shared/components/status";
 import SpotifyCard from "@shared/components/spotify_card";
 import SettingsButton from "@shared/components/settings_button";
 import { ConfigWrapperProps } from "../types/library_types";
+import LoadMoreCard from "../components/load_more_card";
 
 interface ArtistProps {
     uri: string;
@@ -29,7 +30,7 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) =
             sortOrder: sortOption.id,
             textFilter,
             offset: 0,
-            limit: 100,
+            limit: 200,
         }).then((res: any) => {
             const items = res.items.length ? res.items : textFilter ? 300 : 200;
             setArtists(items);
@@ -73,6 +74,24 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) =
             />
         );
     });
+
+    if (artists.length % 200 === 0) {
+        artistCards.push(
+            <LoadMoreCard
+                callback={() => {
+                    Spicetify.Platform.LibraryAPI.getContents({
+                        filters: ["1"],
+                        sortOrder: sortOption.id,
+                        textFilter,
+                        offset: artists.length,
+                        limit: 200,
+                    }).then((res: any) => {
+                        setArtists([...artists, ...res.items]);
+                    });
+                }}
+            />
+        );
+    }
 
     return (
         <PageContainer {...props}>

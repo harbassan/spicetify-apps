@@ -7,6 +7,7 @@ import SpotifyCard from "@shared/components/spotify_card";
 import SettingsButton from "@shared/components/settings_button";
 import AddButton from "../components/add";
 import { ConfigWrapperProps } from "../types/library_types";
+import LoadMoreCard from "../components/load_more_card";
 
 interface PlaylistProps {
     uri: string;
@@ -134,6 +135,26 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
             />
         );
     });
+
+    if (playlists.items.length % 100 === 0) {
+        const playlistItems = playlists.items as PlaylistProps[];
+        playlistCards.push(
+            <LoadMoreCard
+                callback={() => {
+                    Spicetify.Platform.LibraryAPI.getContents({
+                        filters: ["2"],
+                        sortOrder: sortOption.id,
+                        folderUri: folder,
+                        textFilter,
+                        offset: playlistItems.length,
+                        limit: 100,
+                    }).then((res: any) => {
+                        setPlaylists({ folder: res.openedFolderName, items: [...playlistItems, ...res.items] });
+                    });
+                }}
+            />
+        );
+    }
 
     return (
         <PageContainer {...props}>

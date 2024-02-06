@@ -6,6 +6,7 @@ import Status from "@shared/components/status";
 import SettingsButton from "@shared/components/settings_button";
 import { ConfigWrapperProps } from "../types/library_types";
 import SpotifyCard from "@shared/components/spotify_card";
+import LoadMoreCard from "../components/load_more_card";
 
 interface ShowProps {
     uri: string;
@@ -74,6 +75,24 @@ const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => 
             />
         );
     });
+
+    if (shows.length % 100 === 0) {
+        showCards.push(
+            <LoadMoreCard
+                callback={() => {
+                    Spicetify.Platform.LibraryAPI.getContents({
+                        filters: ["3"],
+                        sortOrder: sortOption.id,
+                        textFilter,
+                        offset: shows.length,
+                        limit: 100,
+                    }).then((res: any) => {
+                        setShows([...shows, ...res.items]);
+                    });
+                }}
+            />
+        );
+    }
 
     return (
         <PageContainer {...props}>

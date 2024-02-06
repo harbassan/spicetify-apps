@@ -6,6 +6,7 @@ import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import PageContainer from "@shared/components/page_container";
 import Status from "@shared/components/status";
 import SpotifyCard from "@shared/components/spotify_card";
+import LoadMoreCard from "../components/load_more_card";
 
 interface AlbumProps {
     uri: string;
@@ -32,7 +33,7 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) =>
             sortOrder: sortOption.id,
             textFilter,
             offset: 0,
-            limit: 100,
+            limit: 200,
         }).then((res: any) => {
             const items = res.items.length ? res.items : textFilter ? 300 : 200;
             setAlbums(items);
@@ -76,6 +77,24 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) =>
             />
         );
     });
+
+    if (albums.length % 200 === 0) {
+        albumCards.push(
+            <LoadMoreCard
+                callback={() => {
+                    Spicetify.Platform.LibraryAPI.getContents({
+                        filters: ["0"],
+                        sortOrder: sortOption.id,
+                        textFilter,
+                        offset: albums.length,
+                        limit: 200,
+                    }).then((res: any) => {
+                        setAlbums([...albums, ...res.items]);
+                    });
+                }}
+            />
+        );
+    }
 
     return (
         <PageContainer {...props}>
