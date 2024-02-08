@@ -4,6 +4,7 @@ import ReactDOM from "react-dom";
 import ToggleFiltersButton from "../components/toggle_filters";
 import CollapseButton from "../components/collapse";
 import ExpandButton from "../components/expand";
+import CollectionWrapper from "./collections_wrapper";
 
 // inject css
 const styleLink = document.createElement("link");
@@ -44,6 +45,7 @@ class SpicetifyLibrary {
         ],
         "library"
     );
+    CollectionWrapper = new CollectionWrapper();
 }
 window.SpicetifyLibrary = new SpicetifyLibrary();
 
