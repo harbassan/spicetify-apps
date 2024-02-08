@@ -1,7 +1,8 @@
+import CollectionMenu from "library/src/components/collection_menu";
 import React from "react";
 
 interface SpotifyCardProps {
-    type: "artist" | "album" | "lastfm" | "playlist" | "folder" | "show";
+    type: "artist" | "album" | "lastfm" | "playlist" | "folder" | "show" | "collection";
     uri: string;
     header: string;
     subheader: string;
@@ -47,6 +48,17 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
               }
             : {};
 
+    const collectionProps =
+        type === "collection"
+            ? {
+                  delegateNavigation: true,
+                  onClick: () => {
+                      createHref({ pathname: `/library/collection/${uri}` });
+                      push({ pathname: `/library/collection/${uri}` });
+                  },
+              }
+            : {};
+
     return (
         <ContextMenu menu={<Menu />} trigger="right-click">
             <Card
@@ -70,6 +82,7 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
                 uri={uri}
                 {...lastfmProps}
                 {...folderProps}
+                {...collectionProps}
             />
         </ContextMenu>
     );

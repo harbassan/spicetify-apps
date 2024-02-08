@@ -68,6 +68,15 @@ const App = () => {
         );
     }
 
+    // album collection route
+    if (/^\/collection\/.+/.test(route)) {
+        return (
+            <div id="library-app">
+                <AlbumsPage collection={route.split("/").pop()} configWrapper={configWrapper} />
+            </div>
+        );
+    }
+
     // default route
     return (
         <div id="library-app">

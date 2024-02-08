@@ -9,6 +9,7 @@ import SpotifyCard from "@shared/components/spotify_card";
 import LoadMoreCard from "../components/load_more_card";
 
 interface AlbumProps {
+    type: "album" | "collection";
     uri: string;
     name: string;
     artists: { name: string }[];
@@ -22,26 +23,56 @@ const sortOptions = [
     { id: "6", name: "Recents" },
 ];
 
-const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => {
+const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrapperProps; collection?: string }) => {
     const [albums, setAlbums] = React.useState<AlbumProps[] | 100 | 200 | 300>(100);
     const [dropdown, sortOption] = useDropdownMenu(sortOptions, "library:albums");
     const [textFilter, setTextFilter] = React.useState("");
+    const [collectionName, setCollectionName] = React.useState("");
 
-    React.useEffect(() => {
-        Spicetify.Platform.LibraryAPI.getContents({
+    const fetchItems = async () => {
+        const collections = SpicetifyLibrary.CollectionWrapper.getCollections();
+        const albums = await Spicetify.Platform.LibraryAPI.getContents({
             filters: ["0"],
             sortOrder: sortOption.id,
             textFilter,
             offset: 0,
             limit: 200,
-        }).then((res: any) => {
-            const items = res.items.length ? res.items : textFilter ? 300 : 200;
-            setAlbums(items);
         });
-    }, [sortOption, textFilter]);
+
+        // filter out any album in a collection
+        albums.items = albums.items.filter((album: AlbumProps) => {
+            return SpicetifyLibrary.CollectionWrapper.getCollectionsWithAlbum(album.uri).length === 0;
+        });
+
+        if (albums.items.length === 0 && collections.length === 0) {
+            return textFilter ? setAlbums(300) : setAlbums(200);
+        }
+
+        const items = [...collections, ...albums.items];
+        setAlbums(items);
+    };
+
+    const fetchCollection = async () => {
+        const res = SpicetifyLibrary.CollectionWrapper.getCollection(collection);
+        const collectionItems = res.items;
+
+        if (collectionItems.length === 0) {
+            return textFilter ? setAlbums(300) : setAlbums(200);
+        }
+
+        setAlbums(collectionItems);
+        setCollectionName(res.name);
+    };
+
+    React.useEffect(() => {
+        if (collection) fetchCollection();
+        else fetchItems();
+    }, [sortOption, textFilter, collection]);
+
+    const title = collectionName || "Albums";
 
     const props = {
-        title: "Albums",
+        title,
         headerEls: [
             dropdown,
             <SearchBar setSearch={setTextFilter} placeholder="Albums" />,
@@ -69,11 +100,11 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) =>
     const albumCards = albums.map((album) => {
         return (
             <SpotifyCard
-                type="album"
-                uri={album.uri}
+                type={album.type}
+                uri={album.uri || album.id}
                 header={album.name}
-                subheader={album.artists[0].name}
-                imageUrl={album.images?.[0]?.url || ""}
+                subheader={album.artists?.[0]?.name || album.artist || "Collection"}
+                imageUrl={album.images?.[0]?.url || album.image || ""}
             />
         );
     });
