@@ -1,4 +1,5 @@
 import React from "react";
+import TextInputDialog from "./text_input_dialog";
 
 interface AddButtonProps {
     folderUri: string;
@@ -35,8 +36,30 @@ function AddButton(props: AddButtonProps): React.ReactElement<HTMLButtonElement>
     const { folderUri } = props;
 
     const insertLocation = folderUri === "start" ? folderUri : { uri: folderUri };
-    const createFolder = () => RootlistAPI.createFolder("New Folder", { after: insertLocation });
-    const createPlaylist = () => RootlistAPI.createPlaylist("New Playlist", { after: insertLocation });
+
+    const createFolder = () => {
+        const onSave = (value: string) => {
+            RootlistAPI.createFolder(value || "New Folder", { after: insertLocation });
+        };
+
+        Spicetify.PopupModal.display({
+            title: "Create Folder",
+            // @ts-ignore
+            content: <TextInputDialog def={"New Folder"} onSave={onSave} />,
+        });
+    };
+
+    const createPlaylist = () => {
+        const onSave = (value: string) => {
+            RootlistAPI.createPlaylist(value || "New Playlist", { after: insertLocation });
+        };
+
+        Spicetify.PopupModal.display({
+            title: "Create Playlist",
+            // @ts-ignore
+            content: <TextInputDialog def={"New Playlist"} onSave={onSave} />,
+        });
+    };
 
     const AddMenu = () => {
         return (

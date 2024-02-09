@@ -34,3 +34,31 @@
     }
     
 }
+
+.text-input-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    .text-input {
+        background: rgba(var(--spice-rgb-selected-row),.1);
+        border: 1px solid transparent;
+        border-radius: 4px;
+        color: var(--spice-text);
+        font-family: inherit;
+        font-size: 14px;
+        height: 32px;
+        padding: 0 12px;
+        width: 100%;
+      
+        &:focus {
+          background-color: var(--spice-tab-active);
+          border: 1px solid var(--spice-button-disabled);
+          outline: none;
+        }
+    }
+
+    button {
+        align-self: end;
+    }
+}
