@@ -33,7 +33,7 @@ class ConfigWrapper {
                     <ConfigModal
                         config={this.Config}
                         structure={modalStructure}
-                        key={key}
+                        appKey={key}
                         updateAppConfig={updateConfig}
                     />
                 ),

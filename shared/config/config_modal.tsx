@@ -4,6 +4,7 @@ import { ConfigProps, ModalStructureProps } from "./config_types";
 interface ConfigModalProps {
     config: ConfigProps;
     structure: ModalStructureProps;
+    appKey: string;
     updateAppConfig: (config: ConfigProps) => void;
 }
 
@@ -163,7 +164,7 @@ const ConfigRow = (props: { name: string; desc?: string; children: React.ReactEl
 };
 
 const ConfigModal = (props: ConfigModalProps) => {
-    const { config, structure, updateAppConfig } = props;
+    const { config, structure, appKey, updateAppConfig } = props;
     // local modal state
     const [modalConfig, setModalConfig] = React.useState({ ...config });
 
@@ -173,7 +174,7 @@ const ConfigModal = (props: ConfigModalProps) => {
 
         const updateItem = (state: any) => {
             console.debug(`toggling ${key} to ${state}`);
-            localStorage.setItem(`${key}:config:${key}`, String(state));
+            localStorage.setItem(`${appKey}:config:${key}`, String(state));
 
             if (modalRow.callback) modalRow.callback(state);
 
