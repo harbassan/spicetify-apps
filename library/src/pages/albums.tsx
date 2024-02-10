@@ -26,7 +26,7 @@ const sortOptions = [
     { id: "6", name: "Recents" },
 ];
 
-const AddMenu = () => {
+const AddMenu = ({ collection }: { collection?: string }) => {
     const { MenuItem, Menu } = Spicetify.ReactComponent;
     const { SVGIcons } = Spicetify;
 
@@ -44,6 +44,7 @@ const AddMenu = () => {
 
     const addAlbum = () => {
         const onSave = (value: string) => {
+            if (collection) SpicetifyLibrary.CollectionWrapper.addAlbumToCollection(collection, value);
             Spicetify.Platform.LibraryAPI.add({ uris: [value] });
         };
 
@@ -117,7 +118,7 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
     const props = {
         title,
         headerEls: [
-            <AddButton Menu={AddMenu} />,
+            <AddButton Menu={<AddMenu collection={collection} />} />,
             dropdown,
             <SearchBar setSearch={setTextFilter} placeholder="Albums" />,
             <SettingsButton configWrapper={configWrapper} />,
@@ -129,7 +130,7 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
             return <></>;
         case 200:
             return (
-                <PageContainer title="Albums">
+                <PageContainer {...props}>
                     <Status icon="library" heading="Nothing Here" subheading="You don't have any albums saved" />
                 </PageContainer>
             );

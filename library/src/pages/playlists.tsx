@@ -39,12 +39,12 @@ const filterOptions = [
     { id: "103", name: "By Spotify" },
 ];
 
-const AddMenu = ({ folderUri }: { folderUri: string }) => {
+const AddMenu = ({ folder }: { folder?: string }) => {
     const { MenuItem, Menu } = Spicetify.ReactComponent;
     const { RootlistAPI } = Spicetify.Platform;
     const { SVGIcons } = Spicetify;
 
-    const insertLocation = folderUri === "start" ? folderUri : { uri: folderUri };
+    const insertLocation = folder ? { uri: folder } : "start";
 
     const createFolder = () => {
         const onSave = (value: string) => {
@@ -138,13 +138,11 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
     }, [folder]);
 
     const title = playlists.folder || "Playlists";
-    const folderUri = folder || "start";
 
     const props = {
         title,
-        folderUri,
         headerEls: [
-            <AddButton Menu={AddMenu} />,
+            <AddButton Menu={<AddMenu folder={folder} />} />,
             sortDropdown,
             filterDropdown,
             <SearchBar setSearch={setTextFilter} placeholder="Playlists" />,
@@ -157,7 +155,7 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
             return <></>;
         case 200:
             return (
-                <PageContainer title={title}>
+                <PageContainer {...props}>
                     <Status icon="library" heading="Nothing Here" subheading="There are no playlists in this folder" />
                 </PageContainer>
             );

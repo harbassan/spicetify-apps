@@ -24,7 +24,7 @@ function AddButton(props: AddButtonProps): React.ReactElement<HTMLButtonElement>
     return (
         <TooltipWrapper label={"Add"} placement="top">
             <span>
-                <ContextMenu trigger="click" menu={<Menu />}>
+                <ContextMenu trigger="click" menu={Menu}>
                     <ButtonTertiary buttonSize="sm" aria-label="Add" iconOnly={AddIcon} />
                 </ContextMenu>
             </span>
