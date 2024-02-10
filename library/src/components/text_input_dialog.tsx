@@ -1,8 +1,8 @@
 import React, { FormEvent } from "react";
 
-const TextInputDialog = (props: { def: string; onSave: (value: string) => void }) => {
+const TextInputDialog = (props: { def: string; placeholder: string; onSave: (value: string) => void }) => {
     const { ButtonPrimary } = Spicetify.ReactComponent;
-    const { def, onSave } = props;
+    const { def, placeholder, onSave } = props;
 
     const [value, setValue] = React.useState(def);
 
@@ -20,7 +20,7 @@ const TextInputDialog = (props: { def: string; onSave: (value: string) => void }
                         className={"text-input"}
                         type="text"
                         value={value}
-                        placeholder={"Collection Name"}
+                        placeholder={placeholder}
                         onChange={(e) => setValue(e.target.value)}
                     />
                 </label>

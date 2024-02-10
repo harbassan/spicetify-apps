@@ -54,7 +54,7 @@ const AddMenu = ({ folderUri }: { folderUri: string }) => {
         Spicetify.PopupModal.display({
             title: "Create Folder",
             // @ts-ignore
-            content: <TextInputDialog def={"New Folder"} onSave={onSave} />,
+            content: <TextInputDialog def={"New Folder"} placeholder="Folder Name" onSave={onSave} />,
         });
     };
 
@@ -66,7 +66,7 @@ const AddMenu = ({ folderUri }: { folderUri: string }) => {
         Spicetify.PopupModal.display({
             title: "Create Playlist",
             // @ts-ignore
-            content: <TextInputDialog def={"New Playlist"} onSave={onSave} />,
+            content: <TextInputDialog def={"New Playlist"} placeholder="Playlist Name" onSave={onSave} />,
         });
     };
 

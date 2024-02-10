@@ -38,7 +38,19 @@ const AddMenu = () => {
         Spicetify.PopupModal.display({
             title: "Create Collection",
             // @ts-ignore
-            content: <TextInputDialog def={"New Collection"} onSave={onSave} />,
+            content: <TextInputDialog def={"New Collection"} placeholder="Collection Name" onSave={onSave} />,
+        });
+    };
+
+    const addAlbum = () => {
+        const onSave = (value: string) => {
+            Spicetify.Platform.LibraryAPI.add({ uris: [value] });
+        };
+
+        Spicetify.PopupModal.display({
+            title: "Add Album",
+            // @ts-ignore
+            content: <TextInputDialog def={""} placeholder="Album URI" onSave={onSave} />,
         });
     };
 
@@ -46,6 +58,9 @@ const AddMenu = () => {
         <Menu>
             <MenuItem onClick={createCollection} leadingIcon={<LeadingIcon path={SVGIcons["playlist-folder"]} />}>
                 Create Collection
+            </MenuItem>
+            <MenuItem onClick={addAlbum} leadingIcon={<LeadingIcon path={SVGIcons["album"]} />}>
+                Add Album
             </MenuItem>
         </Menu>
     );
