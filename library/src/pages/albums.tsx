@@ -7,6 +7,9 @@ import PageContainer from "@shared/components/page_container";
 import Status from "@shared/components/status";
 import SpotifyCard from "@shared/components/spotify_card";
 import LoadMoreCard from "../components/load_more_card";
+import AddButton from "../components/add_button";
+import TextInputDialog from "../components/text_input_dialog";
+import LeadingIcon from "../components/leading_icon";
 
 interface AlbumProps {
     type: "album" | "collection";
@@ -22,6 +25,31 @@ const sortOptions = [
     { id: "2", name: "Artist Name" },
     { id: "6", name: "Recents" },
 ];
+
+const AddMenu = () => {
+    const { MenuItem, Menu } = Spicetify.ReactComponent;
+    const { SVGIcons } = Spicetify;
+
+    const createCollection = () => {
+        const onSave = (value: string) => {
+            SpicetifyLibrary.CollectionWrapper.createCollection(value);
+        };
+
+        Spicetify.PopupModal.display({
+            title: "Create Collection",
+            // @ts-ignore
+            content: <TextInputDialog def={"New Collection"} onSave={onSave} />,
+        });
+    };
+
+    return (
+        <Menu>
+            <MenuItem onClick={createCollection} leadingIcon={<LeadingIcon path={SVGIcons["playlist-folder"]} />}>
+                Create Collection
+            </MenuItem>
+        </Menu>
+    );
+};
 
 const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrapperProps; collection?: string }) => {
     const [albums, setAlbums] = React.useState<AlbumProps[] | 100 | 200 | 300>(100);
@@ -74,6 +102,7 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
     const props = {
         title,
         headerEls: [
+            <AddButton Menu={AddMenu} />,
             dropdown,
             <SearchBar setSearch={setTextFilter} placeholder="Albums" />,
             <SettingsButton configWrapper={configWrapper} />,

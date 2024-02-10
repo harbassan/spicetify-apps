@@ -2,8 +2,8 @@ import ConfigWrapper from "@shared/config/config_wrapper";
 import React from "react";
 import ReactDOM from "react-dom";
 import ToggleFiltersButton from "../components/toggle_filters";
-import CollapseButton from "../components/collapse";
-import ExpandButton from "../components/expand";
+import CollapseButton from "../components/collapse_button";
+import ExpandButton from "../components/expand_button";
 import CollectionWrapper from "./collections_wrapper";
 
 // inject css

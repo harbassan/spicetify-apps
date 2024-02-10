@@ -5,9 +5,11 @@ import PageContainer from "@shared/components/page_container";
 import Status from "@shared/components/status";
 import SpotifyCard from "@shared/components/spotify_card";
 import SettingsButton from "@shared/components/settings_button";
-import AddButton from "../components/add";
+import AddButton from "../components/add_button";
 import { ConfigWrapperProps } from "../types/library_types";
 import LoadMoreCard from "../components/load_more_card";
+import TextInputDialog from "../components/text_input_dialog";
+import LeadingIcon from "../components/leading_icon";
 
 interface PlaylistProps {
     uri: string;
@@ -36,6 +38,49 @@ const filterOptions = [
     { id: "102", name: "By You" },
     { id: "103", name: "By Spotify" },
 ];
+
+const AddMenu = ({ folderUri }: { folderUri: string }) => {
+    const { MenuItem, Menu } = Spicetify.ReactComponent;
+    const { RootlistAPI } = Spicetify.Platform;
+    const { SVGIcons } = Spicetify;
+
+    const insertLocation = folderUri === "start" ? folderUri : { uri: folderUri };
+
+    const createFolder = () => {
+        const onSave = (value: string) => {
+            RootlistAPI.createFolder(value || "New Folder", { after: insertLocation });
+        };
+
+        Spicetify.PopupModal.display({
+            title: "Create Folder",
+            // @ts-ignore
+            content: <TextInputDialog def={"New Folder"} onSave={onSave} />,
+        });
+    };
+
+    const createPlaylist = () => {
+        const onSave = (value: string) => {
+            RootlistAPI.createPlaylist(value || "New Playlist", { after: insertLocation });
+        };
+
+        Spicetify.PopupModal.display({
+            title: "Create Playlist",
+            // @ts-ignore
+            content: <TextInputDialog def={"New Playlist"} onSave={onSave} />,
+        });
+    };
+
+    return (
+        <Menu>
+            <MenuItem onClick={createFolder} leadingIcon={<LeadingIcon path={SVGIcons["playlist-folder"]} />}>
+                Create Folder
+            </MenuItem>
+            <MenuItem onClick={createPlaylist} leadingIcon={<LeadingIcon path={SVGIcons["playlist"]} />}>
+                Create Playlist
+            </MenuItem>
+        </Menu>
+    );
+};
 
 const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapperProps; folder?: string }) => {
     console.log("playlists mount");
@@ -99,7 +144,7 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
         title,
         folderUri,
         headerEls: [
-            <AddButton folderUri={folderUri} />,
+            <AddButton Menu={AddMenu} />,
             sortDropdown,
             filterDropdown,
             <SearchBar setSearch={setTextFilter} placeholder="Playlists" />,
