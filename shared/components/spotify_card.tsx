@@ -27,6 +27,8 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
                 return <PlaylistMenu uri={uri} />;
             case "show":
                 return <PodcastShowMenu uri={uri} />;
+            case "collection":
+                return <CollectionMenu id={uri} />;
             default:
                 return <></>;
         }
