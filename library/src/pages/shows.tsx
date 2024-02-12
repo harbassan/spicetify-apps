@@ -38,7 +38,7 @@ const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => 
         return res;
     };
 
-    const { data, status, hasNextPage, fetchNextPage } = useInfiniteQuery({
+    const { data, status, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
         queryKey: ["library:shows", sortOption.id, textFilter],
         queryFn: fetchShows,
         initialPageParam: 0,
@@ -46,6 +46,14 @@ const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => 
             return lastPage.totalLength > lastPageParam + limit ? lastPageParam + limit : undefined;
         },
     });
+
+    React.useEffect(() => {
+        const onUpdate = (e: any) => refetch();
+
+        Spicetify.Platform.LibraryAPI.getEvents()._emitter.addListener("update", onUpdate);
+
+        return () => Spicetify.Platform.LibraryAPI.getEvents()._emitter.removeListener("update", onUpdate);
+    }, []);
 
     const props = {
         title: "Shows",

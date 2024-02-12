@@ -106,7 +106,7 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
         return SpicetifyLibrary.CollectionWrapper.getCollection(collection);
     };
 
-    const { data, status, hasNextPage, fetchNextPage } = useInfiniteQuery({
+    const { data, status, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
         queryKey: ["library:albums", sortOption.id, textFilter, collection],
         queryFn: fetchRootlist,
         initialPageParam: 0,
@@ -114,6 +114,18 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
             return lastPage.totalLength > lastPageParam + limit ? lastPageParam + limit : undefined;
         },
     });
+
+    React.useEffect(() => {
+        const onUpdate = (e: any) => refetch();
+
+        Spicetify.Platform.LibraryAPI.getEvents()._emitter.addListener("update", onUpdate);
+        SpicetifyLibrary.CollectionWrapper.addEventListener("update", onUpdate);
+
+        return () => {
+            Spicetify.Platform.LibraryAPI.getEvents()._emitter.removeListener("update", onUpdate);
+            SpicetifyLibrary.CollectionWrapper.removeEventListener("update", onUpdate);
+        };
+    }, []);
 
     const props = {
         title: data?.pages[0].name || "Albums",

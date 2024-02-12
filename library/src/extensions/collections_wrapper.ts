@@ -19,16 +19,18 @@ interface Album {
 
 type CollectionItem = Album | Collection;
 
-class CollectionWrapper {
+class CollectionWrapper extends EventTarget {
     collections: Collection[];
 
     constructor() {
+        super();
         let storedCollections = JSON.parse(localStorage.getItem("library:collections") || "[]");
         this.collections = storedCollections;
     }
 
     saveCollections() {
         localStorage.setItem("library:collections", JSON.stringify(this.collections));
+        this.dispatchEvent(new CustomEvent("update", { detail: this.collections }));
     }
 
     getCollections() {

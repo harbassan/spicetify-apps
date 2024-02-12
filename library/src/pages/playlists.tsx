@@ -99,7 +99,7 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
         return res;
     };
 
-    const { data, status, hasNextPage, fetchNextPage } = useInfiniteQuery({
+    const { data, status, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
         queryKey: ["library:playlists", sortOption.id, filterOption.id, textFilter, folder],
         queryFn: fetchRootlist,
         initialPageParam: 0,
@@ -107,6 +107,14 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
             return lastPage.totalLength > lastPageParam + limit ? lastPageParam + limit : undefined;
         },
     });
+
+    React.useEffect(() => {
+        const onUpdate = (e: any) => refetch();
+
+        Spicetify.Platform.RootlistAPI.getEvents().addListener("update", onUpdate);
+
+        return () => Spicetify.Platform.RootlistAPI.getEvents().removeListener("update", onUpdate);
+    }, []);
 
     const props = {
         title: data?.pages[0].openedFolderName || "Playlists",
