@@ -34,7 +34,7 @@
 
 ---
 
-### Top Albums (w/ Last.fm Sync Only)
+### Top Albums (works with Last.fm Sync only)
 
 ![preview](previews/top_albums.png)
 
@@ -48,7 +48,7 @@
 
 ### Manual Installation
 
-Download the files in the [dist branch](https://github.com/harbassan/spicetify-stats/archive/refs/heads/dist.zip) and rename the unzipped folder to `stats`, and then place that folder into your `CustomApps` folder in the `spicetify` directory. It should be similair to this:
+Download the files in the [dist branch](https://github.com/harbassan/spicetify-stats/archive/refs/heads/dist.zip), rename the unzipped folder to `stats`, then place that folder into your `CustomApps` folder in the `spicetify` directory and you're all done. If everything's correct, the structure should be similar to this:
 
 ```
 📦spicetify\CustomApps
@@ -61,28 +61,30 @@ Download the files in the [dist branch](https://github.com/harbassan/spicetify-s
  ┃ ┗ 📜style.css
 ```
 
-Then run these commands to apply:
+Finally, run these commands to apply:
 
 ```powershell
 spicetify config custom_apps stats
 spicetify apply
 ```
 
+That's it. Enjoy.
+
 For more help on installing visit the [Spicetify Docs](https://spicetify.app/docs/advanced-usage/custom-apps#installing).
 
 ### Uninstallation
 
-To disable the app run these commands:
+To uninstall the app, run these commands:
 
 ```powershell
 spicetify config custom_apps stats-
 spicetify apply
 ```
 
-If you want to completely remove the app just delete the `stats` folder after running the above commands.
+If you want to remove the app completely, just delete the `stats` folder after running the above commands.
 
 ---
 
-If you have any questions or issues regarding the app open an issue on this repo. Please specify your spicetify version and installation method if you do so.
+If you have any questions or issues regarding the app, open an issue on this repo. While doing so, please specify your spicetify version and installation method.
 
-If you really like the app i'd be grateful if you liked the repo ❤️.
+If you like the app, I'd be really grateful if you liked the repo ❤️.
