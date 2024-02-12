@@ -7,6 +7,9 @@ import SpotifyCard from "@shared/components/spotify_card";
 import SettingsButton from "@shared/components/settings_button";
 import { ConfigWrapperProps } from "../types/library_types";
 import LoadMoreCard from "../components/load_more_card";
+import LeadingIcon from "../components/leading_icon";
+import AddButton from "../components/add_button";
+import TextInputDialog from "../components/text_input_dialog";
 
 interface ArtistProps {
     uri: string;
@@ -18,6 +21,31 @@ const sortOptions = [
     { id: "0", name: "Name" },
     { id: "1", name: "Date Added" },
 ];
+
+const AddMenu = () => {
+    const { MenuItem, Menu } = Spicetify.ReactComponent;
+    const { SVGIcons } = Spicetify;
+
+    const addAlbum = () => {
+        const onSave = (value: string) => {
+            Spicetify.Platform.LibraryAPI.add({ uris: [value] });
+        };
+
+        Spicetify.PopupModal.display({
+            title: "Add Artist",
+            // @ts-ignore
+            content: <TextInputDialog def={""} placeholder="Artist URI" onSave={onSave} />,
+        });
+    };
+
+    return (
+        <Menu>
+            <MenuItem onClick={addAlbum} leadingIcon={<LeadingIcon path={SVGIcons["artist"]} />}>
+                Add Artist
+            </MenuItem>
+        </Menu>
+    );
+};
 
 const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => {
     const [dropdown, sortOption] = useDropdownMenu(sortOptions, "library:artists");
@@ -57,6 +85,7 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) =
     const props = {
         title: "Artists",
         headerEls: [
+            <AddButton Menu={<AddMenu />} />,
             dropdown,
             <SearchBar setSearch={setTextFilter} placeholder="Artists" />,
             <SettingsButton configWrapper={configWrapper} />,
