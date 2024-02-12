@@ -20,22 +20,31 @@ const sortOptions = [
 ];
 
 const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => {
-    const [artists, setArtists] = React.useState<ArtistProps[] | 100 | 200 | 300>(100);
     const [dropdown, sortOption] = useDropdownMenu(sortOptions, "library:artists");
     const [textFilter, setTextFilter] = React.useState("");
 
-    React.useEffect(() => {
-        Spicetify.Platform.LibraryAPI.getContents({
+    const { useInfiniteQuery } = Spicetify.ReactQuery;
+    const limit = 200;
+
+    const fetchArtists = async ({ pageParam }: { pageParam: number }) => {
+        const res = await Spicetify.Platform.LibraryAPI.getContents({
             filters: ["1"],
             sortOrder: sortOption.id,
             textFilter,
-            offset: 0,
-            limit: 200,
-        }).then((res: any) => {
-            const items = res.items.length ? res.items : textFilter ? 300 : 200;
-            setArtists(items);
+            offset: pageParam,
+            limit,
         });
-    }, [sortOption, textFilter]);
+        return res;
+    };
+
+    const { data, status, hasNextPage, fetchNextPage } = useInfiniteQuery({
+        queryKey: ["library:artists", sortOption.id, textFilter],
+        queryFn: fetchArtists,
+        initialPageParam: 0,
+        getNextPageParam: (lastPage: any, _allPages: any, lastPageParam: number) => {
+            return lastPage.totalLength > lastPageParam + limit ? lastPageParam + limit : undefined;
+        },
+    });
 
     const props = {
         title: "Artists",
@@ -46,22 +55,27 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) =
         ],
     };
 
-    switch (artists) {
-        case 100:
-            return <></>;
-        case 200:
-            return (
-                <PageContainer title="Artists">
-                    <Status icon="library" heading="Nothing Here" subheading="You don't have any artists saved" />
-                </PageContainer>
-            );
-        case 300:
-            return (
-                <PageContainer {...props}>
-                    <Status icon="library" heading="Nothing Here" subheading="No artists match your search" />
-                </PageContainer>
-            );
+    if (status === "pending") {
+        return (
+            <PageContainer {...props}>
+                <Status icon="library" heading="Loading" subheading="Fetching your artists" />
+            </PageContainer>
+        );
+    } else if (status === "error") {
+        return (
+            <PageContainer {...props}>
+                <Status icon="error" heading="Error" subheading="Failed to load your artists" />
+            </PageContainer>
+        );
+    } else if (!data.pages[0].items.length) {
+        return (
+            <PageContainer {...props}>
+                <Status icon="library" heading="Nothing Here" subheading="You don't have any artists saved" />
+            </PageContainer>
+        );
     }
+
+    const artists = data.pages.map((page: any) => page.items).flat() as ArtistProps[];
 
     const artistCards = artists.map((artist) => {
         return (
@@ -75,23 +89,7 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) =
         );
     });
 
-    if (artists.length % 200 === 0) {
-        artistCards.push(
-            <LoadMoreCard
-                callback={() => {
-                    Spicetify.Platform.LibraryAPI.getContents({
-                        filters: ["1"],
-                        sortOrder: sortOption.id,
-                        textFilter,
-                        offset: artists.length,
-                        limit: 200,
-                    }).then((res: any) => {
-                        setArtists([...artists, ...res.items]);
-                    });
-                }}
-            />
-        );
-    }
+    if (hasNextPage) artistCards.push(<LoadMoreCard callback={fetchNextPage} />);
 
     return (
         <PageContainer {...props}>

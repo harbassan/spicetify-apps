@@ -4,19 +4,20 @@ import { v4 as uuidv4 } from "uuid";
 interface Collection {
     type: string;
     name: string;
-    id: string;
+    uri: string;
     items: CollectionItem[];
+    totalLength: number;
 }
 
 interface Album {
     type: string;
     name: string;
     uri: string;
-    image: string;
-    artist: string;
+    artists: { name: string }[];
+    images: { url: string }[];
 }
 
-type CollectionItem = Album;
+type CollectionItem = Album | Collection;
 
 class CollectionWrapper {
     collections: Collection[];
@@ -34,36 +35,37 @@ class CollectionWrapper {
         return this.collections;
     }
 
-    getCollection(id: string) {
-        return this.collections.find((collection) => collection.id === id);
+    getCollection(uri: string) {
+        return this.collections.find((collection) => collection.uri === uri);
     }
 
     createCollection(name: string) {
-        const id = uuidv4();
+        const uri = uuidv4();
         const collection: Collection = {
             type: "collection",
-            id,
+            uri,
             name,
             items: [],
+            totalLength: 0,
         };
         this.collections.push(collection);
         this.saveCollections();
     }
 
-    deleteCollection(id: string) {
-        this.collections = this.collections.filter((collection) => collection.id !== id);
+    deleteCollection(uri: string) {
+        this.collections = this.collections.filter((collection) => collection.uri !== uri);
         this.saveCollections();
     }
 
-    async addAlbumToCollection(collectionId: string, albumUri: string) {
-        const collection = this.collections.find((collection) => collection.id === collectionId);
+    async addAlbumToCollection(collectionUri: string, albumUri: string) {
+        const collection = this.collections.find((collection) => collection.uri === collectionUri);
         if (!collection) return;
 
         const res = await Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.getAlbum, {
             uri: albumUri,
             locale: "en",
             offset: 0,
-            limit: 50,
+            limit: 1,
         });
 
         const data = res.data.albumUnion;
@@ -71,19 +73,21 @@ class CollectionWrapper {
             type: "album",
             name: data.name,
             uri: data.uri,
-            image: data.coverArt?.sources?.[0].url,
-            artist: data.artists.items[0].profile.name,
+            images: [{ url: data.coverArt?.sources?.[0].url }],
+            artists: [{ name: data.artists.items[0].profile.name }],
         };
 
         collection.items.push(album);
+        collection.totalLength++;
         this.saveCollections();
     }
 
-    removeAlbumFromCollection(collectionId: string, albumUri: string) {
-        const collection = this.collections.find((collection) => collection.id === collectionId);
+    removeAlbumFromCollection(collectionUri: string, albumUri: string) {
+        const collection = this.collections.find((collection) => collection.uri === collectionUri);
         if (!collection) return;
 
         collection.items = collection.items.filter((item) => item?.uri !== albumUri);
+        collection.totalLength--;
         this.saveCollections();
     }
 
@@ -93,8 +97,8 @@ class CollectionWrapper {
         });
     }
 
-    renameCollection(collectionId: string, newName: string) {
-        const collection = this.collections.find((collection) => collection.id === collectionId);
+    renameCollection(uri: string, newName: string) {
+        const collection = this.collections.find((collection) => collection.uri === uri);
         if (!collection) return;
 
         collection.name = newName;

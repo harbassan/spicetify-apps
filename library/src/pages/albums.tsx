@@ -12,12 +12,22 @@ import TextInputDialog from "../components/text_input_dialog";
 import LeadingIcon from "../components/leading_icon";
 
 interface AlbumProps {
-    type: "album" | "collection";
+    type: "album";
     uri: string;
     name: string;
     artists: { name: string }[];
     images: { url: string }[];
 }
+
+interface CollectionProps {
+    type: "collection";
+    name: string;
+    uri: string;
+    items: RootlistItemProps[];
+    totalLength: number;
+}
+
+type RootlistItemProps = AlbumProps | CollectionProps;
 
 const sortOptions = [
     { id: "0", name: "Name" },
@@ -68,55 +78,45 @@ const AddMenu = ({ collection }: { collection?: string }) => {
 };
 
 const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrapperProps; collection?: string }) => {
-    const [albums, setAlbums] = React.useState<AlbumProps[] | 100 | 200 | 300>(100);
     const [dropdown, sortOption] = useDropdownMenu(sortOptions, "library:albums");
     const [textFilter, setTextFilter] = React.useState("");
-    const [collectionName, setCollectionName] = React.useState("");
 
-    const fetchItems = async () => {
-        const collections = SpicetifyLibrary.CollectionWrapper.getCollections();
-        const albums = await Spicetify.Platform.LibraryAPI.getContents({
-            filters: ["0"],
-            sortOrder: sortOption.id,
-            textFilter,
-            offset: 0,
-            limit: 200,
-        });
+    const { useInfiniteQuery } = Spicetify.ReactQuery;
+    const limit = 200;
 
-        // filter out any album in a collection
-        albums.items = albums.items.filter((album: AlbumProps) => {
-            return SpicetifyLibrary.CollectionWrapper.getCollectionsWithAlbum(album.uri).length === 0;
-        });
+    const fetchRootlist = async ({ pageParam }: { pageParam: number }) => {
+        if (!collection) {
+            const collections = SpicetifyLibrary.CollectionWrapper.getCollections();
+            const res = await Spicetify.Platform.LibraryAPI.getContents({
+                filters: ["0"],
+                sortOrder: sortOption.id,
+                textFilter,
+                offset: pageParam,
+                limit,
+            });
 
-        if (albums.items.length === 0 && collections.length === 0) {
-            return textFilter ? setAlbums(300) : setAlbums(200);
+            // filter out any album in a collection
+            const albums = res.items.filter((album: AlbumProps) => {
+                return SpicetifyLibrary.CollectionWrapper.getCollectionsWithAlbum(album.uri).length === 0;
+            });
+
+            return { items: [...collections, ...albums], name: "", totalLength: res.totalLength };
         }
 
-        const items = [...collections, ...albums.items];
-        setAlbums(items);
+        return SpicetifyLibrary.CollectionWrapper.getCollection(collection);
     };
 
-    const fetchCollection = async () => {
-        const res = SpicetifyLibrary.CollectionWrapper.getCollection(collection);
-        const collectionItems = res.items;
-
-        if (collectionItems.length === 0) {
-            return textFilter ? setAlbums(300) : setAlbums(200);
-        }
-
-        setAlbums(collectionItems);
-        setCollectionName(res.name);
-    };
-
-    React.useEffect(() => {
-        if (collection) fetchCollection();
-        else fetchItems();
-    }, [sortOption, textFilter, collection]);
-
-    const title = collectionName || "Albums";
+    const { data, status, hasNextPage, fetchNextPage } = useInfiniteQuery({
+        queryKey: ["library:albums", sortOption.id, textFilter, collection],
+        queryFn: fetchRootlist,
+        initialPageParam: 0,
+        getNextPageParam: (lastPage: any, _allPages: any, lastPageParam: number) => {
+            return lastPage.totalLength > lastPageParam + limit ? lastPageParam + limit : undefined;
+        },
+    });
 
     const props = {
-        title,
+        title: data?.pages[0].name || "Albums",
         headerEls: [
             <AddButton Menu={<AddMenu collection={collection} />} />,
             dropdown,
@@ -125,56 +125,46 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
         ],
     };
 
-    switch (albums) {
-        case 100:
-            return <></>;
-        case 200:
-            return (
-                <PageContainer {...props}>
-                    <Status icon="library" heading="Nothing Here" subheading="You don't have any albums saved" />
-                </PageContainer>
-            );
-        case 300:
-            return (
-                <PageContainer {...props}>
-                    <Status icon="library" heading="Nothing Here" subheading="No albums match your search" />
-                </PageContainer>
-            );
+    if (status === "pending") {
+        return (
+            <PageContainer {...props}>
+                <Status icon="library" heading="Loading" subheading="Fetching your albums" />
+            </PageContainer>
+        );
+    } else if (status === "error") {
+        return (
+            <PageContainer {...props}>
+                <Status icon="error" heading="Error" subheading="Failed to load your albums" />
+            </PageContainer>
+        );
+    } else if (!data.pages[0].items.length) {
+        return (
+            <PageContainer {...props}>
+                <Status icon="library" heading="Nothing Here" subheading="You don't have any albums saved" />
+            </PageContainer>
+        );
     }
 
-    const albumCards = albums.map((album) => {
+    const rootlistItems = data.pages.map((page: any) => page.items).flat() as RootlistItemProps[];
+
+    const rootlistCards = rootlistItems.map((album) => {
+        const isAlbum = album.type === "album";
         return (
             <SpotifyCard
                 type={album.type}
-                uri={album.uri || album.id}
+                uri={album.uri}
                 header={album.name}
-                subheader={album.artists?.[0]?.name || album.artist || "Collection"}
-                imageUrl={album.images?.[0]?.url || album.image || ""}
+                subheader={isAlbum ? album.artists?.[0]?.name : "Collection"}
+                imageUrl={isAlbum ? album.images?.[0]?.url : ""}
             />
         );
     });
 
-    if (albums.length % 200 === 0) {
-        albumCards.push(
-            <LoadMoreCard
-                callback={() => {
-                    Spicetify.Platform.LibraryAPI.getContents({
-                        filters: ["0"],
-                        sortOrder: sortOption.id,
-                        textFilter,
-                        offset: albums.length,
-                        limit: 200,
-                    }).then((res: any) => {
-                        setAlbums([...albums, ...res.items]);
-                    });
-                }}
-            />
-        );
-    }
+    if (hasNextPage) rootlistCards.push(<LoadMoreCard callback={fetchNextPage} />);
 
     return (
         <PageContainer {...props}>
-            <div className={`main-gridContainer-gridContainer grid`}>{albumCards}</div>
+            <div className={`main-gridContainer-gridContainer grid`}>{rootlistCards}</div>
         </PageContainer>
     );
 };

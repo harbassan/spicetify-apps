@@ -11,17 +11,12 @@ import LoadMoreCard from "../components/load_more_card";
 import TextInputDialog from "../components/text_input_dialog";
 import LeadingIcon from "../components/leading_icon";
 
-interface PlaylistProps {
+interface RootlistItemProps {
+    type: "folder" | "playlist";
     uri: string;
     name: string;
     owner: { name: string };
     images: { url: string }[];
-    type: "folder" | "playlist";
-}
-
-interface PlaylistPageProps {
-    folder: string | null;
-    items: PlaylistProps[] | 100 | 200 | 300;
 }
 
 const dropdownOptions = [
@@ -84,63 +79,37 @@ const AddMenu = ({ folder }: { folder?: string }) => {
 
 const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapperProps; folder?: string }) => {
     console.log("playlists mount");
-    const [playlists, setPlaylists] = React.useState<PlaylistPageProps>({ folder: null, items: 100 });
     const [sortDropdown, sortOption] = useDropdownMenu(dropdownOptions, "library:playlists-sort");
     const [filterDropdown, filterOption, setFilterOption, setAvailableOptions] = useDropdownMenu(filterOptions);
     const [textFilter, setTextFilter] = React.useState("");
 
-    // force a re-render when the rootlist is updated
-    const [trigger, setTrigger] = React.useState(false);
+    const { useInfiniteQuery } = Spicetify.ReactQuery;
+    const limit = 200;
 
-    Spicetify.Platform.RootlistAPI.getEvents().addListener("update", () => {
-        setTrigger(!trigger);
-    });
-
-    const firstUpdate = React.useRef(true);
-
-    React.useEffect(() => {
-        // run only on subsequent updates after mount
-        if (firstUpdate.current) {
-            firstUpdate.current = false;
-            return;
-        }
-
+    const fetchRootlist = async ({ pageParam }: { pageParam: number }) => {
         const filters = filterOption.id === "all" ? ["2"] : ["2", filterOption.id];
-        Spicetify.Platform.LibraryAPI.getContents({
+        const res = await Spicetify.Platform.LibraryAPI.getContents({
             filters,
             sortOrder: sortOption.id,
             folderUri: folder,
             textFilter,
-            offset: 0,
-            limit: 100,
-        }).then((res: any) => {
-            const items = res.items.length ? res.items : textFilter ? 300 : 200;
-            setPlaylists({ folder: res.openedFolderName, items });
+            offset: pageParam,
+            limit,
         });
-    }, [sortOption, filterOption, trigger, textFilter]);
+        return res;
+    };
 
-    // fetch playlists and available sort/filter options on mount
-    React.useEffect(() => {
-        const filters = filterOption.id === "all" ? ["2"] : ["2", filterOption.id];
-        Spicetify.Platform.LibraryAPI.getContents({
-            filters,
-            sortOrder: sortOption.id,
-            folderUri: folder,
-            offset: 0,
-            limit: 100,
-        }).then((res: any) => {
-            const { availableFilters } = res;
-            availableFilters.unshift(filterOptions[0]);
-            setAvailableOptions(availableFilters);
-            const items = res.items.length ? res.items : textFilter ? 300 : 200;
-            setPlaylists({ folder: res.openedFolderName, items });
-        });
-    }, [folder]);
-
-    const title = playlists.folder || "Playlists";
+    const { data, status, hasNextPage, fetchNextPage } = useInfiniteQuery({
+        queryKey: ["library:playlists", sortOption.id, filterOption.id, textFilter, folder],
+        queryFn: fetchRootlist,
+        initialPageParam: 0,
+        getNextPageParam: (lastPage: any, _allPages: any, lastPageParam: number) => {
+            return lastPage.totalLength > lastPageParam + limit ? lastPageParam + limit : undefined;
+        },
+    });
 
     const props = {
-        title,
+        title: data?.pages[0].openedFolderName || "Playlists",
         headerEls: [
             <AddButton Menu={<AddMenu folder={folder} />} />,
             sortDropdown,
@@ -150,24 +119,29 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
         ],
     };
 
-    switch (playlists.items) {
-        case 100:
-            return <></>;
-        case 200:
-            return (
-                <PageContainer {...props}>
-                    <Status icon="library" heading="Nothing Here" subheading="There are no playlists in this folder" />
-                </PageContainer>
-            );
-        case 300:
-            return (
-                <PageContainer {...props}>
-                    <Status icon="library" heading="Nothing Here" subheading="No playlists match your search" />
-                </PageContainer>
-            );
+    if (status === "pending") {
+        return (
+            <PageContainer {...props}>
+                <Status icon="library" heading="Loading" subheading="Fetching your playlists" />
+            </PageContainer>
+        );
+    } else if (status === "error") {
+        return (
+            <PageContainer {...props}>
+                <Status icon="error" heading="Error" subheading="Failed to load your playlists" />
+            </PageContainer>
+        );
+    } else if (!data.pages[0].items.length) {
+        return (
+            <PageContainer {...props}>
+                <Status icon="library" heading="Nothing Here" subheading="You don't have any playlists saved" />
+            </PageContainer>
+        );
     }
 
-    const playlistCards = playlists.items.map((playlist) => {
+    const rootlistItems = data.pages.map((page: any) => page.items).flat() as RootlistItemProps[];
+
+    const rootlistCards = rootlistItems.map((playlist) => {
         return (
             <SpotifyCard
                 type={playlist.type}
@@ -179,29 +153,11 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
         );
     });
 
-    if (playlists.items.length % 100 === 0) {
-        const playlistItems = playlists.items as PlaylistProps[];
-        playlistCards.push(
-            <LoadMoreCard
-                callback={() => {
-                    Spicetify.Platform.LibraryAPI.getContents({
-                        filters: ["2"],
-                        sortOrder: sortOption.id,
-                        folderUri: folder,
-                        textFilter,
-                        offset: playlistItems.length,
-                        limit: 100,
-                    }).then((res: any) => {
-                        setPlaylists({ folder: res.openedFolderName, items: [...playlistItems, ...res.items] });
-                    });
-                }}
-            />
-        );
-    }
+    if (hasNextPage) rootlistCards.push(<LoadMoreCard callback={fetchNextPage} />);
 
     return (
         <PageContainer {...props}>
-            <div className={`main-gridContainer-gridContainer grid`}>{playlistCards}</div>
+            <div className={`main-gridContainer-gridContainer grid`}>{rootlistCards}</div>
         </PageContainer>
     );
 };

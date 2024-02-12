@@ -21,22 +21,31 @@ const sortOptions = [
 ];
 
 const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => {
-    const [shows, setShows] = React.useState<ShowProps[] | 100 | 200 | 300>(100);
     const [dropdown, sortOption] = useDropdownMenu(sortOptions, "library:shows");
     const [textFilter, setTextFilter] = React.useState("");
 
-    React.useEffect(() => {
-        Spicetify.Platform.LibraryAPI.getContents({
+    const { useInfiniteQuery } = Spicetify.ReactQuery;
+    const limit = 200;
+
+    const fetchShows = async ({ pageParam }: { pageParam: number }) => {
+        const res = await Spicetify.Platform.LibraryAPI.getContents({
             filters: ["3"],
             sortOrder: sortOption.id,
             textFilter,
-            offset: 0,
-            limit: 100,
-        }).then((res: any) => {
-            const items = res.items.length ? res.items : textFilter ? 300 : 200;
-            setShows(items);
+            offset: pageParam,
+            limit,
         });
-    }, [sortOption, textFilter]);
+        return res;
+    };
+
+    const { data, status, hasNextPage, fetchNextPage } = useInfiniteQuery({
+        queryKey: ["library:shows", sortOption.id, textFilter],
+        queryFn: fetchShows,
+        initialPageParam: 0,
+        getNextPageParam: (lastPage: any, _allPages: any, lastPageParam: number) => {
+            return lastPage.totalLength > lastPageParam + limit ? lastPageParam + limit : undefined;
+        },
+    });
 
     const props = {
         title: "Shows",
@@ -47,22 +56,27 @@ const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => 
         ],
     };
 
-    switch (shows) {
-        case 100:
-            return <></>;
-        case 200:
-            return (
-                <PageContainer title="Shows">
-                    <Status icon="library" heading="Nothing Here" subheading="You don't have any shows saved" />
-                </PageContainer>
-            );
-        case 300:
-            return (
-                <PageContainer {...props}>
-                    <Status icon="library" heading="Nothing Here" subheading="No shows match your search" />
-                </PageContainer>
-            );
+    if (status === "pending") {
+        return (
+            <PageContainer {...props}>
+                <Status icon="library" heading="Loading" subheading="Fetching your shows" />
+            </PageContainer>
+        );
+    } else if (status === "error") {
+        return (
+            <PageContainer {...props}>
+                <Status icon="error" heading="Error" subheading="Failed to load your shows" />
+            </PageContainer>
+        );
+    } else if (!data.pages[0].items.length) {
+        return (
+            <PageContainer {...props}>
+                <Status icon="library" heading="Nothing Here" subheading="You don't have any shows saved" />
+            </PageContainer>
+        );
     }
+
+    const shows = data.pages.map((page: any) => page.items).flat() as ShowProps[];
 
     const showCards = shows.map((show) => {
         return (
@@ -76,23 +90,7 @@ const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => 
         );
     });
 
-    if (shows.length % 100 === 0) {
-        showCards.push(
-            <LoadMoreCard
-                callback={() => {
-                    Spicetify.Platform.LibraryAPI.getContents({
-                        filters: ["3"],
-                        sortOrder: sortOption.id,
-                        textFilter,
-                        offset: shows.length,
-                        limit: 100,
-                    }).then((res: any) => {
-                        setShows([...shows, ...res.items]);
-                    });
-                }}
-            />
-        );
-    }
+    if (hasNextPage) showCards.push(<LoadMoreCard callback={fetchNextPage} />);
 
     return (
         <PageContainer {...props}>
