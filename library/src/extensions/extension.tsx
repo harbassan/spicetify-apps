@@ -5,6 +5,7 @@ import ToggleFiltersButton from "../components/toggle_filters";
 import CollapseButton from "../components/collapse_button";
 import ExpandButton from "../components/expand_button";
 import CollectionWrapper from "./collections_wrapper";
+import AlbumMenuItem from "../components/album_menu_item";
 
 // inject css
 const styleLink = document.createElement("link");
@@ -59,6 +60,13 @@ window.SpicetifyLibrary = new SpicetifyLibrary();
 })();
 
 function main(LocalStorageAPI: any) {
+    const isAlbum = (props: any) => {
+        return props.uri?.includes("album");
+    };
+
+    // @ts-expect-error
+    Spicetify.ContextMenuV2.registerItem(<AlbumMenuItem />, isAlbum);
+
     function injectYLXButtons() {
         // wait for the sidebar to load
         const ylx_filter = document.querySelector(
