@@ -33,8 +33,14 @@ class CollectionWrapper extends EventTarget {
         this.dispatchEvent(new CustomEvent("update", { detail: this.collections }));
     }
 
-    getCollections() {
-        return this.collections;
+    getCollections(props: { textFilter?: string } | undefined) {
+        if (!props?.textFilter) return this.collections;
+
+        let regex = new RegExp("\\b" + props.textFilter, "i");
+
+        return this.collections.filter((collection) => {
+            return regex.test(collection.name);
+        });
     }
 
     getCollection(uri: string) {

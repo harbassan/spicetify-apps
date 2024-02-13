@@ -86,7 +86,7 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
 
     const fetchRootlist = async ({ pageParam }: { pageParam: number }) => {
         if (!collection) {
-            const collections = SpicetifyLibrary.CollectionWrapper.getCollections();
+            const collections = SpicetifyLibrary.CollectionWrapper.getCollections({ textFilter });
             const res = await Spicetify.Platform.LibraryAPI.getContents({
                 filters: ["0"],
                 sortOrder: sortOption.id,
