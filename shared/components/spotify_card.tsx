@@ -62,7 +62,7 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
             : {};
 
     return (
-        <ContextMenu menu={<Menu />} trigger="right-click">
+        <ContextMenu menu={Menu()} trigger="right-click">
             <Card
                 featureIdentifier={type}
                 headerText={header}
