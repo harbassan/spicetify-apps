@@ -22,34 +22,6 @@ const setSearchBarSize = (enlarged: boolean) => {
     document.documentElement.style.setProperty("--library-searchbar-size", `${size}px`);
 };
 
-// contruct global class for library methods
-class SpicetifyLibrary {
-    ConfigWrapper = new ConfigWrapper(
-        [
-            {
-                name: "Card Size",
-                key: "cardSize",
-                type: "slider",
-                min: 100,
-                max: 200,
-                step: 0.05,
-                def: 180,
-                callback: setCardSize,
-            },
-            {
-                name: "Extend Search Bar",
-                key: "extendSearchBar",
-                type: "toggle",
-                def: false,
-                callback: setSearchBarSize,
-            },
-        ],
-        "library"
-    );
-    CollectionWrapper = new CollectionWrapper();
-}
-window.SpicetifyLibrary = new SpicetifyLibrary();
-
 (function wait() {
     const { LocalStorageAPI } = Spicetify?.Platform;
     if (!LocalStorageAPI) {
@@ -66,6 +38,34 @@ function main(LocalStorageAPI: any) {
 
     // @ts-expect-error
     Spicetify.ContextMenuV2.registerItem(<AlbumMenuItem />, isAlbum);
+
+    // contruct global class for library methods
+    class SpicetifyLibrary {
+        ConfigWrapper = new ConfigWrapper(
+            [
+                {
+                    name: "Card Size",
+                    key: "cardSize",
+                    type: "slider",
+                    min: 100,
+                    max: 200,
+                    step: 0.05,
+                    def: 180,
+                    callback: setCardSize,
+                },
+                {
+                    name: "Extend Search Bar",
+                    key: "extendSearchBar",
+                    type: "toggle",
+                    def: false,
+                    callback: setSearchBarSize,
+                },
+            ],
+            "library"
+        );
+        CollectionWrapper = new CollectionWrapper();
+    }
+    window.SpicetifyLibrary = new SpicetifyLibrary();
 
     function injectYLXButtons() {
         // wait for the sidebar to load

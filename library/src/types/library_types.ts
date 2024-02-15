@@ -1,5 +1,7 @@
+import CollectionWrapper from "../extensions/collections_wrapper";
+
 declare global {
-    var SpicetifyLibrary: any; // Use a more specific type if you have one
+    var SpicetifyLibrary: { CollectionWrapper: CollectionWrapper };
 }
 
 export interface ConfigProps extends Record<string, any> {

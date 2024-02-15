@@ -42,7 +42,7 @@ const AddMenu = ({ collection }: { collection?: string }) => {
 
     const createCollection = () => {
         const onSave = (value: string) => {
-            SpicetifyLibrary.CollectionWrapper.createCollection(value);
+            SpicetifyLibrary.CollectionWrapper.createCollection(value, collection);
         };
 
         Spicetify.PopupModal.display({
@@ -85,25 +85,16 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
     const limit = 200;
 
     const fetchRootlist = async ({ pageParam }: { pageParam: number }) => {
-        if (!collection) {
-            const collections = SpicetifyLibrary.CollectionWrapper.getCollections({ textFilter });
-            const res = await Spicetify.Platform.LibraryAPI.getContents({
-                filters: ["0"],
-                sortOrder: sortOption.id,
-                textFilter,
-                offset: pageParam,
-                limit,
-            });
+        const collections = await SpicetifyLibrary.CollectionWrapper.getCollectionItems({
+            collectionUri: collection,
+            textFilter,
+            sortOrder: sortOption.id,
+            limit,
+            offset: pageParam,
+            rootlist: true,
+        });
 
-            // filter out any album in a collection
-            const albums = res.items.filter((album: AlbumProps) => {
-                return SpicetifyLibrary.CollectionWrapper.getCollectionsWithAlbum(album.uri).length === 0;
-            });
-
-            return { items: [...collections, ...albums], name: "", totalLength: res.totalLength };
-        }
-
-        return SpicetifyLibrary.CollectionWrapper.getCollection(collection);
+        return collections;
     };
 
     const { data, status, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
@@ -128,7 +119,7 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
     }, []);
 
     const props = {
-        title: data?.pages[0].name || "Albums",
+        title: data?.pages[0].openedCollection || "Albums",
         headerEls: [
             <AddButton Menu={<AddMenu collection={collection} />} />,
             dropdown,
@@ -159,15 +150,15 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
 
     const rootlistItems = data.pages.map((page: any) => page.items).flat() as RootlistItemProps[];
 
-    const rootlistCards = rootlistItems.map((album) => {
-        const isAlbum = album.type === "album";
+    const rootlistCards = rootlistItems.map((item) => {
+        const isAlbum = item.type === "album";
         return (
             <SpotifyCard
-                type={album.type}
-                uri={album.uri}
-                header={album.name}
-                subheader={isAlbum ? album.artists?.[0]?.name : "Collection"}
-                imageUrl={isAlbum ? album.images?.[0]?.url : ""}
+                type={item.type}
+                uri={item.uri}
+                header={item.name}
+                subheader={isAlbum ? item.artists?.[0]?.name : "Collection"}
+                imageUrl={isAlbum ? item.images?.[0]?.url : ""}
             />
         );
     });

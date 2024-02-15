@@ -20,10 +20,22 @@ const CollectionSearchMenu = () => {
     const { SVGIcons } = Spicetify;
 
     const [textFilter, setTextFilter] = React.useState("");
+    const [collections, setCollections] = React.useState<any>(null);
 
     // @ts-ignore
     const context: any = React.useContext(Spicetify.ContextMenuV2._context);
     const uri = context?.props?.uri;
+
+    React.useEffect(() => {
+        const fetchCollections = async () => {
+            const res = await SpicetifyLibrary.CollectionWrapper.getCollectionItems({ textFilter });
+            setCollections(res);
+        };
+
+        fetchCollections();
+    }, [textFilter]);
+
+    if (!collections) return <></>;
 
     const addToCollection = (collectionUri: string) => {
         SpicetifyLibrary.CollectionWrapper.addAlbumToCollection(collectionUri, uri);
@@ -38,9 +50,9 @@ const CollectionSearchMenu = () => {
         });
     };
 
-    const allCollectionsLength = SpicetifyLibrary.CollectionWrapper.getCollections().length;
-    const collections = SpicetifyLibrary.CollectionWrapper.getCollections({ textFilter });
-    const menuItems = collections.map((collection, index) => {
+    const allCollectionsLength = collections.unfilteredLength;
+
+    const menuItems = collections.items.map((collection: any, index: number) => {
         return (
             <MenuItem
                 key={collection.uri}
