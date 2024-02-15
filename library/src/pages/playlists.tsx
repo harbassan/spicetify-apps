@@ -82,6 +82,7 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
     const [sortDropdown, sortOption] = useDropdownMenu(dropdownOptions, "library:playlists-sort");
     const [filterDropdown, filterOption, setFilterOption, setAvailableOptions] = useDropdownMenu(filterOptions);
     const [textFilter, setTextFilter] = React.useState("");
+    const [images, setImages] = React.useState({ ...SpicetifyLibrary.FolderImageWrapper.getFolderImages() });
 
     const { useInfiniteQuery } = Spicetify.ReactQuery;
     const limit = 200;
@@ -110,10 +111,15 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
 
     React.useEffect(() => {
         const onUpdate = (e: any) => refetch();
+        const onImageUpdate = (e: any) => setImages({ ...e.detail });
 
         Spicetify.Platform.RootlistAPI.getEvents().addListener("update", onUpdate);
+        SpicetifyLibrary.FolderImageWrapper.addEventListener("update", onImageUpdate);
 
-        return () => Spicetify.Platform.RootlistAPI.getEvents().removeListener("update", onUpdate);
+        return () => {
+            Spicetify.Platform.RootlistAPI.getEvents().removeListener("update", onUpdate);
+            SpicetifyLibrary.FolderImageWrapper.removeEventListener("update", onImageUpdate);
+        };
     }, []);
 
     const props = {
@@ -156,7 +162,7 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
                 uri={playlist.uri}
                 header={playlist.name}
                 subheader={playlist.owner?.name || "Folder"}
-                imageUrl={playlist.images?.[0]?.url || ""}
+                imageUrl={playlist.images?.[0]?.url || images[playlist.uri] || ""}
             />
         );
     });

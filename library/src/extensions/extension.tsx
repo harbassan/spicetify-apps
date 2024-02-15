@@ -6,6 +6,7 @@ import CollapseButton from "../components/collapse_button";
 import ExpandButton from "../components/expand_button";
 import CollectionWrapper from "./collections_wrapper";
 import AlbumMenuItem from "../components/album_menu_item";
+import FolderImageWrapper from "./folder_image_wrapper";
 
 // inject css
 const styleLink = document.createElement("link");
@@ -21,6 +22,63 @@ const setSearchBarSize = (enlarged: boolean) => {
     const size = enlarged ? 300 : 200;
     document.documentElement.style.setProperty("--library-searchbar-size", `${size}px`);
 };
+
+const FolderImage = ({ url }: { url: string }) => {
+    return (
+        <img
+            aria-hidden="true"
+            draggable="false"
+            loading="eager"
+            src={url}
+            className="main-image-image x-entityImage-image main-image-loading main-image-loaded"
+        />
+    );
+};
+
+const FolderPlaceholder = () => {
+    return (
+        <div className="x-entityImage-imagePlaceholder">
+            <svg
+                data-encore-id="icon"
+                role="img"
+                aria-hidden="true"
+                className="Svg-sc-ytk21e-0 Svg-img-icon-medium"
+                viewBox="0 0 24 24"
+            >
+                <path d="M1 4a2 2 0 0 1 2-2h5.155a3 3 0 0 1 2.598 1.5l.866 1.5H21a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V4zm7.155 0H3v16h18V7H10.464L9.021 4.5a1 1 0 0 0-.866-.5z"></path>
+            </svg>
+        </div>
+    );
+};
+
+// contruct global class for library methods
+class SpicetifyLibrary {
+    ConfigWrapper = new ConfigWrapper(
+        [
+            {
+                name: "Card Size",
+                key: "cardSize",
+                type: "slider",
+                min: 100,
+                max: 200,
+                step: 0.05,
+                def: 180,
+                callback: setCardSize,
+            },
+            {
+                name: "Extend Search Bar",
+                key: "extendSearchBar",
+                type: "toggle",
+                def: false,
+                callback: setSearchBarSize,
+            },
+        ],
+        "library"
+    );
+    CollectionWrapper = new CollectionWrapper();
+    FolderImageWrapper = new FolderImageWrapper();
+}
+window.SpicetifyLibrary = new SpicetifyLibrary();
 
 (function wait() {
     const { LocalStorageAPI } = Spicetify?.Platform;
@@ -39,33 +97,34 @@ function main(LocalStorageAPI: any) {
     // @ts-expect-error
     Spicetify.ContextMenuV2.registerItem(<AlbumMenuItem />, isAlbum);
 
-    // contruct global class for library methods
-    class SpicetifyLibrary {
-        ConfigWrapper = new ConfigWrapper(
-            [
-                {
-                    name: "Card Size",
-                    key: "cardSize",
-                    type: "slider",
-                    min: 100,
-                    max: 200,
-                    step: 0.05,
-                    def: 180,
-                    callback: setCardSize,
-                },
-                {
-                    name: "Extend Search Bar",
-                    key: "extendSearchBar",
-                    type: "toggle",
-                    def: false,
-                    callback: setSearchBarSize,
-                },
-            ],
-            "library"
-        );
-        CollectionWrapper = new CollectionWrapper();
+    function injectFolderImages() {
+        const rootlist = document.querySelector(".main-rootlist-wrapper > div:nth-child(2)");
+        if (!rootlist) return setTimeout(injectFolderImages, 100);
+
+        setTimeout(() => {
+            Array.from(rootlist.children).forEach((el: Element) => {
+                const uri = el
+                    .querySelector(".main-yourLibraryX-listItemGroup")
+                    ?.getAttribute("aria-labelledby")
+                    ?.slice(14);
+                if (uri?.includes("folder")) {
+                    const imageBox = el.querySelector(".x-entityImage-imageContainer");
+                    if (!imageBox) return; // for compact view
+
+                    const imageUrl = window.SpicetifyLibrary.FolderImageWrapper.getFolderImage(uri);
+
+                    if (!imageUrl) ReactDOM.render(<FolderPlaceholder />, imageBox);
+                    else ReactDOM.render(<FolderImage url={imageUrl} />, imageBox);
+                }
+            });
+        }, 500); // timeout is easier than waiting for certain elements
     }
-    window.SpicetifyLibrary = new SpicetifyLibrary();
+
+    injectFolderImages();
+
+    window.SpicetifyLibrary.FolderImageWrapper.addEventListener("update", () => {
+        injectFolderImages();
+    });
 
     function injectYLXButtons() {
         // wait for the sidebar to load
@@ -128,10 +187,12 @@ function main(LocalStorageAPI: any) {
     LocalStorageAPI.getEvents()._emitter.addListener("update", (e: any) => {
         const { key, value } = e.data;
         if (key === "ylx-sidebar-state" && value === 0) {
+            injectFolderImages();
             injectYLXButtons();
             removeExpandButton();
         }
         if (key === "ylx-sidebar-state" && value === 1) {
+            injectFolderImages();
             injectExpandButton();
         }
     });

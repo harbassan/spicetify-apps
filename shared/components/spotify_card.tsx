@@ -1,4 +1,5 @@
 import CollectionMenu from "library/src/components/collection_menu";
+import FolderMenu from "library/src/components/folder_menu";
 import React from "react";
 
 interface SpotifyCardProps {
@@ -29,6 +30,8 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
                 return <PodcastShowMenu uri={uri} />;
             case "collection":
                 return <CollectionMenu id={uri} />;
+            case "folder":
+                return <FolderMenu uri={uri} />;
             default:
                 return <></>;
         }
