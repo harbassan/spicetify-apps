@@ -95,3 +95,54 @@ li.main-yourLibraryX-navItem[data-id='/library'] > a {
         background-color: black;
     }
 }
+
+.text-input-form {
+    // copied directly from spotify
+    .Button-small-buttonPrimary {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        font-size: 0.875rem;
+        font-weight: 700;
+        font-family: var(--font-family,CircularSp,CircularSp-Arab,CircularSp-Hebr,CircularSp-Cyrl,CircularSp-Grek,CircularSp-Deva,var(--fallback-fonts,sans-serif));
+        background-color: transparent;
+        border: 0px;
+        border-radius: 9999px;
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        text-align: center;
+        text-decoration: none;
+        text-transform: none;
+        touch-action: manipulation;
+        transition-duration: 33ms;
+        transition-property: background-color, border-color, color, box-shadow, filter, transform;
+        user-select: none;
+        vertical-align: middle;
+        transform: translate3d(0px, 0px, 0px);
+        padding: 0px;
+        min-inline-size: 0px;
+    }
+    .ButtonInner-small {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        position: relative;
+        background-color: var(--background-base,#1ed760);
+        color: var(--text-base,#000000);
+        display: flex;
+        border-radius: 9999px;
+        font-size: inherit;
+        min-block-size: var(--encore-control-size-smaller,32px);
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        justify-content: center;
+        padding-block-start: var(--encore-spacing-tighter-4,4px);
+        padding-block-end: var(--encore-spacing-tighter-4,4px);
+        padding-inline-start: var(--encore-spacing-base,16px);
+        padding-inline-end: var(--encore-spacing-base,16px);
+    }
+    .Button-small-buttonPrimary:hover .ButtonInner-sc-14ud5tc-0, .Button-small-buttonPrimary:hover .ButtonFocus-sc-2hq6ey-0 {
+        transform: scale(1.04);
+    }
+}
+
