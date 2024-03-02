@@ -25,6 +25,7 @@ interface CollectionProps {
     uri: string;
     items: RootlistItemProps[];
     totalLength: number;
+    imgUrl: string;
 }
 
 type RootlistItemProps = AlbumProps | CollectionProps;
@@ -158,7 +159,7 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
                 uri={item.uri}
                 header={item.name}
                 subheader={isAlbum ? item.artists?.[0]?.name : "Collection"}
-                imageUrl={isAlbum ? item.images?.[0]?.url : ""}
+                imageUrl={isAlbum ? item.images?.[0]?.url : item.imgUrl}
             />
         );
     });

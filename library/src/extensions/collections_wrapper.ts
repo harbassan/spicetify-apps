@@ -6,6 +6,7 @@ type Collections = {
     name: string;
     uri: string;
     items: string[];
+    imgUrl: string;
     totalLength: number;
     parentCollection: string;
 }[];
@@ -108,6 +109,7 @@ class CollectionWrapper extends EventTarget {
             name,
             items: [],
             totalLength: 0,
+            imgUrl: "",
             parentCollection,
         };
         this._collections.push(collection);
@@ -159,6 +161,26 @@ class CollectionWrapper extends EventTarget {
 
         this.saveCollections();
         Spicetify.showNotification("Collection renamed");
+    }
+
+    setCollectionImage(uri: string, imgUrl: string) {
+        const collection = this.getCollection(uri);
+        if (!collection) return;
+
+        collection.imgUrl = imgUrl;
+
+        this.saveCollections();
+        Spicetify.showNotification("Collection image set");
+    }
+
+    removeCollectionImage(uri: string) {
+        const collection = this.getCollection(uri);
+        if (!collection) return;
+
+        collection.imgUrl = "";
+
+        this.saveCollections();
+        Spicetify.showNotification("Collection image removed");
     }
 }
 

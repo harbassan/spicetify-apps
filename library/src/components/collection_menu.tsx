@@ -29,6 +29,24 @@ const CollectionMenu = ({ id }: { id: string }) => {
         });
     };
 
+    const image = SpicetifyLibrary.CollectionWrapper.getCollection(id).imgUrl;
+
+    const setCollectionImage = () => {
+        const setImg = (imgUrl: string) => {
+            SpicetifyLibrary.CollectionWrapper.setCollectionImage(id, imgUrl);
+        };
+
+        Spicetify.PopupModal.display({
+            title: "Set Collection Image",
+            //@ts-ignore
+            content: <TextInputDialog def={image} placeholder={"Image URL"} onSave={setImg} />,
+        });
+    };
+
+    const removeImage = () => {
+        SpicetifyLibrary.CollectionWrapper.removeCollectionImage(id);
+    };
+
     return (
         <Menu>
             <MenuItem leadingIcon={<LeadingIcon path={editIconPath} />} onClick={renameCollection}>
@@ -37,6 +55,14 @@ const CollectionMenu = ({ id }: { id: string }) => {
             <MenuItem leadingIcon={<LeadingIcon path={deleteIconPath} />} onClick={deleteCollection}>
                 Delete
             </MenuItem>
+            <MenuItem leadingIcon={<LeadingIcon path={editIconPath} />} onClick={setCollectionImage}>
+                Set Collection Image
+            </MenuItem>
+            {image && (
+                <MenuItem leadingIcon={<LeadingIcon path={deleteIconPath} />} onClick={removeImage}>
+                    Remove Collection Image
+                </MenuItem>
+            )}
         </Menu>
     );
 };
