@@ -86,6 +86,7 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
     const limit = 200;
 
     const fetchRootlist = async ({ pageParam }: { pageParam: number }) => {
+        console.log("yeah");
         const collections = await SpicetifyLibrary.CollectionWrapper.getCollectionItems({
             collectionUri: collection,
             textFilter,
@@ -105,10 +106,14 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
         getNextPageParam: (lastPage: any, _allPages: any, lastPageParam: number) => {
             return lastPage.totalLength > lastPageParam + limit ? lastPageParam + limit : undefined;
         },
+        structuralSharing: false,
     });
 
     React.useEffect(() => {
-        const onUpdate = (e: any) => refetch();
+        const onUpdate = (e: any) => {
+            console.log("asad");
+            refetch();
+        };
 
         Spicetify.Platform.LibraryAPI.getEvents()._emitter.addListener("update", onUpdate);
         SpicetifyLibrary.CollectionWrapper.addEventListener("update", onUpdate);
