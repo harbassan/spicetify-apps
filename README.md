@@ -17,7 +17,7 @@
 
 |                Full Pages                  |                Album Collections                |                Folder Images              |
 | :----------------------------------------: | :---------------------------------------------: | :---------------------------------------: | 
-| ![Image 1](library\previews\artists.png)   | ![Image 2](library\previews\albums.png)         | ![Image 3](library\previews\playlists.png) |
+| ![Image 1](library/previews/artists.png)   | ![Image 2](library/previews/albums.png)         | ![Image 3](library/previews/playlists.png) |
 
 
 ---
