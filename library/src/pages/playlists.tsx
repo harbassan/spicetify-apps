@@ -78,7 +78,6 @@ const AddMenu = ({ folder }: { folder?: string }) => {
 };
 
 const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapperProps; folder?: string }) => {
-    console.log("playlists mount");
     const [sortDropdown, sortOption] = useDropdownMenu(dropdownOptions, "library:playlists-sort");
     const [filterDropdown, filterOption, setFilterOption, setAvailableOptions] = useDropdownMenu(filterOptions);
     const [textFilter, setTextFilter] = React.useState("");

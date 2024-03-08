@@ -86,7 +86,6 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
     const limit = 200;
 
     const fetchRootlist = async ({ pageParam }: { pageParam: number }) => {
-        console.log("yeah");
         const collections = await SpicetifyLibrary.CollectionWrapper.getCollectionItems({
             collectionUri: collection,
             textFilter,
@@ -111,7 +110,6 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
 
     React.useEffect(() => {
         const onUpdate = (e: any) => {
-            console.log("asad");
             refetch();
         };
 
