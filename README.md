@@ -8,15 +8,21 @@
 | :----------------------------------------: | :---------------------------------------------: | :---------------------------------------: | :-----------: |
 | ![Image 1](stats/previews/top_artists.png) | ![Image 2](stats/previews/library_analysis.png) | ![Image 3](stats/previews/top_tracks.png) | And Much More |
 
-More previews for the various features and the installation instructions are in the [readme](stats/README.md)
 
 ---
 
-### Library
+## [Library](library/README.md)
 
-⚠ WIP
+⚠ WIP - Not Released Yet
+
+|                Full Pages                  |                Album Collections                |                Folder Images              |
+| :----------------------------------------: | :---------------------------------------------: | :---------------------------------------: | 
+| ![Image 1](library\previews\artists.png)   | ![Image 2](library\previews\albums.png)         | ![Image 3](library\previews\playlists.png) |
+
 
 ---
+
+The installation instructions are the same for both apps, and can be found in either's readme.
 
 If you have any questions or issues regarding the apps open an issue on this repo. Please specify your spicetify version, and the app you're reffering to, e.g
 
