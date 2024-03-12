@@ -17,11 +17,8 @@ const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
         .then((res) => res.json())
         .then(
             (result) => {
-                try {
-                    setNewUpdate(result[0].name.slice(1) !== STATS_VERSION);
-                } catch (err) {
-                    console.log(err);
-                }
+                const releases = result.filter((release: any) => release.name.startsWith("stats"));
+                setNewUpdate(releases[0].name.slice(7) !== STATS_VERSION);
             },
             (error) => {
                 console.log("Failed to check for updates", error);
@@ -56,7 +53,7 @@ const App = () => {
 
     const [navBar, activeLink, setActiveLink] = useNavigationBar(tabPages);
     const [hasPageSwitched, setHasPageSwitched] = React.useState(false); // TODO: edit spcr-navigation-bar to include initial active link
-    const [newUpdate, setNewUpdate] = React.useState(false);
+    const [newUpdate, setNewUpdate] = React.useState(true);
 
     React.useEffect(() => {
         setActiveLink(Spicetify.LocalStorage.get("stats:active-link") || "Artists");
@@ -78,7 +75,7 @@ const App = () => {
             {newUpdate && (
                 <div className="new-update">
                     New app update available! Visit{" "}
-                    <a href="https://github.com/harbassan/spicetify-stats/releases">harbassan/spicetify-stats</a> to
+                    <a href="https://github.com/harbassan/spicetify-apps/releases">harbassan/spicetify-apps</a> to
                     install.
                 </div>
             )}
