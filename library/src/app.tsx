@@ -5,6 +5,7 @@ import ArtistsPage from "./pages/artists";
 import ShowsPage from "./pages/shows";
 import PlaylistsPage from "./pages/playlists";
 import { ConfigWrapperProps } from "./types/library_types";
+import { version } from "../package.json";
 
 import "./styles/app.scss";
 import "./styles/external.scss";
@@ -12,6 +13,20 @@ import "../../shared/config/config_modal.scss";
 import "../../shared/shared.scss";
 
 const tabPages = ["Playlists", "Albums", "Artists", "Shows"];
+
+const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
+    fetch("https://api.github.com/repos/harbassan/spicetify-apps/releases")
+        .then((res) => res.json())
+        .then(
+            (result) => {
+                const releases = result.filter((release: any) => release.name.startsWith("library"));
+                setNewUpdate(releases[0].name.slice(9) !== version);
+            },
+            (error) => {
+                console.log("Failed to check for updates", error);
+            }
+        );
+};
 
 const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => {
     const pages: Record<string, React.ReactElement> = {
@@ -23,9 +38,11 @@ const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapperProps 
 
     const [navBar, activeLink, setActiveLink] = useNavigationBar(tabPages);
     const [firstUpdate, setFirstUpdate] = React.useState(true);
+    const [newUpdate, setNewUpdate] = React.useState(false);
 
     React.useEffect(() => {
         setActiveLink(Spicetify.LocalStorage.get("library:active-link") || "Playlists");
+        checkForUpdates(setNewUpdate);
         setFirstUpdate(false);
     }, []);
 
@@ -38,6 +55,13 @@ const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapperProps 
     return (
         <>
             {navBar}
+            {newUpdate && (
+                <div className="new-update">
+                    New app update available! Visit{" "}
+                    <a href="https://github.com/harbassan/spicetify-apps/releases">harbassan/spicetify-apps</a> to
+                    install.
+                </div>
+            )}
             {pages[activeLink]}
         </>
     );
