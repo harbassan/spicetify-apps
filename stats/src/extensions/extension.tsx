@@ -1,6 +1,6 @@
 import React from "react";
 import PlaylistPage from "../pages/playlist";
-import { STATS_VERSION } from "../constants";
+import { version as STATS_VERSION } from "../../package.json";
 import ConfigWrapper from "@shared/config/config_wrapper";
 
 // contruct global class for stats methods

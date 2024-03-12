@@ -6,19 +6,19 @@ import GenresPage from "./pages/top_genres";
 import LibraryPage from "./pages/library";
 import ChartsPage from "./pages/charts";
 import AlbumsPage from "./pages/top_albums";
-import { STATS_VERSION, LATEST_RELEASE } from "./constants";
+import { version } from "../package.json";
 
 import "./styles/app.scss";
 import "../../shared/config/config_modal.scss";
 import "../../shared/shared.scss";
 
 const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
-    fetch(LATEST_RELEASE)
+    fetch("https://api.github.com/repos/harbassan/spicetify-apps/releases")
         .then((res) => res.json())
         .then(
             (result) => {
                 const releases = result.filter((release: any) => release.name.startsWith("stats"));
-                setNewUpdate(releases[0].name.slice(7) !== STATS_VERSION);
+                setNewUpdate(releases[0].name.slice(7) !== version);
             },
             (error) => {
                 console.log("Failed to check for updates", error);
@@ -53,7 +53,7 @@ const App = () => {
 
     const [navBar, activeLink, setActiveLink] = useNavigationBar(tabPages);
     const [hasPageSwitched, setHasPageSwitched] = React.useState(false); // TODO: edit spcr-navigation-bar to include initial active link
-    const [newUpdate, setNewUpdate] = React.useState(true);
+    const [newUpdate, setNewUpdate] = React.useState(false);
 
     React.useEffect(() => {
         setActiveLink(Spicetify.LocalStorage.get("stats:active-link") || "Artists");
