@@ -29,4 +29,4 @@ export const SPOTIFY = {
     queryliked: (ids: string) => `https://api.spotify.com/v1/me/tracks/contains?ids=${ids}`,
 };
 
-export const PLACEHOLDER = "https://raw.githubusercontent.com/harbassan/spicetify-stats/main/src/styles/placeholder.png";
+export const PLACEHOLDER = "https://raw.githubusercontent.com/harbassan/spicetify-apps/main/stats/src/styles/placeholder.png";
