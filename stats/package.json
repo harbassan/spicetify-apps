@@ -14,7 +14,7 @@
         "spicetify-creator": "^1.0.13"
     },
     "dependencies": {
-        "spcr-navigation-bar": "^0.0.2"
+        "spcr-navigation-bar": "^0.0.3"
     },
     "description": "---",
     "main": "index.js",
