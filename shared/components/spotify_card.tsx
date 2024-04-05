@@ -8,6 +8,7 @@ interface SpotifyCardProps {
     header: string;
     subheader: string;
     imageUrl: string;
+    artistUri?: string;
 }
 
 function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement> {
@@ -16,14 +17,14 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
         Spicetify.ReactComponent;
     const { Default: Card, CardImage } = Cards;
     const { createHref, push } = Spicetify.Platform.History;
-    const { type, header, uri, imageUrl, subheader } = props;
+    const { type, header, uri, imageUrl, subheader, artistUri } = props;
 
     const Menu = () => {
         switch (type) {
             case "artist":
                 return <ArtistMenu uri={uri} />;
             case "album":
-                return <AlbumMenu uri={uri} />;
+                return <AlbumMenu uri={uri} artistUri={artistUri} canRemove={true} />;
             case "playlist":
                 return <PlaylistMenu uri={uri} />;
             case "show":
@@ -44,24 +45,24 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
     const folderProps =
         type === "folder"
             ? {
-                  delegateNavigation: true,
-                  onClick: () => {
-                      // send the user to the folder page
-                      createHref({ pathname: `/library/folder/${uri}` });
-                      push({ pathname: `/library/folder/${uri}` });
-                  },
-              }
+                delegateNavigation: true,
+                onClick: () => {
+                    // send the user to the folder page
+                    createHref({ pathname: `/library/folder/${uri}` });
+                    push({ pathname: `/library/folder/${uri}` });
+                },
+            }
             : {};
 
     const collectionProps =
         type === "collection"
             ? {
-                  delegateNavigation: true,
-                  onClick: () => {
-                      createHref({ pathname: `/library/collection/${uri}` });
-                      push({ pathname: `/library/collection/${uri}` });
-                  },
-              }
+                delegateNavigation: true,
+                onClick: () => {
+                    createHref({ pathname: `/library/collection/${uri}` });
+                    push({ pathname: `/library/collection/${uri}` });
+                },
+            }
             : {};
 
     return (

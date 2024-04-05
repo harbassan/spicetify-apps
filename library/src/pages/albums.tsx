@@ -15,7 +15,7 @@ interface AlbumProps {
     type: "album";
     uri: string;
     name: string;
-    artists: { name: string }[];
+    artists: { name: string, uri: string }[];
     images: { url: string }[];
 }
 
@@ -163,6 +163,7 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
                 header={item.name}
                 subheader={isAlbum ? item.artists?.[0]?.name : "Collection"}
                 imageUrl={isAlbum ? item.images?.[0]?.url : item.imgUrl}
+                artistUri={isAlbum ? item.artists?.[0]?.uri : undefined}
             />
         );
     });
