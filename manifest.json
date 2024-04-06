@@ -5,5 +5,12 @@
         "preview": "stats/previews/top_genres.png",
         "readme": "stats/README.md",
         "tags": ["stats"]
+    },
+    {
+        "name": "Library",
+        "description": "An extended music library with additional features.",
+        "preview": "library/previews/albums.png",
+        "readme": "library/README.md",
+        "tags": ["library"]
     }
 ]
