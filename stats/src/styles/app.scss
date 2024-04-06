@@ -92,17 +92,16 @@
         font-size: 0.875rem;
     }
     
-    .GenericModal[aria-label="Playlist Stats"] .main-embedWidgetGenerator-container {
-        width: 80vw;
-        height: 80vh;
-        background-color: var(--spice-main);
-    }
-    .GenericModal[aria-label="Playlist Stats"] .main-shelf-title {
-        color: var(--spice-text);
-    }
-    
     .stats-genreCard + .stats-gridInlineSection {
         margin-top: 3px;
     }
 }
 
+.GenericModal[aria-label="Playlist Stats"] .main-embedWidgetGenerator-container {
+    width: 80vw;
+    height: 80vh;
+    background-color: var(--spice-main);
+}
+.GenericModal[aria-label="Playlist Stats"] .main-shelf-title {
+    color: var(--spice-text);
+}

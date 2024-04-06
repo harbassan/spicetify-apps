@@ -158,53 +158,53 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
     });
 
     return (
-        <QueryClientProvider client={new QueryClient()}>
-            <Router
-                location={{
-                    pathname: "/",
-                }}
-                navigator={History}
-            >
-                <StoreProvider store={ReduxStore}>
-                    <PlatformProvider platform={_platform}>
-                        <Routes>
-                            <Route
-                                path="/"
-                                element={
-                                    <div className="page-content encore-dark-theme encore-base-set">
-                                        <section className="stats-libraryOverview">
-                                            <StatCard label="Total Tracks" value={library.trackCount.toString()} />
-                                            <StatCard label="Total Artists" value={library.artistCount.toString()} />
-                                            <StatCard
-                                                label="Total Minutes"
-                                                value={Math.floor(library.totalDuration / 60).toString()}
-                                            />
-                                            <StatCard
-                                                label="Total Hours"
-                                                value={(library.totalDuration / (60 * 60)).toFixed(1)}
-                                            />
-                                        </section>
-                                        <Shelf title="Most Frequent Genres">
-                                            <GenresCard genres={library.genres} total={library.genresDenominator} />
-                                            <InlineGrid special>{statCards}</InlineGrid>
-                                        </Shelf>
-                                        <Shelf title="Most Frequent Artists">
-                                            <InlineGrid>{artistCards}</InlineGrid>
-                                        </Shelf>
-                                        <Shelf title="Most Frequent Albums">
-                                            <InlineGrid>{albumCards}</InlineGrid>
-                                        </Shelf>
-                                        <Shelf title="Release Year Distribution">
-                                            <GenresCard genres={library.years} total={library.yearsDenominator} />
-                                        </Shelf>
-                                    </div>
-                                }
-                            />
-                        </Routes>
-                    </PlatformProvider>
-                </StoreProvider>
-            </Router>
-        </QueryClientProvider>
+        // <QueryClientProvider client={new QueryClient()}>
+        //     <Router
+        //         location={{
+        //             pathname: "/",
+        //         }}
+        //         navigator={History}
+        //     >
+        //         <StoreProvider store={ReduxStore}>
+        //             <PlatformProvider platform={_platform}>
+        //                 <Routes>
+        //                     <Route
+        //                         path="/"
+        //                         element={
+        <div id="stats-app" className="page-content encore-dark-theme encore-base-set">
+            <section className="stats-libraryOverview">
+                <StatCard label="Total Tracks" value={library.trackCount.toString()} />
+                <StatCard label="Total Artists" value={library.artistCount.toString()} />
+                <StatCard
+                    label="Total Minutes"
+                    value={Math.floor(library.totalDuration / 60).toString()}
+                />
+                <StatCard
+                    label="Total Hours"
+                    value={(library.totalDuration / (60 * 60)).toFixed(1)}
+                />
+            </section>
+            <Shelf title="Most Frequent Genres">
+                <GenresCard genres={library.genres} total={library.genresDenominator} />
+                <InlineGrid special>{statCards}</InlineGrid>
+            </Shelf>
+            {/* <Shelf title="Most Frequent Artists">
+                <InlineGrid>{artistCards}</InlineGrid>
+            </Shelf>
+            <Shelf title="Most Frequent Albums">
+                <InlineGrid>{albumCards}</InlineGrid>
+            </Shelf> */}
+            <Shelf title="Release Year Distribution">
+                <GenresCard genres={library.years} total={library.yearsDenominator} />
+            </Shelf>
+        </div>
+        //                         }
+        //                     />
+        //                 </Routes>
+        //             </PlatformProvider>
+        //         </StoreProvider>
+        //     </Router>
+        // </QueryClientProvider>
     );
 };
 
