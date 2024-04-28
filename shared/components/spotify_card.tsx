@@ -15,7 +15,7 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
     // @ts-ignore
     const { Cards, TextComponent, ArtistMenu, AlbumMenu, PodcastShowMenu, PlaylistMenu, ContextMenu } =
         Spicetify.ReactComponent;
-    const { Default: Card, CardImage } = Cards;
+    const { FeatureCard: Card, CardImage } = Cards;
     const { createHref, push } = Spicetify.Platform.History;
     const { type, header, uri, imageUrl, subheader, artistUri } = props;
 
