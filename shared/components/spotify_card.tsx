@@ -19,6 +19,11 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
     const { createHref, push } = Spicetify.Platform.History;
     const { type, header, uri, imageUrl, subheader, artistUri } = props;
 
+    const backupImageUrl = (type === "folder" || type === "collection")
+        ? "https://raw.githubusercontent.com/harbassan/spicetify-apps/main/shared/placeholders/folder_placeholder.png"
+        : "https://raw.githubusercontent.com/harbassan/spicetify-apps/main/shared/placeholders/def_placeholder.png";
+
+
     const Menu = () => {
         switch (type) {
             case "artist":
@@ -72,7 +77,7 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
                 headerText={header}
                 renderCardImage={() => (
                     <CardImage
-                        src={imageUrl}
+                        src={imageUrl || backupImageUrl}
                         size={640}
                     />
                 )}
