@@ -95,6 +95,14 @@
     .stats-genreCard + .stats-gridInlineSection {
         margin-top: 3px;
     }
+
+    // fix styles for old trackrow clone component
+    .main-trackList-rowHeartButton,
+    .main-trackList-rowMoreButton {
+        background-color: transparent;
+        border: none;
+    }
+
 }
 
 .GenericModal[aria-label="Playlist Stats"] .main-embedWidgetGenerator-container {
