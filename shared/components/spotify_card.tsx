@@ -1,6 +1,7 @@
 import CollectionMenu from "library/src/components/collection_menu";
 import FolderMenu from "library/src/components/folder_menu";
 import React from "react";
+import FolderSVG from "./folder_fallback";
 
 interface SpotifyCardProps {
     type: "artist" | "album" | "lastfm" | "playlist" | "folder" | "show" | "collection";
@@ -77,8 +78,15 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
                 headerText={header}
                 renderCardImage={() => (
                     <CardImage
-                        src={imageUrl || backupImageUrl}
-                        size={640}
+                        images={[
+                            {
+                                height: 640,
+                                url: imageUrl,
+                                width: 640,
+                            },
+                        ]}
+                        isCircular={type === "artist"}
+                        FallbackComponent={FolderSVG}
                     />
                 )}
                 renderSubHeaderContent={() => (
