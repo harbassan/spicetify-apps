@@ -51,6 +51,9 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
         let artists: Record<string, number> = {};
 
         playlistMeta.items.forEach((track: any) => {
+            // filter out local tracks and episodes
+            if (track.isLocal || !track.album) return;
+
             popularity += track.popularity;
 
             trackIDs.push(track.link.split(":")[2]);
