@@ -86,7 +86,7 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
                             },
                         ]}
                         isCircular={type === "artist"}
-                        FallbackComponent={FolderSVG}
+                        FallbackComponent={type === "folder" || type === "collection" ? FolderSVG : undefined}
                     />
                 )}
                 renderSubHeaderContent={() => (

@@ -220,7 +220,7 @@ export const convertAlbumData = async (data: any[]) => {
                 console.log(`couldn't find album: ${item.name} by ${item.artist.name}`);
                 return {
                     name: item.name,
-                    image: PLACEHOLDER,
+                    image: null,
                     uri: item.url,
                     id: item.mbid,
                 };
@@ -228,7 +228,7 @@ export const convertAlbumData = async (data: any[]) => {
 
             return {
                 name: item.name,
-                image: spotifyItem.images?.[0]?.url || PLACEHOLDER,
+                image: spotifyItem.images?.[0]?.url,
                 uri: spotifyItem.uri,
                 id: spotifyItem.id,
             };
@@ -247,7 +247,7 @@ export const convertArtistData = async (data: any[]) => {
                 console.log(`couldn't find artist: ${item.name}`);
                 return {
                     name: item.name,
-                    image: PLACEHOLDER,
+                    image: null,
                     uri: item.url,
                     id: item.mbid,
                 };
@@ -255,7 +255,7 @@ export const convertArtistData = async (data: any[]) => {
 
             return {
                 name: item.name,
-                image: spotifyItem.images?.[0]?.url || PLACEHOLDER,
+                image: spotifyItem.images?.[0]?.url,
                 uri: spotifyItem.uri,
                 id: spotifyItem.id,
                 genres: spotifyItem.genres,

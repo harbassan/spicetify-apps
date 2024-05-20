@@ -48,7 +48,7 @@ interface Artist {
 }
 
 export interface ArtistCardProps extends Artist {
-    image: string;
+    image: string | null;
     freq?: number;
     id?: string;
 }
