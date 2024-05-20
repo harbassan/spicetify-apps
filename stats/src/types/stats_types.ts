@@ -39,12 +39,14 @@ export interface Album {
     image: string;
     freq?: number;
     id?: string;
+    playcount?: number;
 }
 
 interface Artist {
     name: string;
     uri: string;
     genres?: string[];
+    playcount?: number;
 }
 
 export interface ArtistCardProps extends Artist {

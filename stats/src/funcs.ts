@@ -223,6 +223,7 @@ export const convertAlbumData = async (data: any[]) => {
                     image: null,
                     uri: item.url,
                     id: item.mbid,
+                    playcount: item.playcount,
                 };
             }
 
@@ -231,6 +232,7 @@ export const convertAlbumData = async (data: any[]) => {
                 image: spotifyItem.images?.[0]?.url,
                 uri: spotifyItem.uri,
                 id: spotifyItem.id,
+                playcount: item.playcount,
             };
         })
     );
@@ -250,6 +252,7 @@ export const convertArtistData = async (data: any[]) => {
                     image: null,
                     uri: item.url,
                     id: item.mbid,
+                    playcount: item.playcount,
                 };
             }
 
@@ -259,6 +262,7 @@ export const convertArtistData = async (data: any[]) => {
                 uri: spotifyItem.uri,
                 id: spotifyItem.id,
                 genres: spotifyItem.genres,
+                playcount: item.playcount,
             };
         })
     );
