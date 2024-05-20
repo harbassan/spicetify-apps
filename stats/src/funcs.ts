@@ -228,7 +228,7 @@ export const convertAlbumData = async (data: any[]) => {
 
             return {
                 name: item.name,
-                image: spotifyItem.images[0].url,
+                image: spotifyItem.images?.[0]?.url || PLACEHOLDER,
                 uri: spotifyItem.uri,
                 id: spotifyItem.id,
             };
@@ -255,7 +255,7 @@ export const convertArtistData = async (data: any[]) => {
 
             return {
                 name: item.name,
-                image: spotifyItem.images[0].url,
+                image: spotifyItem.images?.[0]?.url || PLACEHOLDER,
                 uri: spotifyItem.uri,
                 id: spotifyItem.id,
                 genres: spotifyItem.genres,
