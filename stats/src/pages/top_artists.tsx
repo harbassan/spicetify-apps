@@ -88,11 +88,11 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
 	React.useEffect(() => {
 		updatePageCache(0, fetchTopArtists, activeOption.id);
-	}, [fetchTopArtists, activeOption]);
+	}, []);
 
 	React.useEffect(() => {
 		fetchTopArtists(activeOption.id);
-	}, [fetchTopArtists, activeOption]);
+	}, [activeOption]);
 
 	const refresh = () => {
 		fetchTopArtists(activeOption.id, true);

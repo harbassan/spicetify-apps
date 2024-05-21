@@ -68,11 +68,11 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
 	React.useEffect(() => {
 		updatePageCache(5, fetchTopAlbums, activeOption.id);
-	}, [activeOption, fetchTopAlbums]);
+	}, []);
 
 	React.useEffect(() => {
 		fetchTopAlbums(activeOption.id);
-	}, [activeOption, fetchTopAlbums]);
+	}, [activeOption]);
 
 	const refresh = () => {
 		fetchTopAlbums(activeOption.id, true);
