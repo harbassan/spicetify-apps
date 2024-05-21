@@ -100,8 +100,9 @@ const ChartsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
                     type={type}
                     uri={artist.uri}
                     header={artist.name}
-                    subheader={`#${index + 1} Artist`}
+                    subheader={"Artist"}
                     imageUrl={artist.image}
+                    badge={`${index + 1}`}
                 />
             );
         });
