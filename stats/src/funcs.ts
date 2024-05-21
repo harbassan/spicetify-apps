@@ -217,9 +217,15 @@ export const fetchTopArtists = async (artists: Record<string, number>) => {
 export const convertTrackData = async (data: any[]) => {
 	return await Promise.all(
 		data.map(async (item: any) => {
-			const spotifyItem = await Spicetify.CosmosAsync.get(
+			const spotifyItems = await Spicetify.CosmosAsync.get(
 				SPOTIFY.search(item.name, item.artist.name),
-			).then((res: any) => res.tracks?.items[0]);
+			).then((res: any) => res.tracks?.items);
+
+			// check if the right track is there
+			const spotifyItem = spotifyItems?.find(
+				(e: any) =>
+					e.artists[0].name.toLowerCase() === item.artist.name.toLowerCase(),
+			);
 
 			if (!spotifyItem) {
 				console.log(`couldn't find track: ${item.name} by ${item.artist.name}`);
@@ -259,9 +265,15 @@ export const convertTrackData = async (data: any[]) => {
 export const convertAlbumData = async (data: any[]) => {
 	return await Promise.all(
 		data.map(async (item: any) => {
-			const spotifyItem = await Spicetify.CosmosAsync.get(
+			const spotifyItems = await Spicetify.CosmosAsync.get(
 				SPOTIFY.searchalbum(item.name, item.artist.name),
-			).then((res: any) => res.albums?.items[0]);
+			).then((res: any) => res.albums?.items);
+
+			// check if the right album is there
+			const spotifyItem = spotifyItems?.find(
+				(e: any) =>
+					e.artists[0].name.toLowerCase() === item.artist.name.toLowerCase(),
+			);
 
 			if (!spotifyItem) {
 				console.log(`couldn't find album: ${item.name} by ${item.artist.name}`);
@@ -288,9 +300,14 @@ export const convertAlbumData = async (data: any[]) => {
 export const convertArtistData = async (data: any[]) => {
 	return await Promise.all(
 		data.map(async (item: any) => {
-			const spotifyItem = await Spicetify.CosmosAsync.get(
+			const spotifyItems = await Spicetify.CosmosAsync.get(
 				SPOTIFY.searchartist(item.name),
-			).then((res: any) => res.artists?.items[0]);
+			).then((res: any) => res.artists?.items);
+
+			// check if the right artist is there
+			const spotifyItem = spotifyItems?.find(
+				(e: any) => e.name.toLowerCase() === item.name.toLowerCase(),
+			);
 
 			if (!spotifyItem) {
 				console.log(`couldn't find artist: ${item.name}`);
