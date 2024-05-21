@@ -171,7 +171,7 @@ const GenresPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
         };
 
         for (let key in audioFeatures) {
-            audioFeatures[key] = audioFeatures[key] / 50;
+            audioFeatures[key] = audioFeatures[key] / fetchedTracks.length;
         }
         console.log("total genres fetch time:", window.performance.now() - start);
 
