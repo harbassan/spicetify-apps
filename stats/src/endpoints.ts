@@ -8,11 +8,11 @@ const lfmperiods: Record<string, string> = {
 
 export const LASTFM = {
     toptracks: (user: string, key: string, range: string) =>
-        `http://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=${user}&api_key=${key}&format=json&period=${lfmperiods[range]}`,
+        `http://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=${user}&api_key=${key}&limit=100&format=json&period=${lfmperiods[range]}`,
     topalbums: (user: string, key: string, range: string) =>
-        `https://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=${user}&api_key=${key}&format=json&period=${lfmperiods[range]}`,
+        `https://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=${user}&api_key=${key}&limit=100&format=json&period=${lfmperiods[range]}`,
     topartists: (user: string, key: string, range: string) =>
-        `https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${user}&api_key=${key}&format=json&period=${lfmperiods[range]}`,
+        `https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${user}&api_key=${key}&limit=100&format=json&period=${lfmperiods[range]}`,
     charts: (key: string, type: string) => `http://ws.audioscrobbler.com/2.0/?method=chart.gettop${type}&api_key=${key}&format=json`,
 };
 
