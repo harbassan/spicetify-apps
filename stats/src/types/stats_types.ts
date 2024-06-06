@@ -31,6 +31,7 @@ export interface Track {
     popularity: number;
     explicit: boolean;
     release_year: string;
+    playcount: number;
 }
 
 export interface Album {
