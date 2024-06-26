@@ -133,7 +133,7 @@ const TrackRow = (props: TrackRowProps) => {
                             {/* @ts-ignore - needs uri prop to work with playlist-labels extension*/}
                             <div uri={props.uri} className="main-trackList-rowMarker">
                                 <span className="TypeElement-ballad-type main-trackList-number" data-encore-id="type">
-                                    {props.index}
+                                    {(props.playcount) ? props.playcount : props.index}
                                 </span>
                                 <Spicetify.ReactComponent.TooltipWrapper
                                     label={`Play ${props.name} by ${props.artists

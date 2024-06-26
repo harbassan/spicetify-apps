@@ -28,6 +28,7 @@ export const topTracksReq = async (time_range: string, configWrapper: ConfigWrap
 
         spotifyData.forEach((track: any, index: number) => {
             track.liked = likedArray[index];
+            track.playcount = lastfmData?.toptracks?.track?.[index].playcount ?? index;
         });
 
         return spotifyData;
@@ -59,6 +60,7 @@ export const topTracksReq = async (time_range: string, configWrapper: ConfigWrap
             popularity: track.popularity,
             explicit: track.explicit,
             release_year: track.album.release_date.slice(0, 4),
+            playcount: index,
         };
     });
 };
