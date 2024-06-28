@@ -3,17 +3,10 @@ import { Album, ArtistCardProps } from "./types/stats_types";
 
 export function filter(str: string): string {
 	const normalizedStr = str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-	return normalizedStr
-		.replace(/[^a-zA-Z0-9\-._~:/?#[\]@!$&()*+,;= ]/g, "")
-		.replace(/ /g, "+");
+	return normalizedStr.replace(/[^a-zA-Z0-9\-._~:/?#[\]@!$&()*+,;= ]/g, "").replace(/ /g, "+");
 }
 
-export const updatePageCache = (
-	i: any,
-	callback: Function,
-	activeOption: string,
-	lib: any = false,
-) => {
+export const updatePageCache = (i: any, callback: Function, activeOption: string, lib: any = false) => {
 	let cacheInfo = Spicetify.LocalStorage.get("stats:cache-info");
 	if (!cacheInfo) return;
 
@@ -31,31 +24,17 @@ export const updatePageCache = (
 		}
 		callback(activeOption, true);
 		cacheInfoArray[i] = true;
-		Spicetify.LocalStorage.set(
-			"stats:cache-info",
-			JSON.stringify(cacheInfoArray),
-		);
+		Spicetify.LocalStorage.set("stats:cache-info", JSON.stringify(cacheInfoArray));
 	}
 };
 
 type ApiResponse = Record<string, any> | null;
 
-export const apiRequest = async (
-	name: string,
-	url: string,
-	timeout = 5,
-	log = true,
-): Promise<ApiResponse> => {
+export const apiRequest = async (name: string, url: string, timeout = 5, log = true): Promise<ApiResponse> => {
 	try {
 		const timeStart = window.performance.now();
 		const response = await Spicetify.CosmosAsync.get(url);
-		if (log)
-			console.log(
-				"stats -",
-				name,
-				"fetch time:",
-				window.performance.now() - timeStart,
-			);
+		if (log) console.log("stats -", name, "fetch time:", window.performance.now() - timeStart);
 		return response;
 	} catch (e) {
 		if (timeout === 0) {
@@ -87,12 +66,7 @@ export const fetchAudioFeatures = async (ids: string[]) => {
 
 	// Send multiple simultaneous requests using Promise.all()
 	const promises = batches.map((batch, index) => {
-		return apiRequest(
-			`audioFeaturesBatch${index}`,
-			SPOTIFY.audiofeatures(batch.join(",")),
-			5,
-			false,
-		);
+		return apiRequest(`audioFeaturesBatch${index}`, SPOTIFY.audiofeatures(batch.join(",")), 5, false);
 	});
 
 	const responses = await Promise.all(promises);
@@ -106,10 +80,7 @@ export const fetchAudioFeatures = async (ids: string[]) => {
 	return data;
 };
 
-export const fetchTopAlbums = async (
-	albums: Record<string, number>,
-	cachedAlbums?: Album[],
-) => {
+export const fetchTopAlbums = async (albums: Record<string, number>, cachedAlbums?: Album[]) => {
 	let album_keys = Object.keys(albums)
 		.filter((id) => id.match(/^[a-zA-Z0-9]{22}$/))
 		.sort((a, b) => albums[b] - albums[a])
@@ -126,45 +97,33 @@ export const fetchTopAlbums = async (
 
 			// loop through and see if the album is already cached
 			if (cachedAlbums && cachedAlbumsSet.has(`spotify:album:${albumID}`)) {
-				albumMeta = cachedAlbums.find(
-					(album) => album.uri === `spotify:album:${albumID}`,
-				);
+				albumMeta = cachedAlbums.find((album) => album.uri === `spotify:album:${albumID}`);
 			}
 
 			if (!albumMeta) {
 				try {
-					albumMeta = await Spicetify.GraphQL.Request(
-						Spicetify.GraphQL.Definitions.getAlbum,
-						{
-							uri: `spotify:album:${albumID}`,
-							locale: "en",
-							offset: 0,
-							limit: 50,
-						},
-					);
-					if (!albumMeta?.data?.albumUnion?.name)
-						throw new Error("Invalid URI");
+					albumMeta = await Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.getAlbum, {
+						uri: `spotify:album:${albumID}`,
+						locale: "en",
+						offset: 0,
+						limit: 50,
+					});
+					if (!albumMeta?.data?.albumUnion?.name) throw new Error("Invalid URI");
 				} catch (e) {
 					console.error("stats - album metadata request failed:", e);
 					return;
 				}
 			}
 
-			const releaseYear =
-				albumMeta?.release_year ||
-				albumMeta.data.albumUnion.date.isoString.slice(0, 4);
+			const releaseYear = albumMeta?.release_year || albumMeta.data.albumUnion.date.isoString.slice(0, 4);
 
-			release_years[releaseYear] =
-				(release_years[releaseYear] || 0) + albums[albumID];
+			release_years[releaseYear] = (release_years[releaseYear] || 0) + albums[albumID];
 			total_album_tracks += albums[albumID];
 
 			return {
 				name: albumMeta.name || albumMeta.data.albumUnion.name,
 				uri: albumMeta.uri || albumMeta.data.albumUnion.uri,
-				image:
-					albumMeta.image ||
-					albumMeta.data.albumUnion.coverArt.sources[0]?.url ||
-					PLACEHOLDER,
+				image: albumMeta.image || albumMeta.data.albumUnion.coverArt.sources[0]?.url || PLACEHOLDER,
 				release_year: releaseYear,
 				freq: albums[albumID],
 			};
@@ -186,28 +145,23 @@ export const fetchTopArtists = async (artists: Record<string, number>) => {
 	let genres: Record<string, number> = {};
 	let total_genre_tracks = 0;
 
-	const artistsMeta = await apiRequest(
-		"artistsMetadata",
-		SPOTIFY.artists(artist_keys.join(",")),
-	);
+	const artistsMeta = await apiRequest("artistsMetadata", SPOTIFY.artists(artist_keys.join(",")));
 
-	let top_artists: ArtistCardProps[] = artistsMeta?.artists?.map(
-		(artist: any) => {
-			if (!artist) return null;
+	let top_artists: ArtistCardProps[] = artistsMeta?.artists?.map((artist: any) => {
+		if (!artist) return null;
 
-			artist.genres.forEach((genre: string) => {
-				genres[genre] = (genres[genre] || 0) + artists[artist.id];
-			});
-			total_genre_tracks += artists[artist.id];
+		artist.genres.forEach((genre: string) => {
+			genres[genre] = (genres[genre] || 0) + artists[artist.id];
+		});
+		total_genre_tracks += artists[artist.id];
 
-			return {
-				name: artist.name,
-				uri: artist.uri,
-				image: artist.images[2]?.url || PLACEHOLDER,
-				freq: artists[artist.id],
-			};
-		},
-	);
+		return {
+			name: artist.name,
+			uri: artist.uri,
+			image: artist.images[2]?.url || PLACEHOLDER,
+			freq: artists[artist.id],
+		};
+	});
 
 	top_artists = top_artists.filter((el) => el != null).slice(0, 10);
 	const top_genres = Object.entries(genres).sort((a, b) => b[1] - a[1]);
@@ -217,14 +171,13 @@ export const fetchTopArtists = async (artists: Record<string, number>) => {
 export const convertTrackData = async (data: any[]) => {
 	return await Promise.all(
 		data.map(async (item: any) => {
-			const spotifyItems = await Spicetify.CosmosAsync.get(
-				SPOTIFY.search(item.name, item.artist.name),
-			).then((res: any) => res.tracks?.items);
+			const spotifyItems = await Spicetify.CosmosAsync.get(SPOTIFY.search(item.name, item.artist.name)).then(
+				(res: any) => res.tracks?.items,
+			);
 
 			// check if the right track is there
 			const spotifyItem = spotifyItems?.find(
-				(e: any) =>
-					e.artists[0].name.toLowerCase() === item.artist.name.toLowerCase(),
+				(e: any) => e.artists[0].name.toLowerCase() === item.artist.name.toLowerCase(),
 			);
 
 			if (!spotifyItem) {
@@ -265,14 +218,13 @@ export const convertTrackData = async (data: any[]) => {
 export const convertAlbumData = async (data: any[]) => {
 	return await Promise.all(
 		data.map(async (item: any) => {
-			const spotifyItems = await Spicetify.CosmosAsync.get(
-				SPOTIFY.searchalbum(item.name, item.artist.name),
-			).then((res: any) => res.albums?.items);
+			const spotifyItems = await Spicetify.CosmosAsync.get(SPOTIFY.searchalbum(item.name, item.artist.name)).then(
+				(res: any) => res.albums?.items,
+			);
 
 			// check if the right album is there
 			const spotifyItem = spotifyItems?.find(
-				(e: any) =>
-					e.artists[0].name.toLowerCase() === item.artist.name.toLowerCase(),
+				(e: any) => e.artists[0].name.toLowerCase() === item.artist.name.toLowerCase(),
 			);
 
 			if (!spotifyItem) {
@@ -300,14 +252,12 @@ export const convertAlbumData = async (data: any[]) => {
 export const convertArtistData = async (data: any[]) => {
 	return await Promise.all(
 		data.map(async (item: any) => {
-			const spotifyItems = await Spicetify.CosmosAsync.get(
-				SPOTIFY.searchartist(item.name),
-			).then((res: any) => res.artists?.items);
+			const spotifyItems = await Spicetify.CosmosAsync.get(SPOTIFY.searchartist(item.name)).then(
+				(res: any) => res.artists?.items,
+			);
 
 			// check if the right artist is there
-			const spotifyItem = spotifyItems?.find(
-				(e: any) => e.name.toLowerCase() === item.name.toLowerCase(),
-			);
+			const spotifyItem = spotifyItems?.find((e: any) => e.name.toLowerCase() === item.name.toLowerCase());
 
 			if (!spotifyItem) {
 				console.log(`couldn't find artist: ${item.name}`);
@@ -340,10 +290,7 @@ export const checkLiked = async (tracks: string[]) => {
 		}
 	});
 
-	const apiResponse = await apiRequest(
-		"checkLiked",
-		SPOTIFY.queryliked(tracks.filter((e) => e).join(",")),
-	);
+	const apiResponse = await apiRequest("checkLiked", SPOTIFY.queryliked(tracks.filter((e) => e).join(",")));
 	if (!apiResponse) return;
 
 	const response = [];

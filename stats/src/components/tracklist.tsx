@@ -32,15 +32,8 @@ const Tracklist = ({ minified = false, children }) => {
 							aria-sort="none"
 							tabIndex={-1}
 						>
-							<button
-								type="button"
-								className="main-trackList-column main-trackList-sortable"
-								tabIndex={-1}
-							>
-								<span
-									className="TypeElement-mesto-type standalone-ellipsis-one-line"
-									data-encore-id="type"
-								>
+							<button type="button" className="main-trackList-column main-trackList-sortable" tabIndex={-1}>
+								<span className="TypeElement-mesto-type standalone-ellipsis-one-line" data-encore-id="type">
 									Title
 								</span>
 							</button>
@@ -52,15 +45,8 @@ const Tracklist = ({ minified = false, children }) => {
 							aria-sort="none"
 							tabIndex={-1}
 						>
-							<button
-								type="button"
-								className="main-trackList-column main-trackList-sortable"
-								tabIndex={-1}
-							>
-								<span
-									className="TypeElement-mesto-type standalone-ellipsis-one-line"
-									data-encore-id="type"
-								>
+							<button type="button" className="main-trackList-column main-trackList-sortable" tabIndex={-1}>
+								<span className="TypeElement-mesto-type standalone-ellipsis-one-line" data-encore-id="type">
 									Album
 								</span>
 							</button>
@@ -72,10 +58,7 @@ const Tracklist = ({ minified = false, children }) => {
 							aria-sort="none"
 							tabIndex={-1}
 						>
-							<Spicetify.ReactComponent.TooltipWrapper
-								label={"Duration"}
-								placement="top"
-							>
+							<Spicetify.ReactComponent.TooltipWrapper label={"Duration"} placement="top">
 								<button
 									type="button"
 									aria-label="Duration"
@@ -100,11 +83,7 @@ const Tracklist = ({ minified = false, children }) => {
 					</div>
 				</div>
 			)}
-			<div
-				className="main-rootlist-wrapper"
-				role="presentation"
-				style={{ height: height * 56 }}
-			>
+			<div className="main-rootlist-wrapper" role="presentation" style={{ height: height * 56 }}>
 				<div role="presentation">{children}</div>
 			</div>
 		</div>

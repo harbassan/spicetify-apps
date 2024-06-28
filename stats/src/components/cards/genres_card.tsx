@@ -1,26 +1,17 @@
 import React from "react";
 
-const genreLine = (
-	name: string,
-	value: number,
-	limit: number,
-	total: number,
-) => {
+const genreLine = (name: string, value: number, limit: number, total: number) => {
 	return (
 		<div className="stats-genreRow">
 			<div
 				className="stats-genreRowFill"
 				style={{
-					width: `calc(${(value / limit) * 100}% + ${
-						((limit - value) / (limit - 1)) * 100
-					}px)`,
+					width: `calc(${(value / limit) * 100}% + ${((limit - value) / (limit - 1)) * 100}px)`,
 				}}
 			>
 				<span className="stats-genreText">{name}</span>
 			</div>
-			<span className="stats-genreValue">
-				{Math.round((value / total) * 100) + "%"}
-			</span>
+			<span className="stats-genreValue">{Math.round((value / total) * 100) + "%"}</span>
 		</div>
 	);
 };
@@ -31,10 +22,7 @@ const genreLines = (genres: [string, number][], total: number) => {
 	});
 };
 
-const genresCard = ({
-	genres,
-	total,
-}: { genres: [string, number][]; total: number }) => {
+const genresCard = ({ genres, total }: { genres: [string, number][]; total: number }) => {
 	const [extended, setExtended] = React.useState(false);
 	const genresArray = genres
 		.sort(([, a]: [string, any], [, b]: [string, any]) => b - a)
