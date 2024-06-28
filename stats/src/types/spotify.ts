@@ -1,3 +1,5 @@
+// note: some fields are missing from the types as they are not relevant to the project
+
 interface AudioFeatures {
 	acousticness: number;
 	danceability: number;
@@ -96,6 +98,60 @@ interface Track extends SimplifiedTrack {
 	popularity: number;
 }
 
+interface PlaylistSimplified {
+	collaborative: boolean;
+	description: string | null;
+	external_urls: {
+		spotify: string;
+	};
+	href: string;
+	id: string;
+	images: Image[];
+	name: string;
+	owner: User;
+	public: boolean | null;
+	snapshot_id: string;
+	tracks: {
+		href: string;
+		total: number;
+	};
+	type: "playlist";
+	uri: string;
+}
+
+interface Playlist extends PlaylistSimplified {
+	followers: {
+		href: string | null;
+		total: number;
+	};
+	tracks: Items<PlaylistTrack>;
+}
+
+interface User {
+	external_urls: {
+		spotify: string;
+	};
+	followers: {
+		href: string | null;
+		total: number;
+	};
+	href: string;
+	id: string;
+	type: "user";
+	uri: string;
+}
+
+interface Episode {
+	type: "episode";
+}
+
+interface PlaylistTrack {
+	added_at: string;
+	added_by: User;
+	is_local: boolean;
+	track: Track | Episode | null; // the track can be unavailable
+}
+
 interface Items<T> {
 	href: string;
 	limit: number;
@@ -106,17 +162,33 @@ interface Items<T> {
 	items: T[];
 }
 
-type TopArtistsRes = Items<Artist>;
-type TopTracksRes = Items<Track>;
+export interface SeveralTracksResponse {
+	tracks: Track[];
+}
 
-type SeveralTracksRes = { tracks: Track[] };
-type SeveralArtistsRes = { artists: Artist[] };
-type SeveralAlbumsRes = { albums: Album[] };
-type SeveralAudioFeaturesRes = { audio_features: AudioFeaturesWrapper[] };
+export interface SeveralArtistsResponse {
+	artists: Artist[];
+}
 
-interface SearchRes {
+export interface SeveralAlbumsResponse {
+	albums: Album[];
+}
+
+export interface SeveralAudioFeaturesResponse {
+	audio_features: AudioFeaturesWrapper[];
+}
+
+export interface SearchResponse {
 	tracks: Items<Track>;
 	artists: Items<Artist>;
 	albums: Items<SimplifiedAlbum>;
 	// and other irrelevant object types eg. playlists
 }
+
+export type TopArtistsResponse = Items<Artist>;
+
+export type TopTracksResponse = Items<Track>;
+
+export type UserPlaylistsResponse = Items<PlaylistSimplified>;
+
+export type PlaylistResponse = Playlist;

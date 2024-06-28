@@ -10,7 +10,15 @@ export interface TopAlbumsResponse {
 	topalbums: TopAlbums;
 }
 
-export interface ResponseAttr {
+export interface ArtistChartResponse {
+	artists: TopArtists;
+}
+
+export interface TrackChartResponse {
+	tracks: TopTracks;
+}
+
+interface ResponseAttr {
 	user?: string;
 	totalPages: string;
 	page: string;
@@ -18,18 +26,18 @@ export interface ResponseAttr {
 	total: string;
 }
 
-export interface TopTracks {
+interface TopTracks {
 	track: Track[];
 	"@attr": ResponseAttr;
 }
 
-export interface TopArtists {
+interface TopArtists {
 	artist: Artist[];
 	"@attr": ResponseAttr;
 }
 
-export interface TopAlbums {
-	artist: Album[];
+interface TopAlbums {
+	album: Album[];
 	"@attr": ResponseAttr;
 }
 
@@ -45,7 +53,7 @@ export interface Track {
 	playcount: string;
 }
 
-export interface ArtistSimplified {
+interface ArtistSimplified {
 	url: string;
 	name: string;
 	mbid: string;
@@ -68,31 +76,23 @@ export interface Album {
 	name: string;
 }
 
-export interface ItemAttr {
+interface ItemAttr {
 	rank: string;
 }
 
-export interface Image {
+interface Image {
 	size: Size;
 	"#text": string;
 }
 
-export enum Size {
+enum Size {
 	Extralarge = "extralarge",
 	Large = "large",
 	Medium = "medium",
 	Small = "small",
 }
 
-export interface Streamable {
+interface Streamable {
 	fulltrack: string;
 	"#text": string;
-}
-
-export interface ArtistChartResponse {
-	artists: TopArtists;
-}
-
-export interface TrackChartResponse {
-	tracks: TopTracks;
 }
