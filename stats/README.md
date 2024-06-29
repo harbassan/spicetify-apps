@@ -54,14 +54,22 @@ rename the unzipped folder to `stats`,navigate to `stats/stats` folder then run 
 After the installation is done run `npm run build` to add the stats app folder to your Spicetify
 `CustomApps` and you are all done.If everything's correct run `spicetify config-dir` to get to config folder then navigate to `CustomApps` then to the app you just added, the structure should be similar to this:
 
-```📦spicetify\CustomApps ┣ 📂marketplace ┣ etc... ┗ 📂stats ┃ ┣
-📜extension.js ┃ ┣ 📜index.js ┃ ┣ 📜manifest.json ┃ ┗ 📜style.css ```
+```
+📦spicetify\CustomApps
+┣ 📂marketplace
+┣ etc... 
+┗ 📂stats 
+┃ ┣📜extension.js 
+┃ ┣ 📜index.js 
+┃ ┣ 📜manifest.json 
+┃ ┗ 📜style.css 
+```
 
 Finally, run these commands to apply:
 
-```powershell 
-spicetify config custom_apps stats spicetify apply 
-```
+```powershell
+spicetify config custom_apps stats spicetify apply
+````
 
 That's it. Enjoy.
 
@@ -72,7 +80,7 @@ Docs](https://spicetify.app/docs/advanced-usage/custom-apps#installing).
 
 To uninstall the app, run these commands:
 
-```powershell spicetify config custom_apps stats- spicetify apply ```
+`powershell spicetify config custom_apps stats- spicetify apply `
 
 If you want to remove the app completely, just delete the `stats` folder
 after running the above commands.
@@ -84,5 +92,8 @@ this repo. While doing so, please specify your spicetify version and
 installation method.
 
 If you like the app, I'd be really grateful if you liked the repo ❤️.
-````
+
+```
+
+```
 
