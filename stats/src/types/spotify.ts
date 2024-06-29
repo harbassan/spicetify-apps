@@ -1,5 +1,11 @@
 // note: some fields are missing from the types as they are not relevant to the project
 
+export enum SpotifyRange {
+	Short = "short_term",
+	Medium = "medium_term",
+	Long = "long_term",
+}
+
 interface AudioFeatures {
 	acousticness: number;
 	danceability: number;
@@ -38,7 +44,7 @@ interface SimplifiedArtist {
 	uri: string;
 }
 
-interface Artist extends SimplifiedArtist {
+export interface Artist extends SimplifiedArtist {
 	followers: {
 		total: number;
 	};
@@ -74,7 +80,6 @@ interface Album extends SimplifiedAlbum {
 }
 
 interface SimplifiedTrack {
-	artists: SimplifiedArtist[];
 	disc_number: number;
 	duration_ms: number;
 	explicit: boolean;
@@ -87,7 +92,7 @@ interface SimplifiedTrack {
 	is_local: boolean;
 }
 
-interface Track extends SimplifiedTrack {
+export interface Track extends SimplifiedTrack {
 	album: SimplifiedAlbum;
 	artists: Artist[];
 	external_ids: {
@@ -175,7 +180,7 @@ export interface SeveralAlbumsResponse {
 }
 
 export interface SeveralAudioFeaturesResponse {
-	audio_features: AudioFeaturesWrapper[];
+	audio_features: (AudioFeaturesWrapper | null)[];
 }
 
 export interface SearchResponse {

@@ -12,16 +12,14 @@ const apiFetch = async <T>(name: string, url: string, log = true): Promise<T> =>
 	}
 };
 
-type SpotifyRange = "short_term" | "medium_term" | "long_term";
-
-export const getTopTracks = (range: SpotifyRange) => {
+export const getTopTracks = (range: Spotify.SpotifyRange) => {
 	return apiFetch<Spotify.TopTracksResponse>(
 		"topTracks",
 		`https://api.spotify.com/v1/me/top/tracks?limit=50&offset=0&time_range=${range}`,
 	).then((res) => res.items);
 };
 
-export const getTopArtists = (range: SpotifyRange) => {
+export const getTopArtists = (range: Spotify.SpotifyRange) => {
 	return apiFetch<Spotify.TopArtistsResponse>(
 		"topArtists",
 		`https://api.spotify.com/v1/me/top/artists?limit=50&offset=0&time_range=${range}`,
