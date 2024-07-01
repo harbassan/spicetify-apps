@@ -56,7 +56,6 @@ export interface SpotifyMinifiedTrack {
 	artists: {
 		name: string;
 		uri: string;
-		genres: string[];
 	}[];
 	album: {
 		name: string;
@@ -70,10 +69,10 @@ export interface LastFMMinifiedTrack {
 	name: string;
 	uri: string;
 	playcount: number;
-	duration: number;
-	artist: {
+	duration_ms: number;
+	artists: {
 		name: string;
 		uri: string;
-	};
+	}[];
 	type: "lastfm";
 }

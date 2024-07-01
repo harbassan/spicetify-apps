@@ -1,4 +1,5 @@
 import React from "react";
+import type { LastFMMinifiedTrack, SpotifyMinifiedTrack } from "../types/stats_types";
 
 const ArtistLink = ({ name, uri, index, length }: { name: string; uri: string; index: number; length: number }) => {
 	return (
@@ -41,7 +42,7 @@ const LikedIcon = ({ active, uri }: { active: boolean; uri: string }) => {
 
 	return (
 		<Spicetify.ReactComponent.TooltipWrapper
-			label={liked ? `Remove from Your Library` : "Save to Your Library"}
+			label={liked ? "Remove from Your Library" : "Save to Your Library"}
 			placement="top"
 		>
 			<button
@@ -98,12 +99,14 @@ interface AlbumMenuProps extends Spicetify.ReactComponent.MenuProps {
 }
 
 function playAndQueue(uri: string, uris: string[]) {
-	uris = uris.filter((u) => !u.includes("last"));
-	uris = uris.concat(uris.splice(0, uris.indexOf(uri)));
+	// uris = uris.filter((u) => !u.includes("last"));
+	// uris = uris.concat(uris.splice(0, uris.indexOf(uri)));
 	// queue(uris);
 }
 
 const MenuWrapper = React.memo((props: AlbumMenuProps) => <Spicetify.ReactComponent.AlbumMenu {...props} />);
+
+type TrackRowProps = (SpotifyMinifiedTrack | LastFMMinifiedTrack) & { index: number; uris: string[] };
 
 const TrackRow = (props: TrackRowProps) => {
 	const ArtistLinks = props.artists.map((artist, index) => {
@@ -133,6 +136,7 @@ const TrackRow = (props: TrackRowProps) => {
 									placement="top"
 								>
 									<button
+										type="button"
 										className="main-trackList-rowImagePlayButton"
 										aria-label={`Play ${props.name}`}
 										tabIndex={-1}
@@ -147,7 +151,7 @@ const TrackRow = (props: TrackRowProps) => {
 											viewBox="0 0 24 24"
 											data-encore-id="icon"
 										>
-											<path d="m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606z"></path>
+											<path d="m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606z" />
 										</svg>
 									</button>
 								</Spicetify.ReactComponent.TooltipWrapper>
@@ -187,10 +191,10 @@ const TrackRow = (props: TrackRowProps) => {
 									draggable="true"
 									className="standalone-ellipsis-one-line"
 									dir="auto"
-									href={props.album_uri}
+									href={props.album?.uri}
 									tabIndex={-1}
 								>
-									{props.album}
+									{props.album?.name}
 								</a>
 							</span>
 						</div>
@@ -200,7 +204,7 @@ const TrackRow = (props: TrackRowProps) => {
 								className="TypeElement-mesto-textSubdued TypeElement-mesto-textSubdued-type main-trackList-rowDuration"
 								data-encore-id="type"
 							>
-								{Spicetify.Player.formatTime(props.duration)}
+								{Spicetify.Player.formatTime(props.duration_ms)}
 							</div>
 
 							<Spicetify.ReactComponent.ContextMenu menu={<MenuWrapper uri={props.uri} />} trigger="click">
@@ -225,7 +229,7 @@ const TrackRow = (props: TrackRowProps) => {
 												data-encore-id="icon"
 												className="Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small"
 											>
-												<path d="M3 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm6.5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM16 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"></path>
+												<path d="M3 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm6.5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM16 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
 											</svg>
 										</span>
 									</Spicetify.ReactComponent.TooltipWrapper>

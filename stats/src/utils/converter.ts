@@ -38,7 +38,6 @@ export const minifyTrack = (track: Spotify.Track): SpotifyMinifiedTrack => ({
 	artists: track.artists.map((artist) => ({
 		name: artist.name,
 		uri: artist.uri,
-		genres: artist.genres,
 	})),
 	album: {
 		name: track.album.name,
@@ -92,11 +91,13 @@ export const convertTrack = async (track: LastFM.Track) => {
 			uri: track.url,
 			name: track.name,
 			playcount: Number(track.playcount),
-			duration: Number(track.duration),
-			artist: {
-				name: track.artist.name,
-				uri: track.artist.url,
-			},
+			duration_ms: Number(track.duration) * 1000,
+			artists: [
+				{
+					name: track.artist.name,
+					uri: track.artist.url,
+				},
+			],
 			type: "lastfm",
 		} as LastFMMinifiedTrack;
 	return { ...minifyTrack(spotifyTrack), playcount: Number(track.playcount), name: track.name } as SpotifyMinifiedTrack;

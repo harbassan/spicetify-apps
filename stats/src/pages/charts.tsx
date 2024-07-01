@@ -18,6 +18,7 @@ import SettingsButton from "@shared/components/settings_button";
 import { convertArtist, convertTrack } from "../utils/converter";
 import useStatus from "@shared/status/useStatus";
 import { useQuery } from "../utils/react_query";
+import _ from "lodash";
 
 const DropdownOptions = [
 	{ id: "artists", name: "Top Artists" },
@@ -36,25 +37,33 @@ const getChart = async (type: "tracks" | "artists", config: Config) => {
 };
 
 const ArtistChart = ({ artists }: { artists: (LastFMMinifiedArtist | SpotifyMinifiedArtist)[] }) => {
-	return artists.map((artist, index) => {
-		return (
-			<SpotifyCard
-				type={"artist"}
-				provider={artist.type}
-				uri={artist.uri}
-				header={artist.name}
-				subheader={artist.playcount ? `\u29BE ${artist.playcount} Scrobbles` : "Artist"}
-				imageUrl={artist.image}
-				badge={`${index + 1}`}
-			/>
-		);
-	});
+	return (
+		<div className={"main-gridContainer-gridContainer grid"}>
+			{artists.map((artist, index) => {
+				return (
+					<SpotifyCard
+						type={"artist"}
+						provider={artist.type}
+						uri={artist.uri}
+						header={artist.name}
+						subheader={artist.playcount ? `\u29BE ${artist.playcount} Scrobbles` : "Artist"}
+						imageUrl={artist.image}
+						badge={`${index + 1}`}
+					/>
+				);
+			})}
+		</div>
+	);
 };
 
 const TrackChart = ({ tracks }: { tracks: (LastFMMinifiedTrack | SpotifyMinifiedTrack)[] }) => {
-	return tracks.map((track, index) => (
-		<TrackRow index={index + 1} {...track} uris={tracks.map((track) => track.uri)} />
-	));
+	return (
+		<Tracklist>
+			{tracks.map((track, index) => (
+				<TrackRow index={index + 1} {...track} uris={tracks.map((track) => track.uri)} />
+			))}
+		</Tracklist>
+	);
 };
 
 const getDate = () => {
@@ -76,7 +85,7 @@ const ChartsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const Status = useStatus(status, error);
 
 	const props = {
-		title: `Top Charts - ${activeOption.id.charAt(0).toUpperCase()}`,
+		title: `Top Charts - ${_.startCase(activeOption.id)}`,
 		headerEls: [dropdown, <RefreshButton callback={refetch} />, <SettingsButton configWrapper={configWrapper} />],
 	};
 
@@ -97,11 +106,7 @@ const ChartsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	// @ts-ignore
 	const chartToRender = activeOption.id === "artists" ? <ArtistChart artists={items} /> : <TrackChart tracks={items} />;
 
-	return (
-		<PageContainer {...props}>
-			<Tracklist>{chartToRender}</Tracklist>
-		</PageContainer>
-	);
+	return <PageContainer {...props}>{chartToRender}</PageContainer>;
 };
 
 export default React.memo(ChartsPage);
