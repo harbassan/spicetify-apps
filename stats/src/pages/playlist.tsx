@@ -7,7 +7,7 @@ import Shelf from "../components/shelf";
 import { useQuery } from "../utils/react_query";
 import useStatus from "@shared/status/useStatus";
 import { getPlaylistMeta } from "../api/spotify";
-import { parseTracks } from "../utils/track_helper";
+import { parseStat, parseTracks } from "../utils/track_helper";
 
 const getPlaylist = async (uri: string) => {
 	const playlistMeta = await getPlaylistMeta(uri.split(":")[2]);
@@ -28,7 +28,7 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
 	const analysis = data as NonNullable<typeof data>;
 
 	const statCards = Object.entries(analysis.analysis).map(([key, value]) => {
-		return <StatCard label={key} value={value} />;
+		return <StatCard label={key} value={parseStat(key)(value)} />;
 	});
 
 	const artistCards = analysis.artists.map((artist) => {

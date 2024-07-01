@@ -12,7 +12,7 @@ import SettingsButton from "@shared/components/settings_button";
 import { useQuery } from "../utils/react_query";
 import useStatus from "@shared/status/useStatus";
 import { getPlaylistMeta, getUserPlaylists } from "../api/spotify";
-import { parseTracks } from "../utils/track_helper";
+import { parseStat, parseTracks } from "../utils/track_helper";
 
 const DropdownOptions = [
 	{ id: "owned", name: "My Playlists" },
@@ -49,7 +49,7 @@ const LibraryPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const analysis = data as NonNullable<typeof data>;
 
 	const statCards = Object.entries(analysis.analysis).map(([key, value]) => {
-		return <StatCard label={key} value={value} />;
+		return <StatCard label={key} value={parseStat(key)(value)} />;
 	});
 
 	const artistCards = analysis.artists.map((artist) => {

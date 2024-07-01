@@ -15,6 +15,7 @@
         "spicetify-creator": "^1.0.13"
     },
     "dependencies": {
+        "lodash": "^4.17.21",
         "spcr-navigation-bar": "^0.0.3"
     },
     "description": "---",

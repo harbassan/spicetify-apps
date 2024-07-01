@@ -109,3 +109,14 @@ export const parseTracks = async (tracks: PlaylistTrack[]) => {
 		length: trackIDs.length,
 	};
 };
+
+export const parseStat = (name: string) => {
+	switch (name) {
+		case "tempo":
+			return (v: number) => `${Math.round(v)} bpm`;
+		case "popularity":
+			return (v: number) => `${Math.round(v)}%`;
+		default:
+			return (v: number) => `${Math.round(v * 100)}%`;
+	}
+};
