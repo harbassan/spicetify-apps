@@ -36,7 +36,7 @@ interface Image {
 	width: number | null;
 }
 
-interface SimplifiedArtist {
+export interface SimplifiedArtist {
 	href: string;
 	id: string;
 	name: string;
@@ -94,7 +94,7 @@ interface SimplifiedTrack {
 
 export interface Track extends SimplifiedTrack {
 	album: SimplifiedAlbum;
-	artists: Artist[];
+	artists: SimplifiedArtist[];
 	external_ids: {
 		isrc: string;
 		ean: string;

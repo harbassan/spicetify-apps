@@ -26,6 +26,9 @@ export const getTopArtists = (range: Spotify.SpotifyRange) => {
 	).then((res) => res.items);
 };
 
+/**
+ * @param ids - max: 50
+ */
 export const getArtistMetas = (ids: string[]) => {
 	return apiFetch<Spotify.SeveralArtistsResponse>("artistMetas", `https://api.spotify.com/v1/artists?ids=${ids}`).then(
 		(res) => res.artists,

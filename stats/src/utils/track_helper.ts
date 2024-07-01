@@ -1,5 +1,5 @@
-import { getAudioFeatures } from "../api/spotify";
-import type { Artist, PlaylistTrack, SimplifiedAlbum } from "../types/spotify";
+import { getArtistMetas, getAudioFeatures } from "../api/spotify";
+import type { Artist, PlaylistTrack, SimplifiedAlbum, SimplifiedArtist } from "../types/spotify";
 import type { SpotifyMinifiedAlbum, SpotifyMinifiedArtist } from "../types/stats_types";
 import { minifyAlbum, minifyArtist } from "./converter";
 
@@ -57,7 +57,8 @@ export const parseAlbums = (albums: SimplifiedAlbum[]) => {
 	return { releaseYears, albums: Object.values(uniqueAlbums).sort((a, b) => b.frequency - a.frequency) };
 };
 
-export const parseArtists = (artists: Artist[]) => {
+export const parseArtists = async (artistsRaw: SimplifiedArtist[]) => {
+	const artists = await batchRequest(50, getArtistMetas)(artistsRaw.map((artist) => artist.id));
 	const genres = {} as Record<string, number>;
 	const uniqueArtists = artists.reduce(
 		(acc, artist) => {
@@ -75,7 +76,7 @@ export const parseArtists = (artists: Artist[]) => {
 export const parseTracks = async (tracks: PlaylistTrack[]) => {
 	const trackIDs: string[] = [];
 	const albumsRaw: SimplifiedAlbum[] = [];
-	const artistsRaw: Artist[] = [];
+	const artistsRaw: SimplifiedArtist[] = [];
 	let explicit = 0;
 	let popularity = 0;
 	let duration = 0;
@@ -95,8 +96,16 @@ export const parseTracks = async (tracks: PlaylistTrack[]) => {
 
 	const audioFeatures = await getMeanAudioFeatures(trackIDs);
 	const analysis = { ...audioFeatures, popularity, explicit };
-	const { genres, artists } = parseArtists(artistsRaw);
+	const { genres, artists } = await parseArtists(artistsRaw);
 	const { releaseYears, albums } = parseAlbums(albumsRaw);
 
-	return { analysis, genres, artists, albums, releaseYears, duration, length: trackIDs.length };
+	return {
+		analysis,
+		genres,
+		artists: artists.slice(0, 10),
+		albums: albums.slice(0, 10),
+		releaseYears,
+		duration,
+		length: trackIDs.length,
+	};
 };
