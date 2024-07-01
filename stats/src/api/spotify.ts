@@ -1,6 +1,6 @@
 import type * as Spotify from "../types/spotify";
 
-const apiFetch = async <T>(name: string, url: string, log = true): Promise<T> => {
+export const apiFetch = async <T>(name: string, url: string, log = true): Promise<T> => {
 	try {
 		const timeStart = window.performance.now();
 		const response = await Spicetify.CosmosAsync.get(url);
