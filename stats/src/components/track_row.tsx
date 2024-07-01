@@ -1,11 +1,4 @@
 import React from "react";
-import { queue } from "../funcs";
-import { Track } from "../types/stats_types";
-
-interface TrackRowProps extends Track {
-	index: number;
-	uris: string[];
-}
 
 const ArtistLink = ({ name, uri, index, length }: { name: string; uri: string; index: number; length: number }) => {
 	return (
@@ -107,7 +100,7 @@ interface AlbumMenuProps extends Spicetify.ReactComponent.MenuProps {
 function playAndQueue(uri: string, uris: string[]) {
 	uris = uris.filter((u) => !u.includes("last"));
 	uris = uris.concat(uris.splice(0, uris.indexOf(uri)));
-	queue(uris);
+	// queue(uris);
 }
 
 const MenuWrapper = React.memo((props: AlbumMenuProps) => <Spicetify.ReactComponent.AlbumMenu {...props} />);
