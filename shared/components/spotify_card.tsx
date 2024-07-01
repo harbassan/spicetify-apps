@@ -4,38 +4,23 @@ import React from "react";
 import FolderSVG from "./folder_fallback";
 
 interface SpotifyCardProps {
-	type:
-		| "artist"
-		| "album"
-		| "lastfm"
-		| "playlist"
-		| "folder"
-		| "show"
-		| "collection";
+	type: "artist" | "album" | "lastfm" | "playlist" | "folder" | "show" | "collection";
 	uri: string;
 	header: string;
 	subheader: string;
-	imageUrl: string | null;
+	imageUrl?: string;
 	artistUri?: string;
 	badge?: string;
+	provider: "spotify" | "lastfm";
 }
 
-function SpotifyCard(
-	props: SpotifyCardProps,
-): React.ReactElement<HTMLDivElement> {
+function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement> {
 	// @ts-ignore
-	const {
-		Cards,
-		TextComponent,
-		ArtistMenu,
-		AlbumMenu,
-		PodcastShowMenu,
-		PlaylistMenu,
-		ContextMenu,
-	} = Spicetify.ReactComponent;
+	const { Cards, TextComponent, ArtistMenu, AlbumMenu, PodcastShowMenu, PlaylistMenu, ContextMenu } =
+		Spicetify.ReactComponent;
 	const { FeatureCard: Card, CardImage } = Cards;
 	const { createHref, push } = Spicetify.Platform.History;
-	const { type, header, uri, imageUrl, subheader, artistUri, badge } = props;
+	const { type, header, uri, imageUrl, subheader, artistUri, badge, provider } = props;
 
 	const Menu = () => {
 		switch (type) {
@@ -56,7 +41,7 @@ function SpotifyCard(
 		}
 	};
 	const lastfmProps =
-		type === "lastfm"
+		provider === "lastfm"
 			? {
 					onClick: () => window.open(uri, "_blank"),
 					isPlayable: false,
@@ -103,20 +88,11 @@ function SpotifyCard(
 								},
 							]}
 							isCircular={type === "artist"}
-							FallbackComponent={
-								type === "folder" || type === "collection"
-									? FolderSVG
-									: undefined
-							}
+							FallbackComponent={type === "folder" || type === "collection" ? FolderSVG : undefined}
 						/>
 					)}
 					renderSubHeaderContent={() => (
-						<TextComponent
-							as="div"
-							variant="mesto"
-							semanticColor="textSubdued"
-							children={subheader}
-						/>
+						<TextComponent as="div" variant="mesto" semanticColor="textSubdued" children={subheader} />
 					)}
 					uri={uri}
 					{...lastfmProps}

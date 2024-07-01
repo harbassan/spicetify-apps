@@ -1,13 +1,51 @@
 import { searchForAlbum, searchForArtist, searchForTrack } from "../api/spotify";
 import type * as LastFM from "../types/lastfm";
 import type * as Spotify from "../types/spotify";
+import type {
+	LastFMMinifiedAlbum,
+	LastFMMinifiedArtist,
+	LastFMMinifiedTrack,
+	SpotifyMinifiedAlbum,
+	SpotifyMinifiedArtist,
+	SpotifyMinifiedTrack,
+} from "../types/stats_types";
 
-const minifyArtist = (artist: Spotify.Artist) => ({
+export const minifyArtist = (artist: Spotify.Artist): SpotifyMinifiedArtist => ({
 	id: artist.id,
 	name: artist.name,
 	image: artist.images.at(-1)?.url,
 	uri: artist.uri,
 	genres: artist.genres,
+	type: "spotify",
+});
+
+export const minifyAlbum = (album: Spotify.SimplifiedAlbum): SpotifyMinifiedAlbum => ({
+	id: album.id,
+	uri: album.uri,
+	name: album.name,
+	image: album.images.at(-1)?.url,
+	type: "spotify",
+});
+
+export const minifyTrack = (track: Spotify.Track): SpotifyMinifiedTrack => ({
+	id: track.id,
+	uri: track.uri,
+	name: track.name,
+	duration_ms: track.duration_ms,
+	popularity: track.popularity,
+	explicit: track.explicit,
+	image: track.album.images.at(-1)?.url,
+	artists: track.artists.map((artist) => ({
+		name: artist.name,
+		uri: artist.uri,
+		genres: artist.genres,
+	})),
+	album: {
+		name: track.album.name,
+		uri: track.album.uri,
+		release_date: track.album.release_date,
+	},
+	type: "spotify",
 });
 
 export const convertArtist = async (artist: LastFM.Artist) => {
@@ -15,8 +53,18 @@ export const convertArtist = async (artist: LastFM.Artist) => {
 	const spotifyArtist = searchRes.find(
 		(a) => a.name.localeCompare(artist.name, undefined, { sensitivity: "base" }) === 0,
 	);
-	if (!spotifyArtist) return artist;
-	return { ...minifyArtist(spotifyArtist), playcount: artist.playcount, name: artist.name };
+	if (!spotifyArtist)
+		return {
+			name: artist.name,
+			playcount: Number(artist.playcount),
+			uri: artist.url,
+			type: "lastfm",
+		} as LastFMMinifiedArtist;
+	return {
+		...minifyArtist(spotifyArtist),
+		playcount: Number(artist.playcount),
+		name: artist.name,
+	} as SpotifyMinifiedArtist;
 };
 
 export const convertAlbum = async (album: LastFM.Album) => {
@@ -24,40 +72,32 @@ export const convertAlbum = async (album: LastFM.Album) => {
 	const spotifyAlbum = searchRes.find(
 		(a) => a.name.localeCompare(album.name, undefined, { sensitivity: "base" }) === 0,
 	);
-	if (!spotifyAlbum) return album;
-	return {
-		id: spotifyAlbum.id,
-		uri: spotifyAlbum.uri,
-		name: album.name,
-		image: spotifyAlbum.images.at(-1)?.url,
-		playcount: album.playcount,
-	};
+	if (!spotifyAlbum)
+		return {
+			uri: album.url,
+			name: album.name,
+			playcount: Number(album.playcount),
+			type: "lastfm",
+		} as LastFMMinifiedAlbum;
+	return { ...minifyAlbum(spotifyAlbum), playcount: Number(album.playcount), name: album.name } as SpotifyMinifiedAlbum;
 };
-
-const minifyTrack = (track: Spotify.Track) => ({
-	id: track.id,
-	uri: track.uri,
-	name: track.name,
-	duration: track.duration_ms,
-	popularity: track.popularity,
-	explicit: track.explicit,
-	image: track.album.images.at(-1)?.url,
-	release_year: track.album.release_date.slice(0, 4),
-	artists: track.artists.map((artist) => ({
-		name: artist.name,
-		uri: artist.uri,
-	})),
-	album: {
-		name: track.album.name,
-		uri: track.album.uri,
-	},
-});
 
 export const convertTrack = async (track: LastFM.Track) => {
 	const searchRes = await searchForTrack(track.name, track.artist.name);
 	const spotifyTrack = searchRes.find(
 		(t) => t.name.localeCompare(track.name, undefined, { sensitivity: "base" }) === 0,
 	);
-	if (!spotifyTrack) return track;
-	return { ...minifyTrack(spotifyTrack), playcount: track.playcount, name: track.name };
+	if (!spotifyTrack)
+		return {
+			uri: track.url,
+			name: track.name,
+			playcount: Number(track.playcount),
+			duration: Number(track.duration),
+			artist: {
+				name: track.artist.name,
+				uri: track.artist.url,
+			},
+			type: "lastfm",
+		} as LastFMMinifiedTrack;
+	return { ...minifyTrack(spotifyTrack), playcount: Number(track.playcount), name: track.name } as SpotifyMinifiedTrack;
 };

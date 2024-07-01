@@ -53,7 +53,7 @@ export interface Artist extends SimplifiedArtist {
 	popularity: number;
 }
 
-interface SimplifiedAlbum {
+export interface SimplifiedAlbum {
 	album_type: "album" | "single" | "compilation";
 	total_tracks: number;
 	href: string;
@@ -67,7 +67,7 @@ interface SimplifiedAlbum {
 	artists: SimplifiedArtist[];
 }
 
-interface Album extends SimplifiedAlbum {
+export interface Album extends SimplifiedAlbum {
 	tracks: Items<SimplifiedTrack>;
 	external_ids: {
 		isrc: string;
@@ -150,7 +150,7 @@ interface Episode {
 	type: "episode";
 }
 
-interface PlaylistTrack {
+export interface PlaylistTrack {
 	added_at: string;
 	added_by: User;
 	is_local: boolean;

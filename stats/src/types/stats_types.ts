@@ -2,7 +2,7 @@ declare global {
 	var SpicetifyStats: any;
 }
 
-export interface Config extends Record<string, any> {
+export interface Config {
 	"api-key": string | null;
 	"lastfm-user": string | null;
 	"use-lastfm": boolean;
@@ -18,45 +18,62 @@ export interface ConfigWrapper {
 	launchModal: () => void;
 }
 
-export interface Track {
-	liked: boolean;
-	name: string;
-	image: string;
-	uri: string;
-	id: string;
-	artists: Artist[];
-	duration: number;
-	album: string;
-	album_uri: string;
-	popularity: number;
-	explicit: boolean;
-	release_year: string;
-	playcount: number;
-}
-
-export interface Album {
-	name: string;
-	uri: string;
-	image: string;
-	freq?: number;
-	id?: string;
-	playcount?: number;
-}
-
-interface Artist {
-	name: string;
-	uri: string;
-	genres?: string[];
-	playcount?: number;
-}
-
-export interface ArtistCardProps extends Artist {
-	image: string | null;
-	freq?: number;
-	id?: string;
-}
-
 export interface InfoToCreatePlaylist {
 	playlistName: string;
 	itemsUris: string[];
+}
+
+export interface LastFMMinifiedArtist {
+	name: string;
+	playcount: number;
+	uri: string;
+	image: undefined;
+	type: "lastfm";
+}
+
+export interface SpotifyMinifiedArtist {
+	name: string;
+	uri: string;
+	id: string;
+	image?: string;
+	genres: string[];
+	playcount?: number;
+	type: "spotify";
+}
+
+export interface LastFMMinifiedAlbum extends LastFMMinifiedArtist {}
+export interface SpotifyMinifiedAlbum extends Omit<SpotifyMinifiedArtist, "genres"> {}
+
+export interface SpotifyMinifiedTrack {
+	id: string;
+	uri: string;
+	name: string;
+	duration_ms: number;
+	popularity: number;
+	playcount?: number;
+	explicit: boolean;
+	image?: string;
+	artists: {
+		name: string;
+		uri: string;
+		genres: string[];
+	}[];
+	album: {
+		name: string;
+		uri: string;
+		release_date: string;
+	};
+	type: "spotify";
+}
+
+export interface LastFMMinifiedTrack {
+	name: string;
+	uri: string;
+	playcount: number;
+	duration: number;
+	artist: {
+		name: string;
+		uri: string;
+	};
+	type: "lastfm";
 }

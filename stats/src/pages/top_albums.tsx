@@ -1,100 +1,48 @@
 import React from "react";
 import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import SpotifyCard from "@shared/components/spotify_card";
-import { apiRequest, convertAlbumData, updatePageCache } from "../funcs";
-import Status from "@shared/components/status";
 import PageContainer from "@shared/components/page_container";
-import type { Album, ConfigWrapper } from "../types/stats_types";
-import { LASTFM } from "../endpoints";
+import type { Config, ConfigWrapper } from "../types/stats_types";
 import RefreshButton from "../components/buttons/refresh_button";
 import SettingsButton from "@shared/components/settings_button";
+import type { SpotifyRange } from "../types/spotify";
+import * as lastFM from "../api/lastfm";
+import { convertAlbum } from "../utils/converter";
+import { useQuery } from "../utils/react_query";
+import useStatus from "@shared/status/useStatus";
+import { DropdownOptions } from "./top_artists";
 
-export const topAlbumsReq = async (time_range: string, configWrapper: ConfigWrapper) => {
-	const { config } = configWrapper;
-	if (!config["api-key"] || !config["lastfm-user"]) return 300;
-
+export const getTopAlbums = async (timeRange: SpotifyRange, config: Config) => {
 	const { "lastfm-user": user, "api-key": key } = config;
-	const response = await apiRequest("lastfm", LASTFM.topalbums(user, key, time_range));
-
-	if (!response) return 200;
-
-	return await convertAlbumData(response.topalbums.album);
+	if (!user || !key) throw new Error("Missing LastFM API Key or Username");
+	const response = await lastFM.getTopAlbums(key, user, timeRange);
+	return Promise.all(response.map(convertAlbum));
 };
 
-const DropdownOptions = [
-	{ id: "short_term", name: "Past Month" },
-	{ id: "medium_term", name: "Past 6 Months" },
-	{ id: "long_term", name: "All Time" },
-];
-
 const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
-	const { LocalStorage } = Spicetify;
-
-	const [topAlbums, setTopAlbums] = React.useState<Album[] | 100 | 200 | 300>(100);
 	const [dropdown, activeOption] = useDropdownMenu(DropdownOptions, "stats:top-albums");
 
-	const fetchTopAlbums = async (time_range: string, force?: boolean, set = true) => {
-		if (!force) {
-			const storedData = LocalStorage.get(`stats:top-albums:${time_range}`);
-			if (storedData) return setTopAlbums(JSON.parse(storedData));
-		}
+	const { status, error, data, refetch } = useQuery({
+		queryKey: ["top-albums", activeOption.id],
+		queryFn: () => getTopAlbums(activeOption.id as SpotifyRange, configWrapper.config),
+	});
 
-		const start = window.performance.now();
-
-		const topAlbums = await topAlbumsReq(time_range, configWrapper);
-		if (set) setTopAlbums(topAlbums);
-		LocalStorage.set(`stats:top-albums:${time_range}`, JSON.stringify(topAlbums));
-
-		console.log("total albums fetch time:", window.performance.now() - start);
-	};
-
-	React.useEffect(() => {
-		updatePageCache(5, fetchTopAlbums, activeOption.id);
-	}, []);
-
-	React.useEffect(() => {
-		fetchTopAlbums(activeOption.id);
-	}, [activeOption]);
-
-	const refresh = () => {
-		fetchTopAlbums(activeOption.id, true);
-	};
+	const Status = useStatus(status, error);
 
 	const props = {
 		title: "Top Albums",
-		headerEls: [dropdown, <RefreshButton callback={refresh} />, <SettingsButton configWrapper={configWrapper} />],
+		headerEls: [dropdown, <RefreshButton callback={refetch} />, <SettingsButton configWrapper={configWrapper} />],
 	};
 
-	switch (topAlbums) {
-		case 300:
-			return (
-				<PageContainer {...props}>
-					<Status icon="error" heading="No API Key or Username" subheading="Please enter these in the settings menu" />
-				</PageContainer>
-			);
-		case 200:
-			return (
-				<PageContainer {...props}>
-					<Status
-						icon="error"
-						heading="Failed to Fetch Top Artists"
-						subheading="An error occurred while fetching the data"
-					/>
-				</PageContainer>
-			);
-		case 100:
-			return (
-				<PageContainer {...props}>
-					<Status icon="library" heading="Loading" subheading="Fetching data..." />
-				</PageContainer>
-			);
-	}
+	if (Status) return <PageContainer {...props}>{Status}</PageContainer>;
+
+	const topAlbums = data as NonNullable<typeof data>;
 
 	const albumCards = topAlbums.map((album, index) => {
-		const type = album.uri.startsWith("https") ? "lastfm" : "album";
 		return (
 			<SpotifyCard
-				type={type}
+				type={"album"}
+				provider={album.type}
 				uri={album.uri}
 				header={album.name}
 				subheader={album.playcount ? `\u29BE ${album.playcount} Scrobbles` : "Album"}
