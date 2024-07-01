@@ -84,8 +84,8 @@ const LibraryPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 				<StatCard label="Total Playlists" value={analysis.playlists} />
 				<StatCard label="Total Tracks" value={analysis.length} />
 				<StatCard label="Total Artists" value={analysis.artists.length} />
-				<StatCard label="Total Minutes" value={Math.floor(analysis.duration / 60)} />
-				<StatCard label="Total Hours" value={(analysis.duration / 3600).toFixed(1)} />
+				<StatCard label="Total Minutes" value={Math.floor(analysis.duration / 60000)} />
+				<StatCard label="Total Hours" value={(analysis.duration / 3600000).toFixed(1)} />
 			</section>
 			<Shelf title="Most Frequent Genres">
 				<ChartCard data={analysis.genres} />
