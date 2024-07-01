@@ -1,7 +1,7 @@
 import React from "react";
 import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import StatCard from "../components/cards/stat_card";
-import GenresCard from "../components/cards/genres_card";
+import ChartCard from "../components/cards/chart_card";
 import InlineGrid from "../components/inline_grid";
 import PageContainer from "@shared/components/page_container";
 import Shelf from "../components/shelf";
@@ -96,11 +96,11 @@ const GenresPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	return (
 		<PageContainer {...props}>
 			<section className="main-shelf-shelf Shelf">
-				<GenresCard genres={analysis.genres} total={1275} />
+				<ChartCard data={analysis.genres} />
 				<InlineGrid special>{statCards}</InlineGrid>
 			</section>
 			<Shelf title="Release Year Distribution">
-				<GenresCard genres={analysis.releaseYears} total={50} />
+				<ChartCard data={analysis.releaseYears} />
 			</Shelf>
 			{/* <Shelf title="Most Obscure Tracks">
 				<Tracklist minified>{obscureTracks}</Tracklist>

@@ -1,7 +1,7 @@
 import React from "react";
 import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import StatCard from "../components/cards/stat_card";
-import GenresCard from "../components/cards/genres_card";
+import ChartCard from "../components/cards/chart_card";
 import SpotifyCard from "@shared/components/spotify_card";
 import InlineGrid from "../components/inline_grid";
 import PageContainer from "@shared/components/page_container";
@@ -88,7 +88,7 @@ const LibraryPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 				<StatCard label="Total Hours" value={(analysis.duration / 3600).toFixed(1)} />
 			</section>
 			<Shelf title="Most Frequent Genres">
-				<GenresCard genres={analysis.genres} />
+				<ChartCard data={analysis.genres} />
 				<InlineGrid special>{statCards}</InlineGrid>
 			</Shelf>
 			<Shelf title="Most Frequent Artists">
@@ -98,7 +98,7 @@ const LibraryPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 				<InlineGrid>{albumCards}</InlineGrid>
 			</Shelf>
 			<Shelf title="Release Year Distribution">
-				<GenresCard genres={analysis.releaseYears} />
+				<ChartCard data={analysis.releaseYears} />
 			</Shelf>
 		</PageContainer>
 	);
