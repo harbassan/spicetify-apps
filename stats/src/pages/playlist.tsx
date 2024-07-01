@@ -31,7 +31,7 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
 		return <StatCard label={key} value={parseStat(key)(value)} />;
 	});
 
-	const artistCards = analysis.artists.map((artist) => {
+	const artistCards = analysis.artists.slice(0, 10).map((artist) => {
 		return (
 			<SpotifyCard
 				type="artist"

@@ -102,7 +102,7 @@ export const parseTracks = async (tracks: PlaylistTrack[]) => {
 	return {
 		analysis,
 		genres,
-		artists: artists.slice(0, 10),
+		artists,
 		albums: albums.slice(0, 10),
 		releaseYears,
 		duration,
