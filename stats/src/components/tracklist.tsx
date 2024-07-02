@@ -1,12 +1,12 @@
 import React from "react";
 
-const Tracklist = ({ minified = false, children }) => {
+const Tracklist = ({ playcount = false, minified = false, children }) => {
 	const height = children.length;
 	return (
 		<div
 			role="grid"
 			aria-rowcount={height}
-			aria-colcount={4}
+			aria-colcount={5}
 			className="main-trackList-trackList main-trackList-indexable"
 		>
 			{!minified && (
@@ -38,10 +38,25 @@ const Tracklist = ({ minified = false, children }) => {
 								</span>
 							</button>
 						</div>
+						{playcount && (
+							<div
+								className="main-trackList-rowSectionVariable"
+								role="columnheader"
+								aria-colindex={3}
+								aria-sort="none"
+								tabIndex={-1}
+							>
+								<button type="button" className="main-trackList-column main-trackList-sortable" tabIndex={-1}>
+									<span className="TypeElement-mesto-type standalone-ellipsis-one-line" data-encore-id="type">
+										{"\u29BE Scrobbles"}
+									</span>
+								</button>
+							</div>
+						)}
 						<div
 							className="main-trackList-rowSectionVariable"
 							role="columnheader"
-							aria-colindex={3}
+							aria-colindex={4}
 							aria-sort="none"
 							tabIndex={-1}
 						>

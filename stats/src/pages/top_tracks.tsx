@@ -55,7 +55,7 @@ const TracksPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
 	return (
 		<PageContainer {...props} infoToCreatePlaylist={infoToCreatePlaylist}>
-			<Tracklist>{trackRows}</Tracklist>
+			<Tracklist playcount={Boolean(topTracks[0].playcount)}>{trackRows}</Tracklist>
 		</PageContainer>
 	);
 };

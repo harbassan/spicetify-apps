@@ -129,7 +129,7 @@ const TrackRow = (props: TrackRowProps) => {
 							{/* @ts-ignore - needs uri prop to work with playlist-labels extension*/}
 							<div uri={props.uri} className="main-trackList-rowMarker">
 								<span className="TypeElement-ballad-type main-trackList-number" data-encore-id="type">
-									{props.playcount ? props.playcount : props.index}
+									{props.index}
 								</span>
 								<Spicetify.ReactComponent.TooltipWrapper
 									label={`Play ${props.name} by ${props.artists.map((artist) => artist.name).join(", ")}`}
@@ -162,7 +162,10 @@ const TrackRow = (props: TrackRowProps) => {
 								aria-hidden="false"
 								draggable="false"
 								loading="eager"
-								src={props.image}
+								src={
+									props.image ||
+									"https://raw.githubusercontent.com/harbassan/spicetify-apps/main/stats/src/styles/placeholder.png"
+								}
 								alt=""
 								className="main-image-image main-trackList-rowImage main-image-loaded"
 								width="40"
@@ -185,7 +188,14 @@ const TrackRow = (props: TrackRowProps) => {
 								</span>
 							</div>
 						</div>
-						<div className="main-trackList-rowSectionVariable" role="gridcell" aria-colindex={3} tabIndex={-1}>
+						{props.playcount && (
+							<div className="main-trackList-rowSectionVariable" role="gridcell" aria-colindex={3} tabIndex={-1}>
+								<span data-encore-id="type" className="TypeElement-mesto TypeElement-mesto-type">
+									{props.playcount}
+								</span>
+							</div>
+						)}
+						<div className="main-trackList-rowSectionVariable" role="gridcell" aria-colindex={4} tabIndex={-1}>
 							<span data-encore-id="type" className="TypeElement-mesto TypeElement-mesto-type">
 								<a
 									draggable="true"
@@ -194,7 +204,7 @@ const TrackRow = (props: TrackRowProps) => {
 									href={props.album?.uri}
 									tabIndex={-1}
 								>
-									{props.album?.name}
+									{props.album?.name || "Unknown"}
 								</a>
 							</span>
 						</div>
