@@ -65,7 +65,7 @@ const parseTracks = async (tracks: (SpotifyMinifiedTrack | LastFMMinifiedTrack)[
 };
 
 const getGenres = async (time_range: SpotifyRange, config: Config) => {
-	const topTracks = await getTopTracks(time_range, config);
+	const topTracks = await cacher(() => getTopTracks(time_range, config))({ queryKey: ["top-tracks", time_range] });
 	return parseTracks(topTracks);
 };
 
