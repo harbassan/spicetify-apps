@@ -4,7 +4,6 @@ import ChartCard from "../components/cards/chart_card";
 import SpotifyCard from "@shared/components/spotify_card";
 import InlineGrid from "../components/inline_grid";
 import Shelf from "../components/shelf";
-import { useQuery } from "../utils/react_query";
 import useStatus from "@shared/status/useStatus";
 import { getPlaylistMeta } from "../api/spotify";
 import { parseStat, parseTracks } from "../utils/track_helper";
@@ -15,11 +14,32 @@ const getPlaylist = async (uri: string) => {
 	return parseTracks(contents);
 };
 
+// ? my shitty useQuery replacement because react-query is not working within the popup
+const useQueryShitty = <T,>(callback: () => Promise<T>) => {
+	const [error, setError] = React.useState<null | Error>(null);
+	const [data, setData] = React.useState<null | T>(null);
+	const [status, setStatus] = React.useState<"pending" | "error" | "success">("pending");
+
+	React.useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const data = await callback();
+				setData(data);
+				setStatus("success");
+			} catch (e) {
+				setError(e as Error);
+				setStatus("error");
+			}
+		};
+
+		fetchData();
+	}, [callback]);
+
+	return { status, error, data };
+};
+
 const PlaylistPage = ({ uri }: { uri: string }) => {
-	const { status, error, data, refetch } = useQuery({
-		queryKey: ["playlist", uri],
-		queryFn: () => getPlaylist(uri),
-	});
+	const { status, error, data } = useQueryShitty(() => getPlaylist(uri));
 
 	const Status = useStatus(status, error);
 
@@ -69,12 +89,12 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
 				<ChartCard data={analysis.genres} />
 				<div className={"main-gridContainer-gridContainer grid"}>{statCards}</div>
 			</Shelf>
-			<Shelf title="Most Frequent Artists">
+			{/* <Shelf title="Most Frequent Artists">
 				<InlineGrid>{artistCards}</InlineGrid>
-			</Shelf>
-			<Shelf title="Most Frequent Albums">
+			</Shelf> */}
+			{/* <Shelf title="Most Frequent Albums">
 				<InlineGrid>{albumCards}</InlineGrid>
-			</Shelf>
+			</Shelf> */}
 			<Shelf title="Release Year Distribution">
 				<ChartCard data={analysis.releaseYears} />
 			</Shelf>
