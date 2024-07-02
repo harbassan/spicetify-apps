@@ -11,6 +11,7 @@ import { convertAlbum } from "../utils/converter";
 import { useQuery } from "../utils/react_query";
 import useStatus from "@shared/status/useStatus";
 import { DropdownOptions } from "./top_artists";
+import { cacher, invalidator } from "../extensions/cache";
 
 export const getTopAlbums = async (timeRange: SpotifyRange, config: Config) => {
 	const { "lastfm-user": user, "api-key": key } = config;
@@ -24,14 +25,18 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
 	const { status, error, data, refetch } = useQuery({
 		queryKey: ["top-albums", activeOption.id],
-		queryFn: () => getTopAlbums(activeOption.id as SpotifyRange, configWrapper.config),
+		queryFn: cacher(() => getTopAlbums(activeOption.id as SpotifyRange, configWrapper.config)),
 	});
 
 	const Status = useStatus(status, error);
 
 	const props = {
 		title: "Top Albums",
-		headerEls: [dropdown, <RefreshButton callback={refetch} />, <SettingsButton configWrapper={configWrapper} />],
+		headerEls: [
+			dropdown,
+			<RefreshButton callback={() => invalidator(["top-albums", activeOption.id], refetch)} />,
+			<SettingsButton configWrapper={configWrapper} />,
+		],
 	};
 
 	if (Status) return <PageContainer {...props}>{Status}</PageContainer>;

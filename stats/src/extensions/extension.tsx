@@ -28,7 +28,7 @@ class SpicetifyStats {
 				key: "use-lastfm",
 				type: "toggle",
 				def: false,
-				desc: `Last.fm charts your stats purely based on the streaming count, whereas Spotify factors in other variables`,
+				desc: "Last.fm charts your stats purely based on the streaming count, whereas Spotify factors in other variables",
 			},
 			{
 				name: "Artists Page",
@@ -43,7 +43,7 @@ class SpicetifyStats {
 				key: "show-albums",
 				type: "toggle",
 				def: false,
-				desc: `Requires Last.fm API key and username`,
+				desc: "Requires Last.fm API key and username",
 			},
 			{ name: "Genres Page", key: "show-genres", type: "toggle", def: true },
 			{ name: "Library Page", key: "show-library", type: "toggle", def: true },
@@ -52,7 +52,7 @@ class SpicetifyStats {
 				key: "show-charts",
 				type: "toggle",
 				def: true,
-				desc: `Requires Last.fm API key`,
+				desc: "Requires Last.fm API key",
 			},
 		],
 		"stats",
@@ -83,8 +83,6 @@ window.SpicetifyStats = new SpicetifyStats();
 		}
 		localStorage.setItem("stats:version", STATS_VERSION);
 	}
-
-	LocalStorage.set("stats:cache-info", JSON.stringify([0, 0, 0, 0, 0, 0]));
 
 	const styleLink = document.createElement("link");
 	styleLink.rel = "stylesheet";

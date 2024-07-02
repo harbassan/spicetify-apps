@@ -13,6 +13,7 @@ import type { SpotifyRange } from "../types/spotify";
 import { convertTrack, minifyTrack } from "../utils/converter";
 import { useQuery } from "../utils/react_query";
 import useStatus from "@shared/status/useStatus";
+import { cacher, invalidator } from "../extensions/cache";
 
 export const getTopTracks = async (timeRange: SpotifyRange, config: Config) => {
 	if (config["use-lastfm"]) {
@@ -30,14 +31,18 @@ const TracksPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
 	const { status, error, data, refetch } = useQuery({
 		queryKey: ["top-tracks", activeOption.id],
-		queryFn: () => getTopTracks(activeOption.id as SpotifyRange, configWrapper.config),
+		queryFn: cacher(() => getTopTracks(activeOption.id as SpotifyRange, configWrapper.config)),
 	});
 
 	const Status = useStatus(status, error);
 
 	const props = {
 		title: "Top Tracks",
-		headerEls: [dropdown, <RefreshButton callback={refetch} />, <SettingsButton configWrapper={configWrapper} />],
+		headerEls: [
+			dropdown,
+			<RefreshButton callback={() => invalidator(["top-tracks", activeOption.id], refetch)} />,
+			<SettingsButton configWrapper={configWrapper} />,
+		],
 	};
 
 	if (Status) return <PageContainer {...props}>{Status}</PageContainer>;

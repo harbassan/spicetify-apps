@@ -18,6 +18,8 @@ import SettingsButton from "@shared/components/settings_button";
 import { convertArtist, convertTrack } from "../utils/converter";
 import useStatus from "@shared/status/useStatus";
 import { useQuery } from "../utils/react_query";
+import { cacher, invalidator } from "../extensions/cache";
+// @ts-ignore
 import _ from "lodash";
 
 const DropdownOptions = [
@@ -78,15 +80,19 @@ const ChartsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const [dropdown, activeOption] = useDropdownMenu(DropdownOptions, "stats:charts");
 
 	const { status, error, data, refetch } = useQuery({
-		queryKey: ["top-tracks", activeOption.id],
-		queryFn: () => getChart(activeOption.id as "tracks" | "artists", configWrapper.config),
+		queryKey: ["top-charts", activeOption.id],
+		queryFn: cacher(() => getChart(activeOption.id as "tracks" | "artists", configWrapper.config)),
 	});
 
 	const Status = useStatus(status, error);
 
 	const props = {
 		title: `Top Charts - ${_.startCase(activeOption.id)}`,
-		headerEls: [dropdown, <RefreshButton callback={refetch} />, <SettingsButton configWrapper={configWrapper} />],
+		headerEls: [
+			dropdown,
+			<RefreshButton callback={() => invalidator(["top-charts", activeOption.id], refetch)} />,
+			<SettingsButton configWrapper={configWrapper} />,
+		],
 	};
 
 	if (Status) return <PageContainer {...props}>{Status}</PageContainer>;

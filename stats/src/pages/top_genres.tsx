@@ -15,6 +15,7 @@ import { batchRequest, getMeanAudioFeatures, parseStat } from "../utils/track_he
 import { useQuery } from "../utils/react_query";
 import useStatus from "@shared/status/useStatus";
 import { getArtistMetas } from "../api/spotify";
+import { cacher, invalidator } from "../extensions/cache";
 
 const parseArtists = async (artistsRaw: SpotifyMinifiedTrack["artists"]) => {
 	const artists = await batchRequest(50, getArtistMetas)(artistsRaw.map((artist) => artist.uri.split(":")[2]));
@@ -73,14 +74,18 @@ const GenresPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
 	const { status, error, data, refetch } = useQuery({
 		queryKey: ["top-genres", activeOption.id],
-		queryFn: () => getGenres(activeOption.id as SpotifyRange, configWrapper.config),
+		queryFn: cacher(() => getGenres(activeOption.id as SpotifyRange, configWrapper.config)),
 	});
 
 	const Status = useStatus(status, error);
 
 	const props = {
 		title: "Top Genres",
-		headerEls: [dropdown, <RefreshButton callback={refetch} />, <SettingsButton configWrapper={configWrapper} />],
+		headerEls: [
+			dropdown,
+			<RefreshButton callback={() => invalidator(["top-genres", activeOption.id], refetch)} />,
+			<SettingsButton configWrapper={configWrapper} />,
+		],
 	};
 
 	if (Status) return <PageContainer {...props}>{Status}</PageContainer>;

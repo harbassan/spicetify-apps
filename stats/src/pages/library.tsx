@@ -13,6 +13,7 @@ import { useQuery } from "../utils/react_query";
 import useStatus from "@shared/status/useStatus";
 import { getPlaylistMeta, getUserPlaylists } from "../api/spotify";
 import { parseStat, parseTracks } from "../utils/track_helper";
+import { cacher, invalidator } from "../extensions/cache";
 
 const DropdownOptions = [
 	{ id: "owned", name: "My Playlists" },
@@ -34,12 +35,16 @@ const LibraryPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
 	const { status, error, data, refetch } = useQuery({
 		queryKey: ["library", activeOption.id],
-		queryFn: () => getLibrary(activeOption.id as "owned" | "all"),
+		queryFn: cacher(() => getLibrary(activeOption.id as "owned" | "all")),
 	});
 
 	const props = {
 		title: "Library Analysis",
-		headerEls: [dropdown, <RefreshButton callback={refetch} />, <SettingsButton configWrapper={configWrapper} />],
+		headerEls: [
+			dropdown,
+			<RefreshButton callback={() => invalidator(["library", activeOption.id], refetch)} />,
+			<SettingsButton configWrapper={configWrapper} />,
+		],
 	};
 
 	const Status = useStatus(status, error);
