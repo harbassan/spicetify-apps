@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import StatCard from "../components/cards/stat_card";
 import ChartCard from "../components/cards/chart_card";
 import SpotifyCard from "@shared/components/spotify_card";
@@ -39,7 +39,9 @@ const useQueryShitty = <T,>(callback: () => Promise<T>) => {
 };
 
 const PlaylistPage = ({ uri }: { uri: string }) => {
-	const { status, error, data } = useQueryShitty(() => getPlaylist(uri));
+	const query = useCallback(() => getPlaylist(uri), [uri]);
+
+	const { status, error, data } = useQueryShitty(query);
 
 	const Status = useStatus(status, error);
 
