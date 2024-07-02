@@ -99,7 +99,7 @@ const GenresPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 		<PageContainer {...props}>
 			<section className="main-shelf-shelf Shelf">
 				<ChartCard data={analysis.genres} />
-				<InlineGrid special>{statCards}</InlineGrid>
+				<div className={"main-gridContainer-gridContainer grid"}>{statCards}</div>
 			</section>
 			<Shelf title="Release Year Distribution">
 				<ChartCard data={analysis.releaseYears} />

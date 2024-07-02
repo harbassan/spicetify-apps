@@ -6,6 +6,10 @@
         scroll-behavior: smooth;
         margin-top: 5px;
     }
+
+    .grid:nth-child(2) {
+        margin-top: 24px;
+    }
     
     [data-scroll="both"] {
         mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);

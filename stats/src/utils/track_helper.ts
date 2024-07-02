@@ -18,7 +18,6 @@ export const getMeanAudioFeatures = async (ids: string[]) => {
 	const audioFeaturesSum = {
 		danceability: 0,
 		energy: 0,
-		loudness: 0,
 		speechiness: 0,
 		acousticness: 0,
 		instrumentalness: 0,

@@ -67,7 +67,7 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
 			</section>
 			<Shelf title="Most Frequent Genres">
 				<ChartCard data={analysis.genres} />
-				<InlineGrid special>{statCards}</InlineGrid>
+				<div className={"main-gridContainer-gridContainer grid"}>{statCards}</div>
 			</Shelf>
 			<Shelf title="Most Frequent Artists">
 				<InlineGrid>{artistCards}</InlineGrid>
