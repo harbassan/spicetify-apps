@@ -12,6 +12,10 @@ export const apiFetch = async <T>(name: string, url: string, log = true): Promis
 	}
 };
 
+const f = (param: string) => {
+	return encodeURIComponent(param);
+};
+
 export const getTopTracks = (range: Spotify.SpotifyRange) => {
 	return apiFetch<Spotify.TopTracksResponse>(
 		"topTracks",
@@ -57,21 +61,21 @@ export const getAudioFeatures = (ids: string[]) => {
 export const searchForTrack = (track: string, artist: string) => {
 	return apiFetch<Spotify.SearchResponse>(
 		"searchForTrack",
-		`https://api.spotify.com/v1/search?q=track:${track}+artist:${artist}&type=track`,
+		`https://api.spotify.com/v1/search?q=track:${f(track)}+artist:${f(artist)}&type=track`,
 	).then((res) => res.tracks.items);
 };
 
 export const searchForArtist = (artist: string) => {
 	return apiFetch<Spotify.SearchResponse>(
 		"searchForArtist",
-		`https://api.spotify.com/v1/search?q=artist:${artist}&type=artist`,
+		`https://api.spotify.com/v1/search?q=artist:${f(artist)}&type=artist`,
 	).then((res) => res.artists.items);
 };
 
 export const searchForAlbum = (album: string, artist: string) => {
 	return apiFetch<Spotify.SearchResponse>(
 		"searchForAlbum",
-		`https://api.spotify.com/v1/search?q=album:${album}+artist:${artist}&type=album`,
+		`https://api.spotify.com/v1/search?q=album:${f(album)}+artist:${f(artist)}&type=album`,
 	).then((res) => res.albums.items);
 };
 
