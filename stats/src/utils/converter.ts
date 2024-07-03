@@ -1,4 +1,5 @@
 import { searchForAlbum, searchForArtist, searchForTrack } from "../api/spotify";
+import { cacher } from "../extensions/cache";
 import type * as LastFM from "../types/lastfm";
 import type * as Spotify from "../types/spotify";
 import type {
@@ -48,7 +49,7 @@ export const minifyTrack = (track: Spotify.Track): SpotifyMinifiedTrack => ({
 });
 
 export const convertArtist = async (artist: LastFM.Artist) => {
-	const searchRes = await searchForArtist(artist.name);
+	const searchRes = await cacher(() => searchForArtist(artist.name))({ queryKey: ["searchForArtist", artist.name] });
 	const spotifyArtist = searchRes.find(
 		(a) => a.name.localeCompare(artist.name, undefined, { sensitivity: "base" }) === 0,
 	);
@@ -67,7 +68,9 @@ export const convertArtist = async (artist: LastFM.Artist) => {
 };
 
 export const convertAlbum = async (album: LastFM.Album) => {
-	const searchRes = await searchForAlbum(album.name, album.artist.name);
+	const searchRes = await cacher(() => searchForAlbum(album.name, album.artist.name))({
+		queryKey: ["searchForAlbum", album.name, album.artist.name],
+	});
 	const spotifyAlbum = searchRes.find(
 		(a) => a.name.localeCompare(album.name, undefined, { sensitivity: "base" }) === 0,
 	);
@@ -82,7 +85,9 @@ export const convertAlbum = async (album: LastFM.Album) => {
 };
 
 export const convertTrack = async (track: LastFM.Track) => {
-	const searchRes = await searchForTrack(track.name, track.artist.name);
+	const searchRes = await cacher(() => searchForTrack(track.name, track.artist.name))({
+		queryKey: ["searchForTrack", track.name, track.artist.name],
+	});
 	const spotifyTrack = searchRes.find(
 		(t) => t.name.localeCompare(track.name, undefined, { sensitivity: "base" }) === 0,
 	);
