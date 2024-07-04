@@ -21,7 +21,7 @@ const ChartCard = ({ data }: { data: Record<string, number> }) => {
 
 	const keys = Object.keys(data)
 		.sort((a, b) => data[b] - data[a])
-		.slice(0, extended ? data.length : 10);
+		.slice(0, extended ? 50 : 10);
 
 	const total = Object.values(data).reduce((acc, curr) => acc + curr, 0);
 
