@@ -1,5 +1,6 @@
-import { getArtistMetas, getAudioFeatures } from "../api/spotify";
-import type { Artist, PlaylistTrack, SimplifiedAlbum, SimplifiedArtist } from "../types/spotify";
+import { getAlbumMetas, getArtistMetas, getAudioFeatures } from "../api/spotify";
+import type { Album, Artist, ContentsEpisode, ContentsTrack } from "../types/platform";
+import type { PlaylistTrack, SimplifiedAlbum, SimplifiedArtist } from "../types/spotify";
 import type { SpotifyMinifiedAlbum, SpotifyMinifiedArtist } from "../types/stats_types";
 import { minifyAlbum, minifyArtist } from "./converter";
 
@@ -26,7 +27,7 @@ export const getMeanAudioFeatures = async (ids: string[]) => {
 		tempo: 0,
 	};
 
-	const audioFeaturesList = await batchRequest(50, (batch) => getAudioFeatures(batch))(ids);
+	const audioFeaturesList = await batchRequest(100, getAudioFeatures)(ids);
 
 	for (const audioFeatures of audioFeaturesList) {
 		if (!audioFeatures) continue;
@@ -42,67 +43,86 @@ export const getMeanAudioFeatures = async (ids: string[]) => {
 	return audioFeaturesSum;
 };
 
-export const parseAlbums = (albums: SimplifiedAlbum[]) => {
+/**
+ * Parses the raw album data and returns a list of the top 100 artists along with their frequencies and release years.
+ * @param artistsRaw - The raw album data to be parsed.
+ * @returns An object containing the top 100 albums with their frequencies and release years calculated from them.
+ */
+export const parseAlbums = async (albumsRaw: Album[]) => {
+	const frequencyMap = {} as Record<string, number>;
+	const albumIDs = albumsRaw.map((album) => album.uri.split(":")[2]);
+	for (const id of albumIDs) {
+		frequencyMap[id] = (frequencyMap[id] || 0) + 1;
+	}
+	const ids = Object.keys(frequencyMap)
+		.sort((a, b) => frequencyMap[b] - frequencyMap[a])
+		.slice(0, 100);
+	const albums = await batchRequest(20, getAlbumMetas)(ids);
 	const releaseYears = {} as Record<string, number>;
-	const uniqueAlbums = albums.reduce(
-		(acc, album) => {
-			const year = album.release_date.slice(0, 4);
-			releaseYears[year] = (releaseYears[year] || 0) + 1;
-			acc[album.id] = { ...minifyAlbum(album), frequency: (acc[album.id]?.frequency || 0) + 1 };
-			return acc;
-		},
-		{} as Record<string, SpotifyMinifiedAlbum & { frequency: number }>,
-	);
-	return { releaseYears, albums: Object.values(uniqueAlbums).sort((a, b) => b.frequency - a.frequency) };
+	const uniqueAlbums = albums.map((album) => {
+		const year = album.release_date.slice(0, 4);
+		releaseYears[year] = (releaseYears[year] || 0) + 1;
+		return { ...minifyAlbum(album), frequency: frequencyMap[album.id] };
+	});
+	return { releaseYears, albums: { contents: uniqueAlbums, length: albumsRaw.length } };
 };
 
-export const parseArtists = async (artistsRaw: SimplifiedArtist[]) => {
-	const artists = await batchRequest(50, getArtistMetas)(artistsRaw.map((artist) => artist.id));
+/**
+ * Parses the raw artist data and returns a list of the top 250 artists along with their frequencies and genres.
+ * @param artistsRaw - The raw artist data to be parsed.
+ * @returns An object containing the top 250 artists with their frequencies and genres calculated from them.
+ */
+export const parseArtists = async (artistsRaw: Artist[]) => {
+	const frequencyMap = {} as Record<string, number>;
+	const artistIDs = artistsRaw.map((artist) => artist.uri.split(":")[2]);
+	for (const id of artistIDs) {
+		frequencyMap[id] = (frequencyMap[id] || 0) + 1;
+	}
+	const ids = Object.keys(frequencyMap)
+		.sort((a, b) => frequencyMap[b] - frequencyMap[a])
+		.slice(0, 250);
+	const artists = await batchRequest(50, getArtistMetas)(ids);
 	const genres = {} as Record<string, number>;
-	const uniqueArtists = artists.reduce(
-		(acc, artist) => {
-			for (const genre of artist.genres) {
-				genres[genre] = (genres[genre] || 0) + 1;
-			}
-			acc[artist.id] = { ...minifyArtist(artist), frequency: (acc[artist.id]?.frequency || 0) + 1 };
-			return acc;
-		},
-		{} as Record<string, SpotifyMinifiedArtist & { frequency: number }>,
-	);
-	return { genres, artists: Object.values(uniqueArtists).sort((a, b) => b.frequency - a.frequency) };
+	const uniqueArtists = artists.map((artist) => {
+		for (const genre of artist.genres) {
+			genres[genre] = (genres[genre] || 0) + 1;
+		}
+		return { ...minifyArtist(artist), frequency: frequencyMap[artist.id] };
+	});
+	return { genres, artists: { contents: uniqueArtists, length: artistsRaw.length } };
 };
 
-export const parseTracks = async (tracks: PlaylistTrack[]) => {
+export const parseTracks = async (tracks: (ContentsTrack | ContentsEpisode)[]) => {
 	const trackIDs: string[] = [];
-	const albumsRaw: SimplifiedAlbum[] = [];
-	const artistsRaw: SimplifiedArtist[] = [];
+	const albumsRaw: Album[] = [];
+	const artistsRaw: Artist[] = [];
 	let explicit = 0;
-	let popularity = 0;
+	// let popularity = 0;
 	let duration = 0;
 
-	for (const { track } of tracks) {
-		if (track?.type !== "track" || track.is_local) continue;
-		popularity += track.popularity;
-		duration += track.duration_ms;
-		explicit += track.explicit ? 1 : 0;
-		trackIDs.push(track.id);
+	for (const track of tracks) {
+		if (track?.type !== "track" || track.isLocal) continue;
+		// popularity += track.popularity;
+		duration += track.duration.milliseconds;
+		explicit += track.isExplicit ? 1 : 0;
+		trackIDs.push(track.uri.split(":")[2]);
 		albumsRaw.push(track.album);
 		artistsRaw.push(...track.artists);
 	}
 
 	explicit = explicit / trackIDs.length;
-	popularity = popularity / trackIDs.length;
+	// popularity = popularity / trackIDs.length;
 
 	const audioFeatures = await getMeanAudioFeatures(trackIDs);
-	const analysis = { ...audioFeatures, popularity, explicit };
+	const analysis = { ...audioFeatures, explicit };
 	const { genres, artists } = await parseArtists(artistsRaw);
-	const { releaseYears, albums } = parseAlbums(albumsRaw);
+	const { releaseYears, albums } = await parseAlbums(albumsRaw);
 
 	return {
 		analysis,
 		genres,
 		artists,
-		albums: albums.slice(0, 10),
+		albums,
 		releaseYears,
 		duration,
 		length: trackIDs.length,

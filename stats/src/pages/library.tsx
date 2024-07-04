@@ -11,9 +11,10 @@ import RefreshButton from "../components/buttons/refresh_button";
 import SettingsButton from "@shared/components/settings_button";
 import { useQuery } from "../utils/react_query";
 import useStatus from "@shared/status/useStatus";
-import { getPlaylistMeta, getUserPlaylists } from "../api/spotify";
+import { getUserPlaylists } from "../api/spotify";
 import { parseStat, parseTracks } from "../utils/track_helper";
 import { cacher, invalidator } from "../extensions/cache";
+import { getFullPlaylist } from "../api/platform";
 
 const DropdownOptions = [
 	{ id: "owned", name: "My Playlists" },
@@ -24,9 +25,9 @@ const getLibrary = async (type: "owned" | "all") => {
 	let playlists = await getUserPlaylists();
 	if (type === "owned") playlists = playlists.filter((p) => p.owner.id === Spicetify.Platform.username);
 	if (playlists.length === 0) throw new Error("You have no playlists saved");
-	const playlistMetas = await Promise.all(playlists.map((p) => getPlaylistMeta(p.id)));
-	const contents = playlistMetas.flatMap((p) => p.tracks.items);
-	const analysis = await parseTracks(contents);
+	const contents = await Promise.all(playlists.map((p) => getFullPlaylist(p.uri)));
+	// const contents = playlistMetas.flatMap((p) => p.tracks.items);
+	const analysis = await parseTracks(contents.flat());
 	return { ...analysis, playlists: playlists.length };
 };
 
@@ -57,7 +58,7 @@ const LibraryPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 		return <StatCard label={key} value={parseStat(key)(value)} />;
 	});
 
-	const artistCards = analysis.artists.slice(0, 10).map((artist) => {
+	const artistCards = analysis.artists.contents.slice(0, 10).map((artist) => {
 		return (
 			<SpotifyCard
 				type="artist"
@@ -70,7 +71,7 @@ const LibraryPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 		);
 	});
 
-	const albumCards = analysis.albums.map((album) => {
+	const albumCards = analysis.albums.contents.slice(0, 10).map((album) => {
 		return (
 			<SpotifyCard
 				type="album"

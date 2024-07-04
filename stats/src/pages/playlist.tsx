@@ -2,15 +2,13 @@ import React, { useCallback } from "react";
 import StatCard from "../components/cards/stat_card";
 import ChartCard from "../components/cards/chart_card";
 import SpotifyCard from "@shared/components/spotify_card";
-import InlineGrid from "../components/inline_grid";
 import Shelf from "../components/shelf";
 import useStatus from "@shared/status/useStatus";
-import { getPlaylistMeta } from "../api/spotify";
 import { parseStat, parseTracks } from "../utils/track_helper";
+import { getFullPlaylist } from "../api/platform";
 
 const getPlaylist = async (uri: string) => {
-	const playlistMeta = await getPlaylistMeta(uri.split(":")[2]);
-	const contents = playlistMeta.tracks.items;
+	const contents = await getFullPlaylist(uri);
 	return parseTracks(contents);
 };
 
@@ -53,7 +51,7 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
 		return <StatCard label={key} value={parseStat(key)(value)} />;
 	});
 
-	const artistCards = analysis.artists.slice(0, 10).map((artist) => {
+	const artistCards = analysis.artists.contents.slice(0, 10).map((artist) => {
 		return (
 			<SpotifyCard
 				type="artist"
@@ -66,7 +64,7 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
 		);
 	});
 
-	const albumCards = analysis.albums.map((album) => {
+	const albumCards = analysis.albums.contents.slice(0, 10).map((album) => {
 		return (
 			<SpotifyCard
 				type="album"

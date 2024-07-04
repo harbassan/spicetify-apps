@@ -95,7 +95,7 @@ interface SimplifiedTrack {
 export interface Track extends SimplifiedTrack {
 	album: SimplifiedAlbum;
 	artists: SimplifiedArtist[];
-	external_ids: {
+	external_ids?: {
 		isrc: string;
 		ean: string;
 		upc: string;
