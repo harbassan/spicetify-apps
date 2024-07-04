@@ -82,6 +82,7 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
 			<section className="stats-libraryOverview">
 				<StatCard label="Total Tracks" value={analysis.length} />
 				<StatCard label="Total Artists" value={analysis.artists.length} />
+				<StatCard label="Total Albums" value={analysis.albums.length} />
 				<StatCard label="Total Minutes" value={Math.floor(analysis.duration / 60000)} />
 				<StatCard label="Total Hours" value={(analysis.duration / 3600000).toFixed(1)} />
 			</section>
