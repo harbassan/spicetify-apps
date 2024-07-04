@@ -64,7 +64,7 @@ export const parseAlbums = async (albumsRaw: Album[]) => {
 		releaseYears[year] = (releaseYears[year] || 0) + 1;
 		return { ...minifyAlbum(album), frequency: frequencyMap[album.id] };
 	});
-	return { releaseYears, albums: { contents: uniqueAlbums, length: albumsRaw.length } };
+	return { releaseYears, albums: { contents: uniqueAlbums, length: Object.keys(frequencyMap).length } };
 };
 
 /**
@@ -89,7 +89,7 @@ export const parseArtists = async (artistsRaw: Artist[]) => {
 		}
 		return { ...minifyArtist(artist), frequency: frequencyMap[artist.id] };
 	});
-	return { genres, artists: { contents: uniqueArtists, length: artistsRaw.length } };
+	return { genres, artists: { contents: uniqueArtists, length: Object.keys(frequencyMap).length } };
 };
 
 export const parseTracks = async (tracks: (ContentsTrack | ContentsEpisode)[]) => {
