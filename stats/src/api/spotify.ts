@@ -1,7 +1,5 @@
 import type * as Spotify from "../types/spotify";
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export const apiFetch = async <T>(name: string, url: string, log = true): Promise<T> => {
 	try {
 		const timeStart = window.performance.now();

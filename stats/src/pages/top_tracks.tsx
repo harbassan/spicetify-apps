@@ -14,16 +14,17 @@ import { convertTrack, minifyTrack } from "../utils/converter";
 import { useQuery } from "../utils/react_query";
 import useStatus from "@shared/status/useStatus";
 import { cacher, invalidator } from "../extensions/cache";
+import { parseLiked } from "../utils/track_helper";
 
 export const getTopTracks = async (timeRange: SpotifyRange, config: Config) => {
 	if (config["use-lastfm"]) {
 		const { "lastfm-user": user, "api-key": key } = config;
 		if (!user || !key) throw new Error("Missing LastFM API Key or Username");
 		const response = await lastFM.getTopTracks(key, user, timeRange);
-		return Promise.all(response.map(convertTrack));
+		return parseLiked(await Promise.all(response.map(convertTrack)));
 	}
 	const response = await spotify.getTopTracks(timeRange);
-	return response.map(minifyTrack);
+	return parseLiked(response.map(minifyTrack));
 };
 
 const TracksPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {

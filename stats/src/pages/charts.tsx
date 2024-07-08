@@ -21,6 +21,7 @@ import { useQuery } from "../utils/react_query";
 import { cacher, invalidator } from "../extensions/cache";
 // @ts-ignore
 import _ from "lodash";
+import { parseLiked } from "../utils/track_helper";
 
 const DropdownOptions = [
 	{ id: "artists", name: "Top Artists" },
@@ -35,7 +36,7 @@ const getChart = async (type: "tracks" | "artists", config: Config) => {
 		return Promise.all(response.map(convertArtist));
 	}
 	const response = await lastFM.getTrackChart(key);
-	return Promise.all(response.map(convertTrack));
+	return parseLiked(await Promise.all(response.map(convertTrack)));
 };
 
 const ArtistChart = ({ artists }: { artists: (LastFMMinifiedArtist | SpotifyMinifiedArtist)[] }) => {

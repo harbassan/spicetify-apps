@@ -1,7 +1,6 @@
-import { getAlbumMetas, getArtistMetas, getAudioFeatures } from "../api/spotify";
+import { getAlbumMetas, getArtistMetas, getAudioFeatures, queryLiked } from "../api/spotify";
 import type { Album, Artist, ContentsEpisode, ContentsTrack } from "../types/platform";
-import type { PlaylistTrack, SimplifiedAlbum, SimplifiedArtist } from "../types/spotify";
-import type { SpotifyMinifiedAlbum, SpotifyMinifiedArtist } from "../types/stats_types";
+import type { LastFMMinifiedTrack, SpotifyMinifiedTrack } from "../types/stats_types";
 import { minifyAlbum, minifyArtist } from "./converter";
 
 export const batchRequest = <T>(size: number, request: (batch: string[]) => Promise<T[]>) => {
@@ -138,4 +137,11 @@ export const parseStat = (name: string) => {
 		default:
 			return (v: number) => `${Math.round(v * 100)}%`;
 	}
+};
+
+export const parseLiked = async (tracks: (SpotifyMinifiedTrack | LastFMMinifiedTrack)[]) => {
+	const trackIDs = tracks.filter((t) => t.type === "spotify").map((t) => t.id);
+	const liked = await batchRequest(50, queryLiked)(trackIDs);
+	const likedMap = new Map(trackIDs.map((id, i) => [id, liked[i]]));
+	return tracks.map((t) => ({ ...t, liked: t.type === "spotify" ? (likedMap.get(t.id) as boolean) : false }));
 };
