@@ -1,17 +1,17 @@
-/* ../../AppData/Local/Temp/tmp-11964-wBAOqZhOo4po/18d07cb0fbf2/navBar.module.css */
-.navBar-module__topBarHeaderItem___v29bR_stats {
+/* ../../../AppData/Local/Temp/tmp-8512-oc7Oe30L3Rj6/190904c1cb83/navBar.module.css */
+.navBar-module__topBarHeaderItem___piw4C_stats {
   -webkit-app-region: no-drag;
   display: inline-block;
   pointer-events: auto;
 }
-.navBar-module__topBarHeaderItemLink___VeyBY_stats {
+.navBar-module__topBarHeaderItemLink___xA4uv_stats {
   margin: 0 8px 0 0;
 }
-.navBar-module__topBarActive___-qYPu_stats {
+.navBar-module__topBarActive___XhWpm_stats {
   background-color: var(--spice-tab-active);
   border-radius: 4px;
 }
-.navBar-module__topBarHeaderItemLink___VeyBY_stats {
+.navBar-module__topBarHeaderItemLink___xA4uv_stats {
   border-radius: 4px;
   color: var(--spice-text);
   display: inline-block;
@@ -21,12 +21,12 @@
   text-decoration: none !important;
   cursor: pointer;
 }
-.navBar-module__topBarNav___1OtdR_stats {
+.navBar-module__topBarNav___qWGeZ_stats {
   -webkit-app-region: drag;
   pointer-events: none;
   width: 100%;
 }
-.navBar-module__topBarHeaderItem___v29bR_stats .navBar-module__optionsMenuDropBox___tD9mA_stats {
+.navBar-module__topBarHeaderItem___piw4C_stats .navBar-module__optionsMenuDropBox___pzfNI_stats {
   color: var(--spice-text);
   border: 0;
   max-width: 150px;
@@ -38,66 +38,48 @@
   -moz-appearance: none;
   appearance: none;
 }
-.navBar-module__topBarHeaderItem___v29bR_stats .navBar-module__optionsMenuDropBox___tD9mA_stats svg {
+.navBar-module__topBarHeaderItem___piw4C_stats .navBar-module__optionsMenuDropBox___pzfNI_stats svg {
   position: absolute;
   margin-left: 8px;
 }
-div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
+div.navBar-module__topBarHeaderItemLink___xA4uv_stats {
   padding: 0;
 }
 
-/* ../../AppData/Local/Temp/tmp-11964-wBAOqZhOo4po/18d07cb0e650/app.css */
-.stats-grid {
-  --grid-gap: 24px;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
-}
-.stats-specialGrid {
-  grid-template-columns: repeat(11, 180px) !important;
-}
-.stats-gridInline {
+/* ../../../AppData/Local/Temp/tmp-8512-oc7Oe30L3Rj6/190904c1b520/app.css */
+#stats-app .stats-gridInline {
   --grid-gap: 24px;
   grid-template-columns: repeat(10, 180px) !important;
   overflow-x: hidden;
   scroll-behavior: smooth;
   margin-top: 5px;
 }
-[data-scroll=both] {
+#stats-app .grid:nth-child(2) {
+  margin-top: 24px;
+}
+#stats-app [data-scroll=both] {
   -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
   mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
 }
-[data-scroll=end] {
+#stats-app [data-scroll=end] {
   -webkit-mask-image: linear-gradient(to right, transparent, black 10%);
   mask-image: linear-gradient(to right, transparent, black 10%);
 }
-[data-scroll=start] {
+#stats-app [data-scroll=start] {
   -webkit-mask-image: linear-gradient(to right, black 90%, transparent);
   mask-image: linear-gradient(to right, black 90%, transparent);
 }
-.stats-loadingWrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60vh;
-  flex-direction: column;
-  gap: 16px;
-}
-.stats-libraryOverview {
-  display: flex;
-  gap: 24px;
-  align-items: center;
-  margin-bottom: 16px;
-}
-.stats-page {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-.stats-trackPageTitle {
+#stats-app .stats-libraryOverview {
   display: flex;
   gap: 24px;
   align-items: center;
 }
-.stats-scrollButton {
+#stats-app .stats-trackPageTitle {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+#stats-app .stats-scrollButton {
   width: 40px;
   border-radius: 8px;
   border: none;
@@ -106,39 +88,20 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   background-color: var(--spice-player);
   color: var(--spice-subtext);
 }
-.stats-scrollButton:hover {
+#stats-app .stats-scrollButton:hover {
   background-color: var(--spice-card);
+  color: var(--spice-text);
 }
-.stats-header {
-  align-content: space-between;
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  margin: 16px 0;
-}
-.stats-header-right,
-.stats-header-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 50%;
-}
-.stats-header-right {
-  justify-content: flex-end;
-}
-.stats-header-left {
-  justify-content: flex-start;
-}
-.stats-tracklistHeader > div {
+#stats-app .stats-tracklistHeader > div {
   display: flex;
   -webkit-app-region: no-drag;
   gap: 20px;
   align-items: center;
 }
-.stats-make-playlist-button {
+#stats-app .stats-make-playlist-button {
   margin-inline-start: 12px;
 }
-.stats-genreCard {
+#stats-app .stats-genreCard {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -147,36 +110,68 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   background: var(--spice-player);
   position: relative;
 }
-.stats-genreRow {
+#stats-app .stats-genreRow {
   width: 100%;
   height: 20px;
   display: flex;
   gap: 10px;
 }
-.stats-genreRowFill {
+#stats-app .stats-genreRowFill {
   background: var(--spice-button);
   height: 100%;
   border-radius: 8px;
   display: flex;
   align-items: center;
 }
-.stats-genreText {
+#stats-app .stats-genreText {
   color: var(--spice-player);
   font-size: 0.875rem;
   margin-left: 7px;
   font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.stats-genreValue {
+#stats-app .stats-genreValue {
   color: var(--spice-text);
   font-size: 0.875rem;
 }
-.new-update {
-  background-color: var(--spice-player);
+#stats-app .stats-genreCard + .stats-gridInlineSection {
+  margin-top: 3px;
+}
+#stats-app .main-trackList-rowHeartButton,
+#stats-app .main-trackList-rowMoreButton {
+  background-color: transparent;
+  border: none;
+}
+#stats-app .main-trackList-rowPlayPauseIcon {
+  fill: currentColor;
+}
+#stats-app .badge {
+  position: absolute;
+  top: 3%;
+  left: 3%;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  background-color: rgb(65, 110, 170);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+#stats-app .extend-button {
+  background-color: transparent;
+  border: none;
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  font-size: 14px;
+  color: var(--spice-subtext);
+}
+#stats-app .extend-button:hover {
   color: var(--spice-text);
-  border-radius: 8px;
-  padding: 2px 12px;
-  margin: 0 24px;
-  border: 0px;
 }
 .GenericModal[aria-label="Playlist Stats"] .main-embedWidgetGenerator-container {
   width: 80vw;
@@ -186,19 +181,14 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
 .GenericModal[aria-label="Playlist Stats"] .main-shelf-title {
   color: var(--spice-text);
 }
-.status-icon {
-  width: 40px;
-  height: 40px;
-  fill: currentColor;
-}
 
-/* ../../AppData/Local/Temp/tmp-11964-wBAOqZhOo4po/18d07cb0f9d1/settings_modal.css */
-#stats-config-container {
+/* ../../../AppData/Local/Temp/tmp-8512-oc7Oe30L3Rj6/190904c1c901/config_modal.css */
+.config-container {
   gap: 10px;
   display: flex;
   flex-direction: column;
 }
-#stats-config-container .section-header {
+.config-container .section-header {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
   margin-block: 0px;
@@ -206,7 +196,7 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   font-weight: 700;
   color: var(--spice-text);
 }
-#stats-config-container .col.description {
+.config-container .col.description {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
   margin-block: 0px;
@@ -214,11 +204,11 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   font-weight: 400;
   color: var(--spice-subtext);
 }
-#stats-config-container .disabled {
+.config-container .disabled {
   opacity: 0;
   pointer-events: none;
 }
-#stats-config-container .text-input {
+.config-container .text-input {
   background: rgba(var(--spice-rgb-selected-row), 0.1);
   border: 1px solid transparent;
   border-radius: 4px;
@@ -229,12 +219,12 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   padding: 0 12px;
   width: 100%;
 }
-#stats-config-container .text-input:focus {
+.config-container .text-input:focus {
   background-color: var(--spice-tab-active);
   border: 1px solid var(--spice-button-disabled);
   outline: none;
 }
-#stats-config-container .dropdown-input {
+.config-container .dropdown-input {
   background-color: var(--spice-tab-active);
   border: 0;
   border-radius: 4px;
@@ -247,7 +237,7 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   padding: 0 32px 0 12px;
   width: 100%;
 }
-#stats-config-container .tooltip-icon {
+.config-container .tooltip-icon {
   float: right;
   margin-left: 10px;
   display: flex;
@@ -255,13 +245,67 @@ div.navBar-module__topBarHeaderItemLink___VeyBY_stats {
   height: 22px;
   fill: var(--spice-subtext);
 }
-#stats-config-container .tooltip-icon:hover {
+.config-container .tooltip-icon:hover {
   fill: var(--spice-text);
 }
-#stats-config-container .tooltip {
+.config-container .tooltip {
   text-align: center;
 }
-#stats-config-container .setting-row {
+.config-container .setting-row {
   display: flex;
   justify-content: space-between;
+}
+.config-container .playback-progressbar {
+  width: 200px;
+}
+
+/* ../../../AppData/Local/Temp/tmp-8512-oc7Oe30L3Rj6/190904c1c9e2/shared.css */
+.grid {
+  --grid-gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+}
+.loadingWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  flex-direction: column;
+  gap: 16px;
+}
+.loadingWrapper .status-icon {
+  width: 40px;
+  height: 40px;
+  fill: currentColor;
+}
+.page-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.page-header {
+  align-content: space-between;
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin: 16px 0;
+}
+.page-header .header-right,
+.page-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.page-header .header-right {
+  justify-content: flex-end;
+}
+.page-header .header-left {
+  justify-content: flex-start;
+}
+.new-update {
+  background-color: var(--spice-player);
+  color: var(--spice-text);
+  border-radius: 8px;
+  padding: 2px 12px;
+  margin: 0 24px;
+  border: 0px;
 }
