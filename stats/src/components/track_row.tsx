@@ -1,5 +1,6 @@
 import React from "react";
 import type { LastFMMinifiedTrack, SpotifyMinifiedTrack } from "../types/stats_types";
+import { formatNumber } from "../pages/charts";
 
 const ArtistLink = ({ name, uri, index, length }: { name: string; uri: string; index: number; length: number }) => {
 	return (
@@ -191,7 +192,7 @@ const TrackRow = (props: TrackRowProps) => {
 						{props.playcount && (
 							<div className="main-trackList-rowSectionVariable" role="gridcell" aria-colindex={3} tabIndex={-1}>
 								<span data-encore-id="type" className="TypeElement-mesto TypeElement-mesto-type">
-									{props.playcount}
+									{formatNumber(props.playcount)}
 								</span>
 							</div>
 						)}

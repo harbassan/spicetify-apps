@@ -23,6 +23,13 @@ import { cacher, invalidator } from "../extensions/cache";
 import _ from "lodash";
 import { parseLiked } from "../utils/track_helper";
 
+export const formatNumber = (num: number) => {
+	if (num >= 1e9) return `${(num / 1e9).toFixed(2)}B`;
+	if (num >= 1e6) return `${(num / 1e6).toFixed(2)}M`;
+	if (num >= 1e3) return `${(num / 1e3).toFixed(2)}K`;
+	return num.toString();
+};
+
 const DropdownOptions = [
 	{ id: "artists", name: "Top Artists" },
 	{ id: "tracks", name: "Top Tracks" },
@@ -49,7 +56,7 @@ const ArtistChart = ({ artists }: { artists: (LastFMMinifiedArtist | SpotifyMini
 						provider={artist.type}
 						uri={artist.uri}
 						header={artist.name}
-						subheader={artist.playcount ? `\u29BE ${artist.playcount} Scrobbles` : "Artist"}
+						subheader={artist.playcount ? `\u29BE ${formatNumber(artist.playcount)} Scrobbles` : "Artist"}
 						imageUrl={artist.image}
 						badge={`${index + 1}`}
 					/>
