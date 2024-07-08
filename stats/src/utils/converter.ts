@@ -24,7 +24,7 @@ export const minifyAlbum = (album: Spotify.SimplifiedAlbum): SpotifyMinifiedAlbu
 	id: album.id,
 	uri: album.uri,
 	name: album.name,
-	image: album.images.at(-1)?.url,
+	image: album.images[0]?.url,
 	type: "spotify",
 });
 
