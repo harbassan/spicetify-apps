@@ -152,10 +152,3 @@
 .GenericModal[aria-label="Playlist Stats"] .main-shelf-title {
     color: var(--spice-text);
 }
-
-// make sure track playcount always fits
-div[role=row] > .main-trackList-trackListRow > .main-trackList-rowSectionIndex > .main-trackList-rowMarker > .main-trackList-number {
-    writing-mode: vertical-lr;
-    text-combine-upright: all;
-    text-align: center;
-}
