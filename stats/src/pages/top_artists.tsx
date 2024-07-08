@@ -24,14 +24,16 @@ export const getTopArtists = async (timeRange: SpotifyRange, config: Config) => 
 	return response.map(minifyArtist);
 };
 
-export const DropdownOptions = [
-	{ id: SpotifyRange.Short, name: "Past Month" },
-	{ id: SpotifyRange.Medium, name: "Past 6 Months" },
-	{ id: SpotifyRange.Long, name: "All Time" },
-];
+export const DropdownOptions = ({ config: { "use-lastfm": useLastFM } }: ConfigWrapper) =>
+	[
+		useLastFM && { id: "extra_short_term", name: "Past Week" },
+		{ id: SpotifyRange.Short, name: "Past Month" },
+		{ id: SpotifyRange.Medium, name: "Past 6 Months" },
+		{ id: SpotifyRange.Long, name: "All Time" },
+	].filter(Boolean) as { id: string; name: string }[];
 
 const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
-	const [dropdown, activeOption] = useDropdownMenu(DropdownOptions, "stats:top-artists");
+	const [dropdown, activeOption] = useDropdownMenu(DropdownOptions(configWrapper), "stats:top-artists");
 
 	const { status, error, data, refetch } = useQuery({
 		queryKey: ["top-artists", activeOption.id],

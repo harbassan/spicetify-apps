@@ -21,7 +21,7 @@ export const getTopAlbums = async (timeRange: SpotifyRange, config: Config) => {
 };
 
 const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
-	const [dropdown, activeOption] = useDropdownMenu(DropdownOptions, "stats:top-albums");
+	const [dropdown, activeOption] = useDropdownMenu(DropdownOptions(configWrapper), "stats:top-albums");
 
 	const { status, error, data, refetch } = useQuery({
 		queryKey: ["top-albums", activeOption.id],

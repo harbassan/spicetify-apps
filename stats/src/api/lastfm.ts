@@ -2,6 +2,7 @@ import type * as LastFM from "../types/lastfm";
 import { apiFetch } from "./spotify";
 
 const lfmperiods = {
+	extra_short_term: "7day",
 	short_term: "1month",
 	medium_term: "6month",
 	long_term: "overall",

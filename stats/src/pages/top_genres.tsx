@@ -70,7 +70,7 @@ const getGenres = async (time_range: SpotifyRange, config: Config) => {
 };
 
 const GenresPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
-	const [dropdown, activeOption] = useDropdownMenu(DropdownOptions, "stats:top-genres");
+	const [dropdown, activeOption] = useDropdownMenu(DropdownOptions(configWrapper), "stats:top-genres");
 
 	const { status, error, data, refetch } = useQuery({
 		queryKey: ["top-genres", activeOption.id],
