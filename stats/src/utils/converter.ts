@@ -14,7 +14,7 @@ import type {
 export const minifyArtist = (artist: Spotify.Artist): SpotifyMinifiedArtist => ({
 	id: artist.id,
 	name: artist.name,
-	image: artist.images.at(-1)?.url,
+	image: artist.images?.at(0)?.url,
 	uri: artist.uri,
 	genres: artist.genres,
 	type: "spotify",
@@ -50,9 +50,10 @@ export const minifyTrack = (track: Spotify.Track): SpotifyMinifiedTrack => ({
 
 export const convertArtist = async (artist: LastFM.Artist) => {
 	const searchRes = await cacher(() => searchForArtist(artist.name))({ queryKey: ["searchForArtist", artist.name] });
-	const spotifyArtist = searchRes.find(
+	const spotifyArtists = searchRes.filter(
 		(a) => a.name.localeCompare(artist.name, undefined, { sensitivity: "base" }) === 0,
 	);
+	const spotifyArtist = spotifyArtists.sort((a, b) => b.popularity - a.popularity)[0];
 	if (!spotifyArtist)
 		return {
 			name: artist.name,
