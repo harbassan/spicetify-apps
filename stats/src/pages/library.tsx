@@ -11,10 +11,9 @@ import RefreshButton from "../components/buttons/refresh_button";
 import SettingsButton from "@shared/components/settings_button";
 import { useQuery } from "../utils/react_query";
 import useStatus from "@shared/status/useStatus";
-import { getUserPlaylists } from "../api/spotify";
 import { parseStat, parseTracks } from "../utils/track_helper";
 import { cacher, invalidator } from "../extensions/cache";
-import { getFullPlaylist } from "../api/platform";
+import { getFullPlaylist, getRootlist } from "../api/platform";
 
 const DropdownOptions = [
 	{ id: "owned", name: "My Playlists" },
@@ -22,11 +21,10 @@ const DropdownOptions = [
 ];
 
 const getLibrary = async (type: "owned" | "all") => {
-	let playlists = await getUserPlaylists();
-	if (type === "owned") playlists = playlists.filter((p) => p.owner.id === Spicetify.Platform.username);
+	let playlists = await getRootlist();
+	if (type === "owned") playlists = playlists.filter((p) => p.isOwnedBySelf);
 	if (playlists.length === 0) throw new Error("You have no playlists saved");
 	const contents = await Promise.all(playlists.map((p) => getFullPlaylist(p.uri)));
-	// const contents = playlistMetas.flatMap((p) => p.tracks.items);
 	const analysis = await parseTracks(contents.flat());
 	return { ...analysis, playlists: playlists.length };
 };

@@ -3,6 +3,10 @@ export interface PlaylistResponse {
 	contents: Contents;
 }
 
+export interface RootlistResponse {
+	items: Metadata[];
+}
+
 export interface Contents {
 	items: (ContentsTrack | ContentsEpisode)[];
 	offset: number;
