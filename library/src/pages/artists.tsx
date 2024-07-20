@@ -2,7 +2,6 @@ import React from "react";
 import SearchBar from "../components/searchbar";
 import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import PageContainer from "@shared/components/page_container";
-import Status from "@shared/status/status";
 import SpotifyCard from "@shared/components/spotify_card";
 import SettingsButton from "@shared/components/settings_button";
 import type { ConfigWrapperProps } from "../types/library_types";
@@ -10,17 +9,9 @@ import LoadMoreCard from "../components/load_more_card";
 import LeadingIcon from "../components/leading_icon";
 import AddButton from "../components/add_button";
 import TextInputDialog from "../components/text_input_dialog";
-
-interface ArtistProps {
-	uri: string;
-	name: string;
-	images: { url: string }[];
-}
-
-const sortOptions = [
-	{ id: "0", name: "Name" },
-	{ id: "1", name: "Date Added" },
-];
+import useStatus from "@shared/status/useStatus";
+import { useInfiniteQuery } from "@shared/types/react_query";
+import type { ArtistItem, GetContentsResponse } from "../types/platform";
 
 const AddMenu = () => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -47,32 +38,40 @@ const AddMenu = () => {
 	);
 };
 
+const limit = 200;
+
+const sortOptions = [
+	{ id: "0", name: "Name" },
+	{ id: "1", name: "Date Added" },
+];
+
 const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => {
 	const [dropdown, sortOption] = useDropdownMenu(sortOptions, "library:artists");
 	const [textFilter, setTextFilter] = React.useState("");
 
-	const { useInfiniteQuery } = Spicetify.ReactQuery;
-	const limit = 200;
-
 	const fetchArtists = async ({ pageParam }: { pageParam: number }) => {
-		const res = await Spicetify.Platform.LibraryAPI.getContents({
+		const res = (await Spicetify.Platform.LibraryAPI.getContents({
 			filters: ["1"],
 			sortOrder: sortOption.id,
 			textFilter,
 			offset: pageParam,
 			limit,
-		});
+		})) as GetContentsResponse<ArtistItem>;
+		if (!res.items) throw new Error("No artists found");
 		return res;
 	};
 
-	const { data, status, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
+	const { data, status, error, hasNextPage, fetchNextPage } = useInfiniteQuery({
 		queryKey: ["library:artists", sortOption.id, textFilter],
 		queryFn: fetchArtists,
 		initialPageParam: 0,
-		getNextPageParam: (lastPage: any, _allPages: any, lastPageParam: number) => {
-			return lastPage.totalLength > lastPageParam + limit ? lastPageParam + limit : undefined;
+		getNextPageParam: (lastPage) => {
+			const current = lastPage.offset + limit;
+			if (lastPage.totalLength > current) return current;
 		},
 	});
+
+	const Status = useStatus(status, error);
 
 	const props = {
 		title: "Artists",
@@ -84,42 +83,22 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) =
 		],
 	};
 
-	if (status === "pending") {
-		return (
-			<PageContainer {...props}>
-				<Status icon="library" heading="Loading" subheading="Fetching your artists" />
-			</PageContainer>
-		);
-	}
-	if (status === "error") {
-		return (
-			<PageContainer {...props}>
-				<Status icon="error" heading="Error" subheading="Failed to load your artists" />
-			</PageContainer>
-		);
-	}
-	if (!data.pages[0].items.length) {
-		return (
-			<PageContainer {...props}>
-				<Status icon="library" heading="Nothing Here" subheading="You don't have any artists saved" />
-			</PageContainer>
-		);
-	}
+	if (Status) return <PageContainer {...props}>{Status}</PageContainer>;
 
-	const artists = data.pages.flatMap((page: any) => page.items) as ArtistProps[];
+	const contents = data as NonNullable<typeof data>;
 
-	const artistCards = artists.map((artist) => {
-		return (
-			<SpotifyCard
-				provider="spotify"
-				type="artist"
-				uri={artist.uri}
-				header={artist.name}
-				subheader={"Artist"}
-				imageUrl={artist.images?.[0]?.url || ""}
-			/>
-		);
-	});
+	const artists = contents.pages.flatMap((page) => page.items);
+
+	const artistCards = artists.map((artist) => (
+		<SpotifyCard
+			provider="spotify"
+			type="artist"
+			uri={artist.uri}
+			header={artist.name}
+			subheader={"Artist"}
+			imageUrl={artist.images?.at(0)?.url}
+		/>
+	));
 
 	if (hasNextPage) artistCards.push(<LoadMoreCard callback={fetchNextPage} />);
 
