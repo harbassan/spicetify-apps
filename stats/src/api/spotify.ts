@@ -4,6 +4,10 @@ export const apiFetch = async <T>(name: string, url: string, log = true): Promis
 	try {
 		const timeStart = window.performance.now();
 		const response = await Spicetify.CosmosAsync.get(url);
+		if (response.code)
+			throw new Error(
+				`Failed to fetch the info from server. ${name.includes("lfm") ? "Check your LFM API key and username." : ""}`,
+			);
 		if (log) console.log("stats -", name, "fetch time:", window.performance.now() - timeStart);
 		return response;
 	} catch (error) {
