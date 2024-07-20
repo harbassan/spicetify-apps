@@ -75,14 +75,6 @@ const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => 
 		},
 	});
 
-	React.useEffect(() => {
-		const onUpdate = (e: any) => refetch();
-
-		Spicetify.Platform.LibraryAPI.getEvents()._emitter.addListener("update", onUpdate);
-
-		return () => Spicetify.Platform.LibraryAPI.getEvents()._emitter.removeListener("update", onUpdate);
-	}, [refetch]);
-
 	const props = {
 		title: "Shows",
 		headerEls: [

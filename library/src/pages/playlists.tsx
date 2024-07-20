@@ -108,19 +108,6 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
 		},
 	});
 
-	React.useEffect(() => {
-		const onUpdate = (e: any) => refetch();
-		const onImageUpdate = (e: any) => setImages({ ...e.detail });
-
-		Spicetify.Platform.RootlistAPI.getEvents().addListener("update", onUpdate);
-		SpicetifyLibrary.FolderImageWrapper.addEventListener("update", onImageUpdate);
-
-		return () => {
-			Spicetify.Platform.RootlistAPI.getEvents().removeListener("update", onUpdate);
-			SpicetifyLibrary.FolderImageWrapper.removeEventListener("update", onImageUpdate);
-		};
-	}, [refetch]);
-
 	const props = {
 		title: data?.pages[0].openedFolderName || "Playlists",
 		headerEls: [

@@ -108,20 +108,6 @@ const AlbumsPage = ({ configWrapper, collection }: { configWrapper: ConfigWrappe
 		structuralSharing: false,
 	});
 
-	React.useEffect(() => {
-		const onUpdate = (e: any) => {
-			refetch();
-		};
-
-		Spicetify.Platform.LibraryAPI.getEvents()._emitter.addListener("update", onUpdate);
-		SpicetifyLibrary.CollectionWrapper.addEventListener("update", onUpdate);
-
-		return () => {
-			Spicetify.Platform.LibraryAPI.getEvents()._emitter.removeListener("update", onUpdate);
-			SpicetifyLibrary.CollectionWrapper.removeEventListener("update", onUpdate);
-		};
-	}, [refetch]);
-
 	const props = {
 		title: data?.pages[0].openedCollection || "Albums",
 		headerEls: [
