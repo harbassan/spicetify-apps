@@ -9,7 +9,7 @@ import Shelf from "../components/shelf";
 import type { ConfigWrapper } from "../types/stats_types";
 import RefreshButton from "../components/buttons/refresh_button";
 import SettingsButton from "@shared/components/settings_button";
-import { useQuery } from "../utils/react_query";
+import { useQuery } from "../../../shared/types/react_query";
 import useStatus from "@shared/status/useStatus";
 import { parseStat, parseTracks } from "../utils/track_helper";
 import { cacher, invalidator } from "../extensions/cache";

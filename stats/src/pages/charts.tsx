@@ -17,7 +17,7 @@ import RefreshButton from "../components/buttons/refresh_button";
 import SettingsButton from "@shared/components/settings_button";
 import { convertArtist, convertTrack } from "../utils/converter";
 import useStatus from "@shared/status/useStatus";
-import { useQuery } from "../utils/react_query";
+import { useQuery } from "../../../shared/types/react_query";
 import { cacher, invalidator } from "../extensions/cache";
 // @ts-ignore
 import _ from "lodash";

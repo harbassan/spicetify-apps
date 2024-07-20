@@ -8,7 +8,7 @@ import SettingsButton from "@shared/components/settings_button";
 import type { SpotifyRange } from "../types/spotify";
 import * as lastFM from "../api/lastfm";
 import { convertAlbum } from "../utils/converter";
-import { useQuery } from "../utils/react_query";
+import { useQuery } from "../../../shared/types/react_query";
 import useStatus from "@shared/status/useStatus";
 import { DropdownOptions } from "./top_artists";
 import { cacher, invalidator } from "../extensions/cache";
