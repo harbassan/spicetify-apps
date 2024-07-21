@@ -4,9 +4,7 @@ import ReactDOM from "react-dom";
 import ToggleFiltersButton from "../components/toggle_filters";
 import CollapseButton from "../components/collapse_button";
 import ExpandButton from "../components/expand_button";
-import CollectionWrapper from "./collections_wrapper";
 import AlbumMenuItem from "../components/album_menu_item";
-import FolderImageWrapper from "./folder_image_wrapper";
 
 // inject css
 const styleLink = document.createElement("link");
@@ -87,8 +85,6 @@ class SpicetifyLibrary {
 		],
 		"library",
 	);
-	CollectionWrapper = new CollectionWrapper();
-	FolderImageWrapper = new FolderImageWrapper();
 }
 window.SpicetifyLibrary = new SpicetifyLibrary();
 

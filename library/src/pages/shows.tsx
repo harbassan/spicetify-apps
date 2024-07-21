@@ -3,7 +3,7 @@ import SearchBar from "../components/searchbar";
 import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import PageContainer from "@shared/components/page_container";
 import SettingsButton from "@shared/components/settings_button";
-import type { ConfigWrapperProps } from "../types/library_types";
+import type { ConfigWrapper } from "../types/library_types";
 import SpotifyCard from "@shared/components/spotify_card";
 import LoadMoreCard from "../components/load_more_card";
 import LeadingIcon from "../components/leading_icon";
@@ -45,7 +45,7 @@ const sortOptions = [
 	{ id: "1", name: "Date Added" },
 ];
 
-const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => {
+const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const [dropdown, sortOption] = useDropdownMenu(sortOptions, "library:shows");
 	const [textFilter, setTextFilter] = React.useState("");
 

@@ -5,7 +5,7 @@ import PageContainer from "@shared/components/page_container";
 import SpotifyCard from "@shared/components/spotify_card";
 import SettingsButton from "@shared/components/settings_button";
 import AddButton from "../components/add_button";
-import type { ConfigWrapperProps } from "../types/library_types";
+import type { ConfigWrapper } from "../types/library_types";
 import LoadMoreCard from "../components/load_more_card";
 import TextInputDialog from "../components/text_input_dialog";
 import LeadingIcon from "../components/leading_icon";
@@ -41,7 +41,7 @@ const AddMenu = ({ collection }: { collection?: string }) => {
 
 const limit = 200;
 
-const CollectionsPage = ({ collection, configWrapper }: { configWrapper: ConfigWrapperProps; collection?: string }) => {
+const CollectionsPage = ({ collection, configWrapper }: { configWrapper: ConfigWrapper; collection?: string }) => {
 	const [textFilter, setTextFilter] = React.useState("");
 
 	const fetchRootlist = async ({ pageParam }: { pageParam: number }) => {

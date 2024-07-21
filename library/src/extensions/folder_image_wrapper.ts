@@ -1,12 +1,12 @@
-type FolderImagesProps = Record<string, string>;
-
 class FolderImageWrapper extends EventTarget {
-	_folderImages: FolderImagesProps;
+	_folderImages: Record<string, string>;
 
 	constructor() {
 		super();
 		this._folderImages = JSON.parse(localStorage.getItem("library:folderImages") || "{}");
 	}
+
+	static INSTANCE = new FolderImageWrapper();
 
 	getFolderImage(uri: string) {
 		return this._folderImages[uri];
@@ -36,4 +36,4 @@ class FolderImageWrapper extends EventTarget {
 	}
 }
 
-export default FolderImageWrapper;
+export default FolderImageWrapper.INSTANCE;

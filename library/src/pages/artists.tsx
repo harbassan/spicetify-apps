@@ -4,7 +4,7 @@ import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import PageContainer from "@shared/components/page_container";
 import SpotifyCard from "@shared/components/spotify_card";
 import SettingsButton from "@shared/components/settings_button";
-import type { ConfigWrapperProps } from "../types/library_types";
+import type { ConfigWrapper } from "../types/library_types";
 import LoadMoreCard from "../components/load_more_card";
 import LeadingIcon from "../components/leading_icon";
 import AddButton from "../components/add_button";
@@ -45,7 +45,7 @@ const sortOptions = [
 	{ id: "1", name: "Date Added" },
 ];
 
-const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => {
+const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const [dropdown, sortOption] = useDropdownMenu(sortOptions, "library:artists");
 	const [textFilter, setTextFilter] = React.useState("");
 

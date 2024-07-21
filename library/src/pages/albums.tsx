@@ -1,6 +1,6 @@
 import React from "react";
 import SearchBar from "../components/searchbar";
-import type { ConfigWrapperProps } from "../types/library_types";
+import type { ConfigWrapper } from "../types/library_types";
 import SettingsButton from "@shared/components/settings_button";
 import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import PageContainer from "@shared/components/page_container";
@@ -47,7 +47,7 @@ const sortOptions = [
 	{ id: "6", name: "Recents" },
 ];
 
-const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => {
+const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const [dropdown, sortOption] = useDropdownMenu(sortOptions, "library:albums");
 	const [textFilter, setTextFilter] = React.useState("");
 

@@ -5,13 +5,14 @@ import PageContainer from "@shared/components/page_container";
 import SpotifyCard from "@shared/components/spotify_card";
 import SettingsButton from "@shared/components/settings_button";
 import AddButton from "../components/add_button";
-import type { ConfigWrapperProps } from "../types/library_types";
+import type { ConfigWrapper } from "../types/library_types";
 import LoadMoreCard from "../components/load_more_card";
 import TextInputDialog from "../components/text_input_dialog";
 import LeadingIcon from "../components/leading_icon";
 import { useInfiniteQuery } from "@shared/types/react_query";
 import type { FolderItem, GetContentsResponse, PlaylistItem } from "../types/platform";
 import useStatus from "@shared/status/useStatus";
+import FolderImageWrapper from "../extensions/folder_image_wrapper";
 
 const AddMenu = ({ folder }: { folder?: string }) => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -78,12 +79,12 @@ const flattenOptions = [
 	{ id: "true", name: "Flattened" },
 ];
 
-const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapperProps; folder?: string }) => {
+const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper; folder?: string }) => {
 	const [sortDropdown, sortOption] = useDropdownMenu(dropdownOptions, "library:playlists-sort");
 	const [filterDropdown, filterOption] = useDropdownMenu(filterOptions);
 	const [flattenDropdown, flattenOption] = useDropdownMenu(flattenOptions);
 	const [textFilter, setTextFilter] = React.useState("");
-	const [images, setImages] = React.useState({ ...SpicetifyLibrary.FolderImageWrapper.getFolderImages() });
+	const [images, setImages] = React.useState({ ...FolderImageWrapper.getFolderImages() });
 
 	const fetchRootlist = async ({ pageParam }: { pageParam: number }) => {
 		const filters = filterOption.id === "all" ? ["2"] : ["2", filterOption.id];
