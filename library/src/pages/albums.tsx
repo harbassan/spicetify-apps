@@ -59,7 +59,7 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) =>
 			offset: pageParam,
 			limit,
 		})) as GetContentsResponse<AlbumItem>;
-		if (!res.items) throw new Error("No albums found");
+		if (!res.items?.length) throw new Error("No albums found");
 		return res;
 	};
 

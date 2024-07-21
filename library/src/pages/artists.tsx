@@ -57,7 +57,7 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) =
 			offset: pageParam,
 			limit,
 		})) as GetContentsResponse<ArtistItem>;
-		if (!res.items) throw new Error("No artists found");
+		if (!res.items?.length) throw new Error("No artists found");
 		return res;
 	};
 

@@ -73,9 +73,15 @@ const filterOptions = [
 	{ id: "103", name: "By Spotify" },
 ];
 
+const flattenOptions = [
+	{ id: "false", name: "Unflattened" },
+	{ id: "true", name: "Flattened" },
+];
+
 const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapperProps; folder?: string }) => {
 	const [sortDropdown, sortOption] = useDropdownMenu(dropdownOptions, "library:playlists-sort");
 	const [filterDropdown, filterOption] = useDropdownMenu(filterOptions);
+	const [flattenDropdown, flattenOption] = useDropdownMenu(flattenOptions);
 	const [textFilter, setTextFilter] = React.useState("");
 	const [images, setImages] = React.useState({ ...SpicetifyLibrary.FolderImageWrapper.getFolderImages() });
 
@@ -88,19 +94,22 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
 			textFilter,
 			offset: pageParam,
 			limit,
+			flattenTree: JSON.parse(flattenOption.id),
 		})) as GetContentsResponse<PlaylistItem | FolderItem>;
-		if (!res.items) throw new Error("No playlists found");
+		console.log(res);
+		if (!res.items?.length) throw new Error("No playlists found");
 		return res;
 	};
 
 	const { data, status, error, hasNextPage, fetchNextPage } = useInfiniteQuery({
-		queryKey: ["library:playlists", sortOption.id, filterOption.id, textFilter, folder],
+		queryKey: ["library:playlists", sortOption.id, filterOption.id, flattenOption.id, textFilter, folder],
 		queryFn: fetchRootlist,
 		initialPageParam: 0,
 		getNextPageParam: (lastPage) => {
 			const current = lastPage.offset + limit;
 			if (lastPage.totalLength > current) return current;
 		},
+		retry: false,
 	});
 
 	const Status = useStatus(status, error);
@@ -111,6 +120,7 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
 			<AddButton Menu={<AddMenu folder={folder} />} />,
 			sortDropdown,
 			filterDropdown,
+			flattenDropdown,
 			<SearchBar setSearch={setTextFilter} placeholder="Playlists" />,
 			<SettingsButton configWrapper={configWrapper} />,
 		],

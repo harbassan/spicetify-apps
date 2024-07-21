@@ -57,7 +57,7 @@ const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => 
 			offset: pageParam,
 			limit,
 		})) as GetContentsResponse<ShowItem>;
-		if (!res.items) throw new Error("No shows found");
+		if (!res.items?.length) throw new Error("No shows found");
 		return res;
 	};
 
