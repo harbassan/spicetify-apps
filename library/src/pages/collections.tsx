@@ -1,0 +1,105 @@
+import React from "react";
+import SearchBar from "../components/searchbar";
+import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
+import PageContainer from "@shared/components/page_container";
+import SpotifyCard from "@shared/components/spotify_card";
+import SettingsButton from "@shared/components/settings_button";
+import AddButton from "../components/add_button";
+import type { ConfigWrapperProps } from "../types/library_types";
+import LoadMoreCard from "../components/load_more_card";
+import TextInputDialog from "../components/text_input_dialog";
+import LeadingIcon from "../components/leading_icon";
+import { useInfiniteQuery } from "@shared/types/react_query";
+import useStatus from "@shared/status/useStatus";
+
+const AddMenu = ({ collection }: { collection?: string }) => {
+	const { MenuItem, Menu } = Spicetify.ReactComponent;
+	const { RootlistAPI } = Spicetify.Platform;
+	const { SVGIcons } = Spicetify;
+
+	const createCollection = () => {
+		const onSave = (value: string) => {
+			SpicetifyLibrary.CollectionWrapper.createCollection(value || "New Collection", collection);
+		};
+
+		Spicetify.PopupModal.display({
+			title: "Create Collection",
+			// @ts-ignore
+			content: <TextInputDialog def={"New Collection"} placeholder="Collection Name" onSave={onSave} />,
+		});
+	};
+
+	return (
+		<Menu>
+			<MenuItem onClick={createCollection} leadingIcon={<LeadingIcon path={SVGIcons["playlist-folder"]} />}>
+				Create Collection
+			</MenuItem>
+		</Menu>
+	);
+};
+
+const limit = 200;
+
+const CollectionsPage = ({ collection, configWrapper }: { configWrapper: ConfigWrapperProps; collection?: string }) => {
+	const [textFilter, setTextFilter] = React.useState("");
+
+	const fetchRootlist = async ({ pageParam }: { pageParam: number }) => {
+		const res = await SpicetifyLibrary.CollectionWrapper.getContents({
+			collectionUri: collection,
+			textFilter,
+			offset: pageParam,
+			limit,
+		});
+		if (!res.items.length) throw new Error("No collections found");
+		return res;
+	};
+
+	const { data, status, error, hasNextPage, fetchNextPage } = useInfiniteQuery({
+		queryKey: ["library:collections", textFilter, collection],
+		queryFn: fetchRootlist,
+		initialPageParam: 0,
+		getNextPageParam: (lastPage) => {
+			const current = lastPage.offset + limit;
+			if (lastPage.totalLength > current) return current;
+		},
+		retry: false,
+	});
+
+	const Status = useStatus(status, error);
+
+	const props = {
+		title: data?.pages[0].openedCollectionName || "Collections",
+		headerEls: [
+			<AddButton Menu={<AddMenu collection={collection} />} />,
+			<SearchBar setSearch={setTextFilter} placeholder="Collections" />,
+			<SettingsButton configWrapper={configWrapper} />,
+		],
+	};
+
+	if (Status) return <PageContainer {...props}>{Status}</PageContainer>;
+
+	const contents = data as NonNullable<typeof data>;
+
+	const items = contents.pages.flatMap((page) => page.items);
+
+	const rootlistCards = items.map((item) => (
+		<SpotifyCard
+			provider="spotify"
+			type={item.type}
+			uri={item.uri}
+			header={item.name}
+			subheader={item.type === "collection" ? "Collection" : item.artists?.[0]?.name}
+			imageUrl={item.type === "collection" ? item.image : item.images?.[0]?.url}
+		/>
+	));
+
+	if (hasNextPage) rootlistCards.push(<LoadMoreCard callback={fetchNextPage} />);
+
+	return (
+		<PageContainer {...props}>
+			<div className={"main-gridContainer-gridContainer grid"}>{rootlistCards}</div>
+		</PageContainer>
+	);
+};
+
+export default CollectionsPage;

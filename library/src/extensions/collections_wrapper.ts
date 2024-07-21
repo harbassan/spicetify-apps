@@ -1,18 +1,29 @@
 // @ts-ignore
 import { v4 as uuidv4 } from "uuid";
+import type { AlbumItem, GetContentsResponse } from "../types/platform";
 
-type Collections = {
-	type: string;
+export interface CollectionItem {
+	type: "collection";
 	name: string;
 	uri: string;
+	image?: string;
+	addedAt: Date;
+	lastPlayedAt: Date | null;
 	items: string[];
-	imgUrl: string;
-	totalLength: number;
 	parentCollection: string;
-}[];
+}
+
+export type CollectionChild = CollectionItem | AlbumItem;
+
+type GetContentsProps = {
+	collectionUri?: string;
+	textFilter?: string;
+	limit: number;
+	offset: number;
+};
 
 class CollectionWrapper extends EventTarget {
-	_collections: Collections;
+	_collections: CollectionItem[];
 
 	constructor() {
 		super();
@@ -25,94 +36,51 @@ class CollectionWrapper extends EventTarget {
 	}
 
 	getCollection(uri: string) {
-		return this._collections.find((collection) => collection.uri === uri) as Collections[0];
+		return this._collections.find((collection) => collection.uri === uri);
 	}
 
-	async requestAlbums({ sortOrder, textFilter }: { sortOrder?: string; textFilter?: string }) {
-		const albums = await Spicetify.Platform.LibraryAPI.getContents({
+	async getCollectionContents(uri: string) {
+		const collection = this.getCollection(uri);
+		if (!collection) throw new Error("Collection not found");
+
+		const items: CollectionChild[] = this._collections.filter((collection) => collection.parentCollection === uri);
+
+		const albums = (await Spicetify.Platform.LibraryAPI.getContents({
 			filters: ["0"],
-			sortOrder,
-			textFilter,
 			offset: 0,
 			limit: 9999,
-		});
-		return albums;
+		})) as GetContentsResponse<AlbumItem>;
+
+		items.push(...albums.items.filter((album) => collection.items.includes(album.uri)));
+		return items;
 	}
 
-	async getCollectionItems(props: {
-		collectionUri?: string;
-		textFilter?: string;
-		sortOrder?: string;
-		rootlist?: boolean;
-		limit?: number;
-		offset?: number;
-	}) {
-		const { collectionUri, textFilter, sortOrder, rootlist, limit = 9999, offset = 0 } = props;
+	async getContents(props: GetContentsProps) {
+		const { collectionUri, offset, limit, textFilter } = props;
 
-		let collectionItems = this._collections;
-		let albumItems = [];
-		let unfilteredLength = this._collections.length;
-		let openedCollection = "";
-
-		if (collectionUri) {
-			const collection = this.getCollection(collectionUri);
-
-			// filter out any albums not in the collection
-			const res = await this.requestAlbums({ sortOrder, textFilter });
-			const collectionSet = new Set(collection.items);
-			const commonElements = res.items.filter((item: any) => collectionSet.has(item.uri));
-			const collections = this._collections.filter((collection) => collection.parentCollection === collectionUri);
-
-			openedCollection = collection.name;
-			collectionItems = collections;
-			albumItems = commonElements;
-			unfilteredLength = collection.totalLength;
-		}
+		let items = collectionUri ? await this.getCollectionContents(collectionUri) : this._collections;
+		const openedCollectionName = collectionUri ? this.getCollection(collectionUri)?.name : undefined;
 
 		if (textFilter) {
 			const regex = new RegExp(`\\b${textFilter}`, "i");
-			collectionItems = collectionItems.filter((item) => {
-				return regex.test(item.name);
-			});
+			items = items.filter((collection) => regex.test(collection.name));
 		}
 
-		if (rootlist && !collectionUri) {
-			const res = await this.requestAlbums({ sortOrder, textFilter });
-			albumItems = res.items;
+		items = items.slice(offset, offset + limit);
 
-			if (!textFilter) {
-				const collectionSet = new Set(this._collections.flatMap((collection) => collection.items));
-				const uncommonElements = res.items.filter((item: any) => !collectionSet.has(item.uri));
-
-				collectionItems = this._collections.filter((collection) => !collection.parentCollection);
-				albumItems = uncommonElements;
-
-				unfilteredLength = this._collections.length + uncommonElements.length;
-			}
-		}
-
-		if (offset > 0) collectionItems = [];
-
-		return {
-			openedCollection,
-			items: [...collectionItems, ...albumItems.slice(offset, offset + limit)],
-			totalLength: albumItems.length + collectionItems.length,
-			unfilteredLength: unfilteredLength,
-		};
+		return { items, totalLength: this._collections.length, offset, openedCollectionName };
 	}
 
 	createCollection(name: string, parentCollection = "") {
-		const uri = uuidv4();
-		const collection = {
-			type: "collection",
-			uri,
+		this._collections.push({
+			type: "collection" as CollectionItem["type"],
+			uri: uuidv4(),
 			name,
 			items: [],
-			totalLength: 0,
-			imgUrl: "",
+			addedAt: new Date(),
+			lastPlayedAt: new Date(),
 			parentCollection,
-		};
-		this._collections.push(collection);
+		});
 
 		this.saveCollections();
 		Spicetify.showNotification("Collection created");
@@ -130,7 +98,6 @@ class CollectionWrapper extends EventTarget {
 		if (!collection) return;
 
 		collection.items.push(albumUri);
-		collection.totalLength++;
 
 		this.saveCollections();
 		Spicetify.showNotification("Album added to collection");
@@ -141,7 +108,6 @@ class CollectionWrapper extends EventTarget {
 		if (!collection) return;
 
 		collection.items = collection.items.filter((item) => item !== albumUri);
-		collection.totalLength--;
 
 		this.saveCollections();
 		Spicetify.showNotification("Album removed from collection");
@@ -153,21 +119,21 @@ class CollectionWrapper extends EventTarget {
 		});
 	}
 
-	renameCollection(uri: string, newName: string) {
+	renameCollection(uri: string, name: string) {
 		const collection = this.getCollection(uri);
 		if (!collection) return;
 
-		collection.name = newName;
+		collection.name = name;
 
 		this.saveCollections();
 		Spicetify.showNotification("Collection renamed");
 	}
 
-	setCollectionImage(uri: string, imgUrl: string) {
+	setCollectionImage(uri: string, url: string) {
 		const collection = this.getCollection(uri);
 		if (!collection) return;
 
-		collection.imgUrl = imgUrl;
+		collection.image = url;
 
 		this.saveCollections();
 		Spicetify.showNotification("Collection image set");
@@ -177,7 +143,7 @@ class CollectionWrapper extends EventTarget {
 		const collection = this.getCollection(uri);
 		if (!collection) return;
 
-		collection.imgUrl = "";
+		collection.image = undefined;
 
 		this.saveCollections();
 		Spicetify.showNotification("Collection image removed");

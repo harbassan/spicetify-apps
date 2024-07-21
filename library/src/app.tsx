@@ -11,6 +11,7 @@ import "./styles/app.scss";
 import "./styles/external.scss";
 import "../../shared/config/config_modal.scss";
 import "../../shared/shared.scss";
+import CollectionsPage from "./pages/collections";
 
 const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
 	fetch("https://api.github.com/repos/harbassan/spicetify-apps/releases")
@@ -32,9 +33,10 @@ const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapperProps 
 		["Albums"]: <AlbumsPage configWrapper={configWrapper} />,
 		["Shows"]: <ShowsPage configWrapper={configWrapper} />,
 		["Playlists"]: <PlaylistsPage configWrapper={configWrapper} />,
+		["Collections"]: <CollectionsPage configWrapper={configWrapper} />,
 	};
 
-	const tabPages = ["Playlists", "Albums", "Artists", "Shows"].filter(
+	const tabPages = ["Playlists", "Albums", "Collections", "Artists", "Shows"].filter(
 		(page) => configWrapper.config[`show-${page.toLowerCase()}`],
 	);
 
@@ -97,7 +99,7 @@ const App = () => {
 	if (/^\/collection\/.+/.test(route)) {
 		return (
 			<div id="library-app">
-				<AlbumsPage collection={route.split("/").pop()} configWrapper={configWrapper} />
+				<CollectionsPage collection={route.split("/").pop()} configWrapper={configWrapper} />
 			</div>
 		);
 	}
