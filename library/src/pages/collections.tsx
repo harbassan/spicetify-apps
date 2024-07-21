@@ -11,6 +11,7 @@ import TextInputDialog from "../components/text_input_dialog";
 import LeadingIcon from "../components/leading_icon";
 import { useInfiniteQuery } from "@shared/types/react_query";
 import useStatus from "@shared/status/useStatus";
+import CollectionsWrapper from "../extensions/collections_wrapper";
 
 const AddMenu = ({ collection }: { collection?: string }) => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -19,7 +20,7 @@ const AddMenu = ({ collection }: { collection?: string }) => {
 
 	const createCollection = () => {
 		const onSave = (value: string) => {
-			SpicetifyLibrary.CollectionWrapper.createCollection(value || "New Collection", collection);
+			CollectionsWrapper.createCollection(value || "New Collection", collection);
 		};
 
 		Spicetify.PopupModal.display({
@@ -44,7 +45,7 @@ const CollectionsPage = ({ collection, configWrapper }: { configWrapper: ConfigW
 	const [textFilter, setTextFilter] = React.useState("");
 
 	const fetchRootlist = async ({ pageParam }: { pageParam: number }) => {
-		const res = await SpicetifyLibrary.CollectionWrapper.getContents({
+		const res = await CollectionsWrapper.getContents({
 			collectionUri: collection,
 			textFilter,
 			offset: pageParam,

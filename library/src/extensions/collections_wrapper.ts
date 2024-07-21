@@ -22,13 +22,15 @@ type GetContentsProps = {
 	offset: number;
 };
 
-class CollectionWrapper extends EventTarget {
+class CollectionsWrapper extends EventTarget {
 	_collections: CollectionItem[];
 
 	constructor() {
 		super();
 		this._collections = JSON.parse(localStorage.getItem("library:collections") || "[]");
 	}
+
+	static INSTANCE = new CollectionsWrapper();
 
 	saveCollections() {
 		localStorage.setItem("library:collections", JSON.stringify(this._collections));
@@ -150,4 +152,4 @@ class CollectionWrapper extends EventTarget {
 	}
 }
 
-export default CollectionWrapper;
+export default CollectionsWrapper.INSTANCE;

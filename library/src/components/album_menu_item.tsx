@@ -2,10 +2,11 @@ import React from "react";
 import LeadingIcon from "./leading_icon";
 import TextInputDialog from "./text_input_dialog";
 import SearchBar from "./searchbar";
+import CollectionsWrapper from "../extensions/collections_wrapper";
 
 const createCollection = () => {
 	const onSave = (value: string) => {
-		SpicetifyLibrary.CollectionWrapper.createCollection(value);
+		CollectionsWrapper.createCollection(value);
 	};
 
 	Spicetify.PopupModal.display({
@@ -20,39 +21,37 @@ const CollectionSearchMenu = () => {
 	const { SVGIcons } = Spicetify;
 
 	const [textFilter, setTextFilter] = React.useState("");
-	const [collections, setCollections] = React.useState<any>(null);
+	const [collections, setCollections] = React.useState<Awaited<
+		ReturnType<typeof CollectionsWrapper.getContents>
+	> | null>(null);
 
-	// @ts-ignore
-	const context: any = React.useContext(Spicetify.ContextMenuV2._context);
+	const context = React.useContext(Spicetify.ContextMenuV2._context);
 	const uri = context?.props?.uri;
 
 	React.useEffect(() => {
-		const fetchCollections = async () => {
-			const res = await SpicetifyLibrary.CollectionWrapper.getCollectionItems({ textFilter });
-			setCollections(res);
-		};
-
+		const fetchCollections = async () =>
+			setCollections(await CollectionsWrapper.getContents({ textFilter, limit: 20, offset: 0 }));
 		fetchCollections();
 	}, [textFilter]);
 
 	if (!collections) return <></>;
 
 	const addToCollection = (collectionUri: string) => {
-		SpicetifyLibrary.CollectionWrapper.addAlbumToCollection(collectionUri, uri);
+		CollectionsWrapper.addAlbumToCollection(collectionUri, uri);
 	};
 
-	const activeCollections = SpicetifyLibrary.CollectionWrapper.getCollectionsWithAlbum(uri);
+	const activeCollections = CollectionsWrapper.getCollectionsWithAlbum(uri);
 	const hasCollections = activeCollections.length > 0;
 
 	const removeFromCollections = () => {
-		activeCollections.forEach((collection) => {
-			SpicetifyLibrary.CollectionWrapper.removeAlbumFromCollection(collection.uri, uri);
-		});
+		for (const collection of activeCollections) {
+			CollectionsWrapper.removeAlbumFromCollection(collection.uri, uri);
+		}
 	};
 
-	const allCollectionsLength = collections.unfilteredLength;
+	const allCollectionsLength = collections.totalLength;
 
-	const menuItems = collections.items.map((collection: any, index: number) => {
+	const menuItems = collections.items.map((collection, index) => {
 		return (
 			<MenuItem
 				key={collection.uri}
@@ -79,17 +78,13 @@ const CollectionSearchMenu = () => {
 					<SearchBar setSearch={setTextFilter} placeholder="collections" />
 				</div>
 			</li>
-			<MenuItem
-				key="new-collection"
-				leadingIcon={<LeadingIcon path={SVGIcons["plus2px"]} />}
-				onClick={createCollection}
-			>
+			<MenuItem key="new-collection" leadingIcon={<LeadingIcon path={SVGIcons.plus2px} />} onClick={createCollection}>
 				Create collection
 			</MenuItem>
 			{hasCollections && (
 				<MenuItem
 					key="remove-collection"
-					leadingIcon={<LeadingIcon path={SVGIcons["minus"]} />}
+					leadingIcon={<LeadingIcon path={SVGIcons.minus} />}
 					onClick={removeFromCollections}
 				>
 					Remove from all
@@ -109,7 +104,7 @@ const AlbumMenuItem = () => {
 		<MenuSubMenuItem
 			displayText="Add to collection"
 			divider="after"
-			leadingIcon={<LeadingIcon path={SVGIcons["plus2px"]} />}
+			leadingIcon={<LeadingIcon path={SVGIcons.plus2px} />}
 		>
 			<CollectionSearchMenu />
 		</MenuSubMenuItem>
