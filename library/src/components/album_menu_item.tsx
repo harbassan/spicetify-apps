@@ -11,7 +11,6 @@ const createCollection = () => {
 
 	Spicetify.PopupModal.display({
 		title: "Create Collection",
-		// @ts-ignore
 		content: <TextInputDialog def={"New Collection"} placeholder="Collection Name" onSave={onSave} />,
 	});
 };

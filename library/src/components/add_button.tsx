@@ -1,3 +1,4 @@
+// biome-ignore lint:
 import React from "react";
 
 interface AddButtonProps {

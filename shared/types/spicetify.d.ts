@@ -325,8 +325,8 @@ declare namespace Spicetify {
 						 */
 						container: HTMLElement;
 					};
-				}
-			) => void
+				},
+			) => void,
 		): void;
 		/**
 		 * Skip to previous track.
@@ -524,13 +524,13 @@ declare namespace Spicetify {
 			callback: (b: Response["body"]) => void,
 			onError?: (e: Error) => void,
 			body?: Body,
-			headers?: Headers
+			headers?: Headers,
 		): Promise<Response["body"]>;
 		function postSub(
 			url: string,
 			body: Body | null,
 			callback: (b: Response["body"]) => void,
-			onError?: (e: Error) => void
+			onError?: (e: Error) => void,
 		): Promise<Response["body"]>;
 		function request(method: Method, url: string, body?: Body, headers?: Headers): Promise<Response>;
 		function resolve(method: Method, url: string, body?: Body, headers?: Headers): Promise<Response>;
@@ -1225,6 +1225,10 @@ declare namespace Spicetify {
 		static isPlaylistV1OrV2(uri: URI | string): boolean;
 	}
 
+	namespace ContextMenuV2 {
+		const _context: React.Context<Record<string, any>>;
+	}
+
 	/**
 	 * Create custom menu item and prepend to right click context menu
 	 */
@@ -1238,7 +1242,13 @@ declare namespace Spicetify {
 			 * List of valid icons to use.
 			 */
 			static readonly iconList: Icon[];
-			constructor(name: string, onClick: OnClickCallback, shouldAdd?: ShouldAddCallback, icon?: Icon, disabled?: boolean);
+			constructor(
+				name: string,
+				onClick: OnClickCallback,
+				shouldAdd?: ShouldAddCallback,
+				icon?: Icon,
+				disabled?: boolean,
+			);
 			name: string;
 			icon: Icon | string;
 			disabled: boolean;
@@ -1295,7 +1305,7 @@ declare namespace Spicetify {
 			 * You can specify a string for simple text display
 			 * or a HTML element for interactive config/setting menu
 			 */
-			content: string | Element;
+			content: string | Element | React.JSX.Element;
 			/**
 			 * Bigger window
 			 */
@@ -1371,7 +1381,9 @@ declare namespace Spicetify {
 			 * or a function. If a function is passed it will be called with
 			 * (`isOpen`, `handleContextMenu`, `ref`) as arguments.
 			 */
-			children: Element | ((isOpen?: boolean, handleContextMenu?: (e: MouseEvent) => void, ref?: (e: Element) => void) => Element);
+			children:
+				| Element
+				| ((isOpen?: boolean, handleContextMenu?: (e: MouseEvent) => void, ref?: (e: Element) => void) => Element);
 		};
 		type MenuProps = {
 			/**
@@ -1943,7 +1955,7 @@ declare namespace Spicetify {
 				onClick?: (self: Button) => void,
 				disabled?: boolean,
 				active?: boolean,
-				registerOnCreate?: boolean
+				registerOnCreate?: boolean,
 			);
 			label: string;
 			icon: string;
@@ -1966,7 +1978,7 @@ declare namespace Spicetify {
 				onClick?: (self: Widget) => void,
 				disabled?: boolean,
 				active?: boolean,
-				registerOnCreate?: boolean
+				registerOnCreate?: boolean,
 			);
 			label: string;
 			icon: string;
@@ -2167,7 +2179,11 @@ declare namespace Spicetify {
 		 * @param context Context to use
 		 * @return Promise that resolves to the response
 		 */
-		function Request(query: (typeof Definitions)[Query | string], variables?: Record<string, any>, context?: Record<string, any>): Promise<any>;
+		function Request(
+			query: (typeof Definitions)[Query | string],
+			variables?: Record<string, any>,
+			context?: Record<string, any>,
+		): Promise<any>;
 		/**
 		 * Context for GraphQL queries.
 		 * @description Used to set context for the handler and initialze it.
@@ -2179,8 +2195,12 @@ declare namespace Spicetify {
 		 * @return Function to handle GraphQL queries
 		 */
 		function Handler(
-			context: Record<string, any>
-		): (query: (typeof Definitions)[Query | string], variables?: Record<string, any>, context?: Record<string, any>) => Promise<any>;
+			context: Record<string, any>,
+		): (
+			query: (typeof Definitions)[Query | string],
+			variables?: Record<string, any>,
+			context?: Record<string, any>,
+		) => Promise<any>;
 	}
 
 	namespace ReactHook {
@@ -2200,7 +2220,7 @@ declare namespace Spicetify {
 			label?: string,
 			contextUri?: string,
 			sectionIndex?: number,
-			dropOriginUri?: string
+			dropOriginUri?: string,
 		): (event: React.DragEvent, uris?: string[], label?: string, contextUri?: string, sectionIndex?: number) => void;
 
 		/**
@@ -2224,7 +2244,11 @@ declare namespace Spicetify {
 		 *
 		 * @return Extracted color hex code.
 		 */
-		function useExtractedColor(uri: string, fallbackColor?: string, variant?: "colorRaw" | "colorLight" | "colorDark"): string;
+		function useExtractedColor(
+			uri: string,
+			fallbackColor?: string,
+			variant?: "colorRaw" | "colorLight" | "colorDark",
+		): string;
 	}
 
 	/**
