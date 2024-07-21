@@ -73,6 +73,17 @@ class SpicetifyLibrary {
 				def: false,
 				callback: setSearchBarSize,
 			},
+			{
+				name: "Playlists Page",
+				key: "show-playlists",
+				type: "toggle",
+				def: true,
+				sectionHeader: "Pages",
+			},
+			{ name: "Albums Page", key: "show-albums", type: "toggle", def: true },
+			{ name: "Collections Page", key: "show-collections", type: "toggle", def: true },
+			{ name: "Artists Page", key: "show-artists", type: "toggle", def: true },
+			{ name: "Shows Page", key: "show-shows", type: "toggle", def: true },
 		],
 		"library",
 	);

@@ -12,8 +12,6 @@ import "./styles/external.scss";
 import "../../shared/config/config_modal.scss";
 import "../../shared/shared.scss";
 
-const tabPages = ["Playlists", "Albums", "Artists", "Shows"];
-
 const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
 	fetch("https://api.github.com/repos/harbassan/spicetify-apps/releases")
 		.then((res) => res.json())
@@ -35,6 +33,10 @@ const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapperProps 
 		["Shows"]: <ShowsPage configWrapper={configWrapper} />,
 		["Playlists"]: <PlaylistsPage configWrapper={configWrapper} />,
 	};
+
+	const tabPages = ["Playlists", "Albums", "Artists", "Shows"].filter(
+		(page) => configWrapper.config[`show-${page.toLowerCase()}`],
+	);
 
 	const [navBar, activeLink, setActiveLink] = useNavigationBar(tabPages);
 	const [firstUpdate, setFirstUpdate] = React.useState(true);
