@@ -89,3 +89,11 @@ export interface Owner {
 	username: string;
 	images: Image[];
 }
+
+export interface UpdateEvent {
+	data: { list: string };
+	defaultPrevented: boolean;
+	immediateStopped: boolean;
+	stopped: boolean;
+	type: "update";
+}

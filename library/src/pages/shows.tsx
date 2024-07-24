@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import SearchBar from "../components/searchbar";
 import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import PageContainer from "@shared/components/page_container";
@@ -10,7 +10,7 @@ import LeadingIcon from "../components/leading_icon";
 import AddButton from "../components/add_button";
 import TextInputDialog from "../components/text_input_dialog";
 import { useInfiniteQuery } from "@shared/types/react_query";
-import type { GetContentsResponse, ShowItem } from "../types/platform";
+import type { GetContentsResponse, ShowItem, UpdateEvent } from "../types/platform";
 import useStatus from "@shared/status/useStatus";
 
 const AddMenu = () => {
@@ -61,7 +61,7 @@ const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 		return res;
 	};
 
-	const { data, status, error, hasNextPage, fetchNextPage } = useInfiniteQuery({
+	const { data, status, error, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
 		queryKey: ["library:shows", sortOption.id, textFilter],
 		queryFn: fetchShows,
 		initialPageParam: 0,
@@ -70,6 +70,16 @@ const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 			if (lastPage.totalLength > current) return current;
 		},
 	});
+
+	useEffect(() => {
+		const update = (e: UpdateEvent) => {
+			if (e.data.list === "shows") refetch();
+		};
+		Spicetify.Platform.LibraryAPI.getEvents()._emitter.addListener("update", update, {});
+		return () => {
+			Spicetify.Platform.LibraryAPI.getEvents()._emitter.removeListener("update", update);
+		};
+	}, [refetch]);
 
 	const Status = useStatus(status, error);
 

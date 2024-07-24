@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import SearchBar from "../components/searchbar";
 import type { ConfigWrapper } from "../types/library_types";
 import SettingsButton from "@shared/components/settings_button";
@@ -11,7 +11,7 @@ import TextInputDialog from "../components/text_input_dialog";
 import LeadingIcon from "../components/leading_icon";
 import useStatus from "@shared/status/useStatus";
 import { useInfiniteQuery } from "@shared/types/react_query";
-import type { AlbumItem, GetContentsResponse } from "../types/platform";
+import type { AlbumItem, GetContentsResponse, UpdateEvent } from "../types/platform";
 
 const AddMenu = () => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -63,7 +63,7 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 		return res;
 	};
 
-	const { data, status, error, hasNextPage, fetchNextPage } = useInfiniteQuery({
+	const { data, status, error, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
 		queryKey: ["library:albums", sortOption.id, textFilter],
 		queryFn: fetchAlbums,
 		initialPageParam: 0,
@@ -72,6 +72,16 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 			if (lastPage.totalLength > current) return current;
 		},
 	});
+
+	useEffect(() => {
+		const update = (e: UpdateEvent) => {
+			if (e.data.list === "albums") refetch();
+		};
+		Spicetify.Platform.LibraryAPI.getEvents()._emitter.addListener("update", update, {});
+		return () => {
+			Spicetify.Platform.LibraryAPI.getEvents()._emitter.removeListener("update", update);
+		};
+	}, [refetch]);
 
 	const Status = useStatus(status, error);
 

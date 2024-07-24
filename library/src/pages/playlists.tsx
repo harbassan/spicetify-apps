@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import SearchBar from "../components/searchbar";
 import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import PageContainer from "@shared/components/page_container";
@@ -10,7 +10,7 @@ import LoadMoreCard from "../components/load_more_card";
 import TextInputDialog from "../components/text_input_dialog";
 import LeadingIcon from "../components/leading_icon";
 import { useInfiniteQuery } from "@shared/types/react_query";
-import type { FolderItem, GetContentsResponse, PlaylistItem } from "../types/platform";
+import type { FolderItem, GetContentsResponse, PlaylistItem, UpdateEvent } from "../types/platform";
 import useStatus from "@shared/status/useStatus";
 import FolderImageWrapper from "../extensions/folder_image_wrapper";
 
@@ -102,7 +102,7 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
 		return res;
 	};
 
-	const { data, status, error, hasNextPage, fetchNextPage } = useInfiniteQuery({
+	const { data, status, error, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
 		queryKey: ["library:playlists", sortOption.id, filterOption.id, flattenOption.id, textFilter, folder],
 		queryFn: fetchRootlist,
 		initialPageParam: 0,
@@ -112,6 +112,16 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
 		},
 		retry: false,
 	});
+
+	useEffect(() => {
+		const update = (e: UpdateEvent) => {
+			refetch();
+		};
+		Spicetify.Platform.RootlistAPI.getEvents()._emitter.addListener("update", update, {});
+		return () => {
+			Spicetify.Platform.RootlistAPI.getEvents()._emitter.removeListener("update", update);
+		};
+	}, [refetch]);
 
 	const Status = useStatus(status, error);
 
