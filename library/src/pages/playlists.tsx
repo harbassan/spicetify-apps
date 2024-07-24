@@ -114,11 +114,12 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
 	});
 
 	useEffect(() => {
-		const update = (e: UpdateEvent) => {
-			refetch();
-		};
+		const update = (e: UpdateEvent) => refetch();
+		const updateImages = (e: CustomEvent | Event) => "detail" in e && setImages({ ...e.detail });
+		FolderImageWrapper.addEventListener("update", updateImages);
 		Spicetify.Platform.RootlistAPI.getEvents()._emitter.addListener("update", update, {});
 		return () => {
+			FolderImageWrapper.removeEventListener("update", updateImages);
 			Spicetify.Platform.RootlistAPI.getEvents()._emitter.removeListener("update", update);
 		};
 	}, [refetch]);

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import SearchBar from "../components/searchbar";
 import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import PageContainer from "@shared/components/page_container";
@@ -55,7 +55,7 @@ const CollectionsPage = ({ collection, configWrapper }: { configWrapper: ConfigW
 		return res;
 	};
 
-	const { data, status, error, hasNextPage, fetchNextPage } = useInfiniteQuery({
+	const { data, status, error, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
 		queryKey: ["library:collections", textFilter, collection],
 		queryFn: fetchRootlist,
 		initialPageParam: 0,
@@ -64,7 +64,16 @@ const CollectionsPage = ({ collection, configWrapper }: { configWrapper: ConfigW
 			if (lastPage.totalLength > current) return current;
 		},
 		retry: false,
+		structuralSharing: false,
 	});
+
+	useEffect(() => {
+		const update = (e: CustomEvent | Event) => refetch();
+		CollectionsWrapper.addEventListener("update", update);
+		return () => {
+			CollectionsWrapper.removeEventListener("update", update);
+		};
+	}, [refetch]);
 
 	const Status = useStatus(status, error);
 
