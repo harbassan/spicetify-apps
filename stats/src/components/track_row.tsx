@@ -30,9 +30,9 @@ const LikedIcon = ({ active, uri }: { active: boolean; uri: string }) => {
 
 	const toggleLike = () => {
 		if (liked) {
-			Spicetify.Platform.LibraryAPI.remove(uri);
+			Spicetify.Platform.LibraryAPI.remove({ uris: [uri] });
 		} else {
-			Spicetify.Platform.LibraryAPI.add(uri);
+			Spicetify.Platform.LibraryAPI.add({ uris: [uri] });
 		}
 		setLiked(!liked);
 	};

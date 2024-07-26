@@ -21,10 +21,10 @@ export const getTopTracks = async (timeRange: SpotifyRange, config: Config) => {
 		const { "lastfm-user": user, "api-key": key } = config;
 		if (!user || !key) throw new Error("Missing LastFM API Key or Username");
 		const response = await lastFM.getTopTracks(key, user, timeRange);
-		return parseLiked(await Promise.all(response.map(convertTrack)));
+		return Promise.all(response.map(convertTrack));
 	}
 	const response = await spotify.getTopTracks(timeRange);
-	return parseLiked(response.map(minifyTrack));
+	return response.map(minifyTrack);
 };
 
 const TracksPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
@@ -32,7 +32,8 @@ const TracksPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
 	const { status, error, data, refetch } = useQuery({
 		queryKey: ["top-tracks", activeOption.id],
-		queryFn: cacher(() => getTopTracks(activeOption.id as SpotifyRange, configWrapper.config)),
+		queryFn: (props) =>
+			cacher(() => getTopTracks(activeOption.id as SpotifyRange, configWrapper.config))(props).then(parseLiked),
 	});
 
 	const Status = useStatus(status, error);

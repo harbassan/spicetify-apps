@@ -43,7 +43,7 @@ const getChart = async (type: "tracks" | "artists", config: Config) => {
 		return Promise.all(response.map(convertArtist));
 	}
 	const response = await lastFM.getTrackChart(key);
-	return parseLiked(await Promise.all(response.map(convertTrack)));
+	return Promise.all(response.map(convertTrack));
 };
 
 const ArtistChart = ({ artists }: { artists: (LastFMMinifiedArtist | SpotifyMinifiedArtist)[] }) => {
@@ -89,7 +89,10 @@ const ChartsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
 	const { status, error, data, refetch } = useQuery({
 		queryKey: ["top-charts", activeOption.id],
-		queryFn: cacher(() => getChart(activeOption.id as "tracks" | "artists", configWrapper.config)),
+		queryFn: (props) =>
+			cacher(() => getChart(activeOption.id as "tracks" | "artists", configWrapper.config))(props).then((res) =>
+				"artists" in res[0] ? parseLiked(res) : res,
+			),
 	});
 
 	const Status = useStatus(status, error);
