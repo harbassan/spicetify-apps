@@ -1,3 +1,4 @@
+import type { getAlbumResponse } from "../types/graph_ql";
 import type { PlaylistResponse, RootlistResponse } from "../types/platform";
 
 export const getFullPlaylist = async (uri: string) => {
@@ -9,4 +10,23 @@ export const getFullPlaylist = async (uri: string) => {
 export const getRootlist = async () => {
 	const rootlist = (await Spicetify.Platform.RootlistAPI.getContents({ flatten: true })) as RootlistResponse;
 	return rootlist.items;
+};
+
+export const getAlbumMeta = (uri: string) => {
+	return (
+		Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.getAlbum, {
+			uri,
+			offset: 0,
+			limit: 1,
+			locale: Spicetify.Locale.getLocale(),
+		}) as Promise<getAlbumResponse>
+	).then((res) => res.data.albumUnion);
+};
+
+export const getAlbumMetas = (uris: string[]) => {
+	return Promise.all(uris.map((uri) => getAlbumMeta(uri)));
+};
+
+export const queryInLibrary = async (uris: string[]) => {
+	return Spicetify.Platform.LibraryAPI.contains(...uris) as Promise<boolean[]>;
 };

@@ -1,6 +1,8 @@
-import { getAlbumMetas, getArtistMetas, getAudioFeatures, queryLiked } from "../api/spotify";
+import { getAlbumMetas, queryInLibrary } from "../api/platform";
+import { getArtistMetas, getAudioFeatures } from "../api/spotify";
+import type { AlbumUnion } from "../types/graph_ql";
 import type { Album, Artist, ContentsEpisode, ContentsTrack } from "../types/platform";
-import type { LastFMMinifiedTrack, SpotifyMinifiedTrack } from "../types/stats_types";
+import type { LastFMMinifiedTrack, SpotifyMinifiedAlbum, SpotifyMinifiedTrack } from "../types/stats_types";
 import { minifyAlbum, minifyArtist } from "./converter";
 
 export const batchRequest = <T>(size: number, request: (batch: string[]) => Promise<T[]>) => {
@@ -42,6 +44,14 @@ export const getMeanAudioFeatures = async (ids: string[]) => {
 	return audioFeaturesSum;
 };
 
+export const minifyAlbumUnion = (album: AlbumUnion): SpotifyMinifiedAlbum => ({
+	id: album.uri.split(":")[2],
+	uri: album.uri,
+	name: album.name,
+	image: album.coverArt.sources[0]?.url,
+	type: "spotify",
+});
+
 /**
  * Parses the raw album data and returns a list of the top 100 artists along with their frequencies and release years.
  * @param artistsRaw - The raw album data to be parsed.
@@ -49,19 +59,19 @@ export const getMeanAudioFeatures = async (ids: string[]) => {
  */
 export const parseAlbums = async (albumsRaw: Album[]) => {
 	const frequencyMap = {} as Record<string, number>;
-	const albumIDs = albumsRaw.map((album) => album.uri.split(":")[2]);
-	for (const id of albumIDs) {
-		frequencyMap[id] = (frequencyMap[id] || 0) + 1;
+	const albumURIs = albumsRaw.map((album) => album.uri);
+	for (const uri of albumURIs) {
+		frequencyMap[uri] = (frequencyMap[uri] || 0) + 1;
 	}
-	const ids = Object.keys(frequencyMap)
+	const uris = Object.keys(frequencyMap)
 		.sort((a, b) => frequencyMap[b] - frequencyMap[a])
-		.slice(0, 100);
-	const albums = await batchRequest(20, getAlbumMetas)(ids);
+		.slice(0, 500);
+	const albums = await getAlbumMetas(uris);
 	const releaseYears = {} as Record<string, number>;
 	const uniqueAlbums = albums.map((album) => {
-		const year = album.release_date.slice(0, 4);
+		const year = new Date(album.date.isoString).getFullYear().toString();
 		releaseYears[year] = (releaseYears[year] || 0) + 1;
-		return { ...minifyAlbum(album), frequency: frequencyMap[album.id] };
+		return { ...minifyAlbumUnion(album), frequency: frequencyMap[album.uri] };
 	});
 	return { releaseYears, albums: { contents: uniqueAlbums, length: Object.keys(frequencyMap).length } };
 };
@@ -140,8 +150,8 @@ export const parseStat = (name: string) => {
 };
 
 export const parseLiked = async (tracks: (SpotifyMinifiedTrack | LastFMMinifiedTrack)[]) => {
-	const trackIDs = tracks.filter((t) => t.type === "spotify").map((t) => t.id);
-	const liked = await batchRequest(50, queryLiked)(trackIDs);
-	const likedMap = new Map(trackIDs.map((id, i) => [id, liked[i]]));
-	return tracks.map((t) => ({ ...t, liked: t.type === "spotify" ? (likedMap.get(t.id) as boolean) : false }));
+	const trackURIs = tracks.filter((t) => t.type === "spotify").map((t) => t.uri);
+	const liked = await queryInLibrary(trackURIs);
+	const likedMap = new Map(trackURIs.map((id, i) => [id, liked[i]]));
+	return tracks.map((t) => ({ ...t, liked: t.type === "spotify" ? (likedMap.get(t.uri) as boolean) : false }));
 };
