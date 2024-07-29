@@ -4,7 +4,7 @@ export const apiFetch = async <T>(name: string, url: string, log = true): Promis
 	try {
 		const timeStart = window.performance.now();
 		const response = await Spicetify.CosmosAsync.get(url);
-		if (response.code)
+		if (response.code || response.error)
 			throw new Error(
 				`Failed to fetch the info from server. ${name.includes("lfm") ? "Check your LFM API key and username." : ""}`,
 			);
@@ -16,6 +16,12 @@ export const apiFetch = async <T>(name: string, url: string, log = true): Promis
 	}
 };
 
+const val = <T>(res: T | undefined) => {
+	if (!res || (Array.isArray(res) && !res.length))
+		throw new Error("Spotify returned an empty result. Try again later.");
+	return res;
+};
+
 const f = (param: string) => {
 	return encodeURIComponent(param.replace(/'/g, ""));
 };
@@ -24,14 +30,14 @@ export const getTopTracks = (range: Spotify.SpotifyRange) => {
 	return apiFetch<Spotify.TopTracksResponse>(
 		"topTracks",
 		`https://api.spotify.com/v1/me/top/tracks?limit=50&offset=0&time_range=${range}`,
-	).then((res) => res.items);
+	).then((res) => val(res.items));
 };
 
 export const getTopArtists = (range: Spotify.SpotifyRange) => {
 	return apiFetch<Spotify.TopArtistsResponse>(
 		"topArtists",
 		`https://api.spotify.com/v1/me/top/artists?limit=50&offset=0&time_range=${range}`,
-	).then((res) => res.items);
+	).then((res) => val(res.items));
 };
 
 /**

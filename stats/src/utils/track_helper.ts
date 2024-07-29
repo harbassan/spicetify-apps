@@ -12,7 +12,7 @@ export const batchRequest = <T>(size: number, request: (batch: string[]) => Prom
 			chunks.push(ids.slice(i, i + size));
 		}
 
-		return Promise.all(chunks.map(request)).then((res) => res.flat());
+		return Promise.all(chunks.map((chunk) => request(chunk).catch(() => []))).then((res) => res.flat());
 	};
 };
 
