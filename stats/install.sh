@@ -3,15 +3,18 @@
 # Define variables
 CUSTOM_APPS_DIR="$HOME/.config/spicetify/CustomApps"
 STATS_APP_DIR="$CUSTOM_APPS_DIR/stats"
-ZIP_URL="https://github.com/harbassan/spicetify-apps/releases/download/v1.0.0/spicetify-stats.release.zip"
+REPO="harbassan/spicetify-apps"
 ZIP_FILE="/tmp/spicetify-stats.zip"
 TEMP_DIR="/tmp/spicetify-stats"
 
 # Create CustomApps directory if it doesn't exist
 mkdir -p "$CUSTOM_APPS_DIR"
 
+# Get the latest release download URL
+LATEST_RELEASE_URL=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep "browser_download_url.*spicetify-stats.release.zip" | cut -d '"' -f 4)
+
 # Download the zip file
-curl -L -o "$ZIP_FILE" "$ZIP_URL"
+curl -L -o "$ZIP_FILE" "$LATEST_RELEASE_URL"
 
 # Unzip the file
 unzip "$ZIP_FILE" -d "$TEMP_DIR"

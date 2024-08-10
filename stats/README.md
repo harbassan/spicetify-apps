@@ -47,7 +47,6 @@
 ---
 ### Automatic Installation (Linux)
 
-
 ```sh
 sh <(curl -s https://raw.githubusercontent.com/harbassan/spicetify-apps/main/stats/install.sh)
 ```
