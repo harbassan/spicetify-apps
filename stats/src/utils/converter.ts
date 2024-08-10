@@ -1,5 +1,5 @@
 import { searchForAlbum, searchForArtist, searchForTrack } from "../api/spotify";
-import { cacher } from "../extensions/cache";
+import { cacher, set } from "../extensions/cache";
 import type * as LastFM from "../types/lastfm";
 import type * as Spotify from "../types/spotify";
 import type {
@@ -63,6 +63,7 @@ export const convertArtist = async (artist: LastFM.Artist) => {
 			uri: artist.url,
 			type: "lastfm",
 		} as LastFMMinifiedArtist;
+	set(`artist-${spotifyArtist.id}`, spotifyArtist);
 	return {
 		...minifyArtist(spotifyArtist),
 		playcount: Number(artist.playcount),

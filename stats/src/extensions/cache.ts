@@ -1,6 +1,6 @@
 const cache: Record<string, unknown> = {};
 
-const set = <T>(key: string, value: T) => {
+export const set = <T>(key: string, value: T) => {
 	cache[key] = value;
 };
 
