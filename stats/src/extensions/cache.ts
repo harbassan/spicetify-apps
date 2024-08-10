@@ -26,7 +26,7 @@ export const batchCacher = <T>(prefix: string, cb: (ids: string[]) => Promise<T[
 		const uncached = ids.filter((_, index) => !cached[index]);
 		const results = await cb(uncached);
 		results.forEach((result, index) => set(`${prefix}-${uncached[index]}`, result));
-		return [...cached, ...results];
+		return [...cached.filter(Boolean), ...results];
 	};
 };
 
