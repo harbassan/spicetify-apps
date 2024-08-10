@@ -81,7 +81,7 @@ export const parseAlbums = async (albumsRaw: Album[]) => {
  * @param artistsRaw - The raw artist data to be parsed.
  * @returns An object containing the top 250 artists with their frequencies and genres calculated from them.
  */
-export const parseArtists = async (artistsRaw: Artist[]) => {
+export const parseArtists = async (artistsRaw: Omit<Artist, "type">[]) => {
 	const frequencyMap = {} as Record<string, number>;
 	const artistIDs = artistsRaw.map((artist) => artist.uri.split(":")[2]);
 	for (const id of artistIDs) {
@@ -91,6 +91,7 @@ export const parseArtists = async (artistsRaw: Artist[]) => {
 		.sort((a, b) => frequencyMap[b] - frequencyMap[a])
 		.slice(0, 250);
 	const artists = await batchRequest(50, getArtistMetas)(ids);
+	console.log(artists);
 	const genres = {} as Record<string, number>;
 	const uniqueArtists = artists.map((artist) => {
 		for (const genre of artist.genres) {

@@ -11,22 +11,10 @@ import type { Config, ConfigWrapper, LastFMMinifiedTrack, SpotifyMinifiedTrack }
 import RefreshButton from "../components/buttons/refresh_button";
 import SettingsButton from "@shared/components/settings_button";
 import type { SpotifyRange } from "../types/spotify";
-import { batchRequest, getMeanAudioFeatures, parseStat } from "../utils/track_helper";
+import { getMeanAudioFeatures, parseArtists, parseStat } from "../utils/track_helper";
 import { useQuery } from "../../../shared/types/react_query";
 import useStatus from "@shared/status/useStatus";
-import { getArtistMetas } from "../api/spotify";
 import { cacher, invalidator } from "../extensions/cache";
-
-const parseArtists = async (artistsRaw: SpotifyMinifiedTrack["artists"]) => {
-	const artists = await batchRequest(50, getArtistMetas)(artistsRaw.map((artist) => artist.uri.split(":")[2]));
-	const genres = {} as Record<string, number>;
-	for (const artist of artists) {
-		for (const genre of artist.genres) {
-			genres[genre] = (genres[genre] || 0) + 1;
-		}
-	}
-	return genres;
-};
 
 const parseAlbums = (albums: SpotifyMinifiedTrack["album"][]) => {
 	const releaseYears = {} as Record<string, number>;
@@ -58,7 +46,7 @@ const parseTracks = async (tracks: (SpotifyMinifiedTrack | LastFMMinifiedTrack)[
 
 	const audioFeatures = await getMeanAudioFeatures(trackIDs);
 	const analysis = { ...audioFeatures, popularity, explicit };
-	const genres = await parseArtists(artistsRaw);
+	const { genres } = await parseArtists(artistsRaw);
 	const releaseYears = parseAlbums(albumsRaw);
 
 	return { analysis, genres, releaseYears };
