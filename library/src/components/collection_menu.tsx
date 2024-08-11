@@ -72,7 +72,7 @@ const CollectionMenu = ({ id }: { id: string }) => {
 				</MenuItem>
 			) : (
 				<MenuItem leadingIcon={<LeadingIcon path={addIconPath} />} onClick={convertToPlaylist}>
-					Convert to Playlist
+					Sync to Playlist
 				</MenuItem>
 			)}
 			<MenuItem leadingIcon={<LeadingIcon path={editIconPath} />} onClick={setCollectionImage}>
