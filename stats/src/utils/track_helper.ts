@@ -70,8 +70,10 @@ export const parseAlbums = async (albumsRaw: Album[]) => {
 	const albums = await batchCacher("album", getAlbumMetas)(uris);
 	const releaseYears = {} as Record<string, number>;
 	const uniqueAlbums = albums.map((album) => {
-		const year = new Date(album.date.isoString).getFullYear().toString();
-		releaseYears[year] = (releaseYears[year] || 0) + 1;
+		if (album?.date?.isoString) {
+			const year = new Date(album.date.isoString).getFullYear().toString();
+			releaseYears[year] = (releaseYears[year] || 0) + frequencyMap[album.uri];
+		}
 		return { ...minifyAlbumUnion(album), frequency: frequencyMap[album.uri] };
 	});
 	return { releaseYears, albums: { contents: uniqueAlbums, length: Object.keys(frequencyMap).length } };
@@ -95,7 +97,7 @@ export const parseArtists = async (artistsRaw: Omit<Artist, "type">[]) => {
 	const genres = {} as Record<string, number>;
 	const uniqueArtists = artists.map((artist) => {
 		for (const genre of artist.genres) {
-			genres[genre] = (genres[genre] || 0) + 1;
+			genres[genre] = (genres[genre] || 0) + frequencyMap[artist.id];
 		}
 		return { ...minifyArtist(artist), frequency: frequencyMap[artist.id] };
 	});
