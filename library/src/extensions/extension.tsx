@@ -98,7 +98,7 @@ window.SpicetifyLibrary = new SpicetifyLibrary();
 })();
 
 function main(LocalStorageAPI: any) {
-	const isAlbum = (props: any) => {
+	const isAlbum = (props: { uri: string }) => {
 		return props.uri?.includes("album");
 	};
 
@@ -126,10 +126,6 @@ function main(LocalStorageAPI: any) {
 	}
 
 	injectFolderImages();
-
-	window.SpicetifyLibrary.FolderImageWrapper.addEventListener("update", () => {
-		injectFolderImages();
-	});
 
 	function injectYLXButtons() {
 		// wait for the sidebar to load
@@ -161,42 +157,20 @@ function main(LocalStorageAPI: any) {
 		);
 	}
 
-	function injectExpandButton() {
-		const sidebarHeader = document.querySelector("li.main-yourLibraryX-navItem[data-id='/library']");
-		if (!sidebarHeader) {
-			return setTimeout(injectExpandButton, 100);
-		}
-
-		const expandButton = document.createElement("span");
-		expandButton.classList.add("expand-button");
-		sidebarHeader.appendChild(expandButton);
-		ReactDOM.render(<ExpandButton />, expandButton);
-	}
-
-	function removeExpandButton() {
-		const expandButton = document.querySelector(".expand-button");
-		if (expandButton) expandButton.remove();
-	}
-
 	// check if ylx is expanded on load
 	const state = LocalStorageAPI.getItem("ylx-sidebar-state");
-	if (state === 0) {
-		injectYLXButtons();
-	} else if (state === 1) {
-		injectExpandButton();
-	}
+	if (state === 0) injectYLXButtons();
 
 	// handle button injection on maximise/minimise
-	LocalStorageAPI.getEvents()._emitter.addListener("update", (e: any) => {
+	LocalStorageAPI.getEvents()._emitter.addListener("update", (e: { data: Record<string, unknown> }) => {
 		const { key, value } = e.data;
+		console.log("Haa");
 		if (key === "ylx-sidebar-state" && value === 0) {
 			injectFolderImages();
 			injectYLXButtons();
-			removeExpandButton();
 		}
 		if (key === "ylx-sidebar-state" && value === 1) {
 			injectFolderImages();
-			injectExpandButton();
 		}
 	});
 }
