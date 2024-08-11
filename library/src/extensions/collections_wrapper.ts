@@ -73,6 +73,17 @@ class CollectionsWrapper extends EventTarget {
 		return { items, totalLength: this._collections.length, offset, openedCollectionName };
 	}
 
+	async cleanCollections() {
+		for (const collection of this._collections) {
+			const boolArray = (await Spicetify.Platform.LibraryAPI.contains(...collection.items)) as boolean[];
+			if (boolArray.includes(false)) {
+				collection.items = collection.items.filter((_, i) => boolArray[i]);
+				this.saveCollections();
+				Spicetify.showNotification("Album removed from collection");
+			}
+		}
+	}
+
 	createCollection(name: string, parentCollection = "") {
 		this._collections.push({
 			type: "collection" as CollectionItem["type"],
@@ -99,6 +110,7 @@ class CollectionsWrapper extends EventTarget {
 		const collection = this.getCollection(collectionUri);
 		if (!collection) return;
 
+		await Spicetify.Platform.LibraryAPI.add({ uris: [albumUri] });
 		collection.items.push(albumUri);
 
 		this.saveCollections();
@@ -152,4 +164,6 @@ class CollectionsWrapper extends EventTarget {
 	}
 }
 
-export default CollectionsWrapper.INSTANCE;
+window.CollectionsWrapper = CollectionsWrapper.INSTANCE;
+
+export default CollectionsWrapper;

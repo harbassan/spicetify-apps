@@ -3,8 +3,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import ToggleFiltersButton from "../components/toggle_filters";
 import CollapseButton from "../components/collapse_button";
-import ExpandButton from "../components/expand_button";
 import AlbumMenuItem from "../components/album_menu_item";
+import "../extensions/collections_wrapper";
 
 // inject css
 const styleLink = document.createElement("link");
@@ -104,6 +104,8 @@ function main(LocalStorageAPI: any) {
 
 	// @ts-expect-error
 	Spicetify.ContextMenuV2.registerItem(<AlbumMenuItem />, isAlbum);
+
+	Spicetify.Platform.LibraryAPI.getEvents()._emitter.addListener("update", () => CollectionsWrapper.cleanCollections());
 
 	function injectFolderImages() {
 		const rootlist = document.querySelector(".main-rootlist-wrapper > div:nth-child(2)");

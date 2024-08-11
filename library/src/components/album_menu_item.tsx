@@ -2,7 +2,6 @@ import React from "react";
 import LeadingIcon from "./leading_icon";
 import TextInputDialog from "./text_input_dialog";
 import SearchBar from "./searchbar";
-import CollectionsWrapper from "../extensions/collections_wrapper";
 
 const createCollection = () => {
 	const onSave = (value: string) => {
@@ -28,8 +27,10 @@ const CollectionSearchMenu = () => {
 	const uri = context?.props?.uri;
 
 	React.useEffect(() => {
-		const fetchCollections = async () =>
+		const fetchCollections = async () => {
 			setCollections(await CollectionsWrapper.getContents({ textFilter, limit: 20, offset: 0 }));
+			console.log(CollectionsWrapper);
+		};
 		fetchCollections();
 	}, [textFilter]);
 
