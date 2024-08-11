@@ -8,6 +8,9 @@ const editIconPath =
 const deleteIconPath =
 	'<path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z"></path><path d="M12 8.75H4v-1.5h8v1.5z"></path>';
 
+const addIconPath =
+	'<path d="M15.25 8a.75.75 0 0 1-.75.75H8.75v5.75a.75.75 0 0 1-1.5 0V8.75H1.5a.75.75 0 0 1 0-1.5h5.75V1.5a.75.75 0 0 1 1.5 0v5.75h5.75a.75.75 0 0 1 .75.75z"></path>';
+
 const CollectionMenu = ({ id }: { id: string }) => {
 	const { Menu, MenuItem } = Spicetify.ReactComponent;
 
@@ -45,6 +48,10 @@ const CollectionMenu = ({ id }: { id: string }) => {
 		CollectionsWrapper.removeCollectionImage(id);
 	};
 
+	const convertToPlaylist = () => {
+		CollectionsWrapper.convertToPlaylist(id);
+	};
+
 	return (
 		<Menu>
 			<MenuItem leadingIcon={<LeadingIcon path={editIconPath} />} onClick={renameCollection}>
@@ -52,6 +59,9 @@ const CollectionMenu = ({ id }: { id: string }) => {
 			</MenuItem>
 			<MenuItem leadingIcon={<LeadingIcon path={deleteIconPath} />} onClick={deleteCollection}>
 				Delete
+			</MenuItem>
+			<MenuItem leadingIcon={<LeadingIcon path={addIconPath} />} onClick={convertToPlaylist}>
+				Convert to Playlist
 			</MenuItem>
 			<MenuItem leadingIcon={<LeadingIcon path={editIconPath} />} onClick={setCollectionImage}>
 				Set Collection Image

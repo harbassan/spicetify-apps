@@ -84,6 +84,29 @@ class CollectionsWrapper extends EventTarget {
 		}
 	}
 
+	async convertToPlaylist(uri: string) {
+		const collection = this.getCollection(uri);
+		if (!collection) return;
+
+		const { Platform, showNotification } = Spicetify;
+		const { RootlistAPI, PlaylistAPI, LibraryAPI } = Platform;
+
+		try {
+			const playlistUri = await RootlistAPI.createPlaylist(collection.name, { before: "start" });
+			const items = await Promise.all(
+				collection.items.map(async (uri) => {
+					const album = await LibraryAPI.getAlbum(uri);
+					return album.items.map((t) => t.uri);
+				}),
+			).then((tracks) => tracks.flat());
+			console.log(items);
+			await PlaylistAPI.add(playlistUri, items, { before: "start" });
+		} catch (error) {
+			console.error(error);
+			showNotification("Failed to create playlist", true, 1000);
+		}
+	}
+
 	createCollection(name: string, parentCollection = "") {
 		this._collections.push({
 			type: "collection" as CollectionItem["type"],
