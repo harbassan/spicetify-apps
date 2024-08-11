@@ -31,7 +31,9 @@ const CollectionMenu = ({ id }: { id: string }) => {
 		});
 	};
 
-	const image = CollectionsWrapper.getCollection(id)?.image;
+	const collection = CollectionsWrapper.getCollection(id);
+	const image = collection?.image;
+	const synced = collection?.syncedPlaylistUri;
 
 	const setCollectionImage = () => {
 		const setImg = (imgUrl: string) => {
@@ -52,6 +54,10 @@ const CollectionMenu = ({ id }: { id: string }) => {
 		CollectionsWrapper.convertToPlaylist(id);
 	};
 
+	const unsyncPlaylist = () => {
+		CollectionsWrapper.unsyncCollection(id);
+	};
+
 	return (
 		<Menu>
 			<MenuItem leadingIcon={<LeadingIcon path={editIconPath} />} onClick={renameCollection}>
@@ -60,9 +66,15 @@ const CollectionMenu = ({ id }: { id: string }) => {
 			<MenuItem leadingIcon={<LeadingIcon path={deleteIconPath} />} onClick={deleteCollection}>
 				Delete
 			</MenuItem>
-			<MenuItem leadingIcon={<LeadingIcon path={addIconPath} />} onClick={convertToPlaylist}>
-				Convert to Playlist
-			</MenuItem>
+			{synced ? (
+				<MenuItem leadingIcon={<LeadingIcon path={deleteIconPath} />} onClick={unsyncPlaylist}>
+					Unsync from Playlist
+				</MenuItem>
+			) : (
+				<MenuItem leadingIcon={<LeadingIcon path={addIconPath} />} onClick={convertToPlaylist}>
+					Convert to Playlist
+				</MenuItem>
+			)}
 			<MenuItem leadingIcon={<LeadingIcon path={editIconPath} />} onClick={setCollectionImage}>
 				Set Collection Image
 			</MenuItem>

@@ -108,6 +108,15 @@ class CollectionsWrapper extends EventTarget {
 		if (unwanted.length) await PlaylistAPI.remove(collection.syncedPlaylistUri, unwanted);
 	}
 
+	unsyncCollection(uri: string) {
+		const collection = this.getCollection(uri);
+		if (!collection) return;
+
+		collection.syncedPlaylistUri = undefined;
+
+		this.saveCollections();
+	}
+
 	async getTracklist(collectionUri: string) {
 		const collection = this.getCollection(collectionUri);
 		if (!collection) return [];
