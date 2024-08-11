@@ -27,7 +27,7 @@ const CollectionMenu = ({ id }: { id: string }) => {
 
 		Spicetify.PopupModal.display({
 			title: "Rename Collection",
-			content: <TextInputDialog def={name} onSave={rename} />,
+			content: <TextInputDialog def={name} placeholder={"Collection Name"} onSave={rename} />,
 		});
 	};
 

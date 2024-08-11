@@ -1,5 +1,5 @@
 import type { getAlbumResponse } from "../types/graph_ql";
-import type { PlaylistResponse, RootlistResponse } from "../types/platform";
+import type { PlaylistResponse, RootlistResponse } from "../../../shared/types/platform";
 
 export const getFullPlaylist = async (uri: string) => {
 	const playlist = (await Spicetify.Platform.PlaylistAPI.getPlaylist(uri)) as PlaylistResponse;

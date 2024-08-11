@@ -2,7 +2,7 @@ import { getAlbumMetas, queryInLibrary } from "../api/platform";
 import { getArtistMetas, getAudioFeatures } from "../api/spotify";
 import { batchCacher } from "../extensions/cache";
 import type { AlbumUnion } from "../types/graph_ql";
-import type { Album, Artist, ContentsEpisode, ContentsTrack } from "../types/platform";
+import type { Album, Artist, ContentsEpisode, ContentsTrack } from "../../../shared/types/platform";
 import type { LastFMMinifiedTrack, SpotifyMinifiedAlbum, SpotifyMinifiedTrack } from "../types/stats_types";
 import { minifyAlbum, minifyArtist } from "./converter";
 
