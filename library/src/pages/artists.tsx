@@ -105,7 +105,7 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 			type="artist"
 			uri={artist.uri}
 			header={artist.name}
-			subheader={"Artist"}
+			subheader={""}
 			imageUrl={artist.images?.at(0)?.url}
 		/>
 	));
