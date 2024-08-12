@@ -1,9 +1,9 @@
 import React, { type FormEvent } from "react";
 
-const TextInputDialog = (props: { def: string; placeholder: string; onSave: (value: string) => void }) => {
+const TextInputDialog = (props: { def?: string; placeholder: string; onSave: (value: string) => void }) => {
 	const { def, placeholder, onSave } = props;
 
-	const [value, setValue] = React.useState(def);
+	const [value, setValue] = React.useState(def || "");
 
 	const onSubmit = (e: FormEvent) => {
 		e.preventDefault();

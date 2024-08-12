@@ -3,8 +3,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import ToggleFiltersButton from "../components/toggle_filters";
 import CollapseButton from "../components/collapse_button";
-import ExpandButton from "../components/expand_button";
 import AlbumMenuItem from "../components/album_menu_item";
+import "../extensions/collections_wrapper";
 
 // inject css
 const styleLink = document.createElement("link");
@@ -54,16 +54,16 @@ const FolderPlaceholder = () => {
 class SpicetifyLibrary {
 	ConfigWrapper = new ConfigWrapper(
 		[
-			{
-				name: "Card Size",
-				key: "cardSize",
-				type: "slider",
-				min: 100,
-				max: 200,
-				step: 0.05,
-				def: 180,
-				callback: setCardSize,
-			},
+			// {
+			// 	name: "Card Size",
+			// 	key: "cardSize",
+			// 	type: "slider",
+			// 	min: 100,
+			// 	max: 200,
+			// 	step: 0.05,
+			// 	def: 180,
+			// 	callback: setCardSize,
+			// },
 			{
 				name: "Extend Search Bar",
 				key: "extendSearchBar",
@@ -98,12 +98,14 @@ window.SpicetifyLibrary = new SpicetifyLibrary();
 })();
 
 function main(LocalStorageAPI: any) {
-	const isAlbum = (props: any) => {
+	const isAlbum = (props: { uri: string }) => {
 		return props.uri?.includes("album");
 	};
 
 	// @ts-expect-error
 	Spicetify.ContextMenuV2.registerItem(<AlbumMenuItem />, isAlbum);
+
+	Spicetify.Platform.LibraryAPI.getEvents()._emitter.addListener("update", () => CollectionsWrapper.cleanCollections());
 
 	function injectFolderImages() {
 		const rootlist = document.querySelector(".main-rootlist-wrapper > div:nth-child(2)");
@@ -126,10 +128,6 @@ function main(LocalStorageAPI: any) {
 	}
 
 	injectFolderImages();
-
-	window.SpicetifyLibrary.FolderImageWrapper.addEventListener("update", () => {
-		injectFolderImages();
-	});
 
 	function injectYLXButtons() {
 		// wait for the sidebar to load
@@ -161,42 +159,20 @@ function main(LocalStorageAPI: any) {
 		);
 	}
 
-	function injectExpandButton() {
-		const sidebarHeader = document.querySelector("li.main-yourLibraryX-navItem[data-id='/library']");
-		if (!sidebarHeader) {
-			return setTimeout(injectExpandButton, 100);
-		}
-
-		const expandButton = document.createElement("span");
-		expandButton.classList.add("expand-button");
-		sidebarHeader.appendChild(expandButton);
-		ReactDOM.render(<ExpandButton />, expandButton);
-	}
-
-	function removeExpandButton() {
-		const expandButton = document.querySelector(".expand-button");
-		if (expandButton) expandButton.remove();
-	}
-
 	// check if ylx is expanded on load
 	const state = LocalStorageAPI.getItem("ylx-sidebar-state");
-	if (state === 0) {
-		injectYLXButtons();
-	} else if (state === 1) {
-		injectExpandButton();
-	}
+	if (state === 0) injectYLXButtons();
 
 	// handle button injection on maximise/minimise
-	LocalStorageAPI.getEvents()._emitter.addListener("update", (e: any) => {
+	LocalStorageAPI.getEvents()._emitter.addListener("update", (e: { data: Record<string, unknown> }) => {
 		const { key, value } = e.data;
+		console.log("Haa");
 		if (key === "ylx-sidebar-state" && value === 0) {
 			injectFolderImages();
 			injectYLXButtons();
-			removeExpandButton();
 		}
 		if (key === "ylx-sidebar-state" && value === 1) {
 			injectFolderImages();
-			injectExpandButton();
 		}
 	});
 }

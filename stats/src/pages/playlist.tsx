@@ -25,6 +25,7 @@ const useQueryShitty = <T,>(callback: () => Promise<T>) => {
 				setData(data);
 				setStatus("success");
 			} catch (e) {
+				console.log(e);
 				setError(e as Error);
 				setStatus("error");
 			}

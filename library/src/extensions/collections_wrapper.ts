@@ -1,6 +1,7 @@
 // @ts-ignore
 import { v4 as uuidv4 } from "uuid";
 import type { AlbumItem, GetContentsResponse } from "../types/platform";
+import type { PlaylistResponse } from "@shared/types/platform";
 
 export interface CollectionItem {
 	type: "collection";
@@ -11,6 +12,7 @@ export interface CollectionItem {
 	lastPlayedAt: Date | null;
 	items: string[];
 	parentCollection: string;
+	syncedPlaylistUri?: string;
 }
 
 export type CollectionChild = CollectionItem | AlbumItem;
@@ -73,6 +75,83 @@ class CollectionsWrapper extends EventTarget {
 		return { items, totalLength: this._collections.length, offset, openedCollectionName };
 	}
 
+	async cleanCollections() {
+		for (const collection of this._collections) {
+			const boolArray = (await Spicetify.Platform.LibraryAPI.contains(...collection.items)) as boolean[];
+			if (boolArray.includes(false)) {
+				collection.items = collection.items.filter((_, i) => boolArray[i]);
+				this.saveCollections();
+				Spicetify.showNotification("Album removed from collection");
+				this.syncCollection(collection.uri);
+			}
+		}
+	}
+
+	async syncCollection(uri: string) {
+		const collection = this.getCollection(uri);
+		if (!collection) return;
+
+		const { PlaylistAPI } = Spicetify.Platform;
+
+		if (!collection.syncedPlaylistUri) return;
+
+		const playlist = (await PlaylistAPI.getPlaylist(collection.syncedPlaylistUri)) as PlaylistResponse;
+		const playlistTracks = playlist.contents.items.filter((t) => t.type === "track").map((t) => t.uri);
+		const collectionTracks = await this.getTracklist(uri);
+
+		const wanted = collectionTracks.filter((track) => !playlistTracks.includes(track));
+		const unwanted = playlistTracks
+			.filter((track) => !collectionTracks.includes(track))
+			.map((uri) => ({ uri, uid: [] }));
+
+		if (wanted.length) await PlaylistAPI.add(collection.syncedPlaylistUri, wanted, { before: "end" });
+		if (unwanted.length) await PlaylistAPI.remove(collection.syncedPlaylistUri, unwanted);
+	}
+
+	unsyncCollection(uri: string) {
+		const collection = this.getCollection(uri);
+		if (!collection) return;
+
+		collection.syncedPlaylistUri = undefined;
+
+		this.saveCollections();
+	}
+
+	async getTracklist(collectionUri: string) {
+		const collection = this.getCollection(collectionUri);
+		if (!collection) return [];
+
+		return Promise.all(
+			collection.items.map(async (uri) => {
+				const album = await Spicetify.Platform.LibraryAPI.getAlbum(uri);
+				return album.items.map((t) => t.uri);
+			}),
+		).then((tracks) => tracks.flat());
+	}
+
+	async convertToPlaylist(uri: string) {
+		const collection = this.getCollection(uri);
+		if (!collection) return;
+
+		const { Platform, showNotification } = Spicetify;
+		const { RootlistAPI, PlaylistAPI } = Platform;
+
+		if (collection.syncedPlaylistUri) {
+			showNotification("Synced Playlist already exists", true);
+			return;
+		}
+
+		try {
+			const playlistUri = await RootlistAPI.createPlaylist(collection.name, { before: "start" });
+			const items = await this.getTracklist(uri);
+			await PlaylistAPI.add(playlistUri, items, { before: "start" });
+			collection.syncedPlaylistUri = playlistUri;
+		} catch (error) {
+			console.error(error);
+			showNotification("Failed to create playlist", true);
+		}
+	}
+
 	createCollection(name: string, parentCollection = "") {
 		this._collections.push({
 			type: "collection" as CollectionItem["type"],
@@ -99,10 +178,13 @@ class CollectionsWrapper extends EventTarget {
 		const collection = this.getCollection(collectionUri);
 		if (!collection) return;
 
+		await Spicetify.Platform.LibraryAPI.add({ uris: [albumUri] });
 		collection.items.push(albumUri);
 
 		this.saveCollections();
 		Spicetify.showNotification("Album added to collection");
+
+		this.syncCollection(collectionUri);
 	}
 
 	removeAlbumFromCollection(collectionUri: string, albumUri: string) {
@@ -113,6 +195,8 @@ class CollectionsWrapper extends EventTarget {
 
 		this.saveCollections();
 		Spicetify.showNotification("Album removed from collection");
+
+		this.syncCollection(collectionUri);
 	}
 
 	getCollectionsWithAlbum(albumUri: string) {
@@ -152,4 +236,6 @@ class CollectionsWrapper extends EventTarget {
 	}
 }
 
-export default CollectionsWrapper.INSTANCE;
+window.CollectionsWrapper = CollectionsWrapper.INSTANCE;
+
+export default CollectionsWrapper;

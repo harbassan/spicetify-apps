@@ -11,7 +11,6 @@ import TextInputDialog from "../components/text_input_dialog";
 import LeadingIcon from "../components/leading_icon";
 import { useInfiniteQuery } from "@shared/types/react_query";
 import useStatus from "@shared/status/useStatus";
-import CollectionsWrapper from "../extensions/collections_wrapper";
 
 const AddMenu = ({ collection }: { collection?: string }) => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -30,11 +29,29 @@ const AddMenu = ({ collection }: { collection?: string }) => {
 		});
 	};
 
+	const addAlbum = () => {
+		if (!collection) return;
+		const onSave = (value: string) => {
+			CollectionsWrapper.addAlbumToCollection(collection, value);
+		};
+
+		Spicetify.PopupModal.display({
+			title: "Add Album",
+			// @ts-ignore
+			content: <TextInputDialog def={""} placeholder="Album URI" onSave={onSave} />,
+		});
+	};
+
 	return (
 		<Menu>
 			<MenuItem onClick={createCollection} leadingIcon={<LeadingIcon path={SVGIcons["playlist-folder"]} />}>
 				Create Collection
 			</MenuItem>
+			{collection && (
+				<MenuItem onClick={addAlbum} leadingIcon={<LeadingIcon path={SVGIcons.album} />}>
+					Add Album
+				</MenuItem>
+			)}
 		</Menu>
 	);
 };
@@ -51,6 +68,7 @@ const CollectionsPage = ({ collection, configWrapper }: { configWrapper: ConfigW
 			offset: pageParam,
 			limit,
 		});
+		console.log(res);
 		if (!res.items.length) throw new Error("No collections found");
 		return res;
 	};
@@ -68,7 +86,10 @@ const CollectionsPage = ({ collection, configWrapper }: { configWrapper: ConfigW
 	});
 
 	useEffect(() => {
-		const update = (e: CustomEvent | Event) => refetch();
+		const update = (e: CustomEvent | Event) => {
+			console.log("recieved");
+			refetch();
+		};
 		CollectionsWrapper.addEventListener("update", update);
 		return () => {
 			CollectionsWrapper.removeEventListener("update", update);

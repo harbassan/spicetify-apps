@@ -15,14 +15,18 @@ body:not(.show-ylx-filters) .main-yourLibraryX-filterArea:not(:has(> .main-yourL
     margin-top: -8px;
 }
 
-// hide sort-by text
-.main-yourLibraryX-librarySortWrapper button span:first-child {
-    display: none;
-}
+.main-yourLibraryX-libraryFilter {
+    // hide sort-by text
+    .main-yourLibraryX-librarySortWrapper button span:first-child,
+    span[role="presentation"] span[role="presentation"] button span:first-child {
+        display: none;
+    }
 
-// push sort button to the right within its flex parent
-.main-yourLibraryX-librarySortWrapper {
-    margin-left: auto;
+    // push sort button to the right within its flex parent
+    .main-yourLibraryX-librarySortWrapper,
+    span[role="presentation"] {
+        margin-left: auto;
+    }
 }
 
 // hide weird button effect
@@ -31,7 +35,6 @@ body:not(.show-ylx-filters) .main-yourLibraryX-filterArea:not(:has(> .main-yourL
 .expand-button > button:after {
     display: none;
 }
-
 
 
 // expand button positioning
@@ -51,25 +54,30 @@ li.main-yourLibraryX-navItem[data-id='/library'] {
 li.main-yourLibraryX-navItem[data-id='/library'] > a {
     flex-grow: 1;
 }
+.main-yourLibraryX-libraryFilter {
+    // ylx button styling
+    .toggle-filters-button > button,
+    .collapse-button > button,
+    .main-yourLibraryX-librarySortWrapper > button,
+    span[role="presentation"] span[role="presentation"] > button {
+        padding: 0;
+    }
+    .toggle-filters-button,
+    .collapse-button,
+    .main-yourLibraryX-librarySortWrapper,
+    span[role="presentation"] span[role="presentation"] {
+        display: flex;
+        flex-basis:32px;
+        justify-content: center;
+        min-width: 24px;
+        flex-shrink: 10;
+    }
+    .main-yourLibraryX-librarySortWrapper > button > span:nth-child(2),
+    span[role="presentation"] span[role="presentation"] > button > span:nth-child(2) {
+        margin: 0;
+    }
+}
 
-// ylx button styling
-.toggle-filters-button > button,
-.collapse-button > button,
-.main-yourLibraryX-librarySortWrapper > button {
-    padding: 0;
-}
-.toggle-filters-button,
-.collapse-button,
-.main-yourLibraryX-librarySortWrapper {
-    display: flex;
-    flex-basis:32px;
-    justify-content: center;
-    min-width: 24px;
-    flex-shrink: 10;
-}
-.main-yourLibraryX-librarySortWrapper > button > span:nth-child(2) {
-    margin: 0;
-}
 
 // remove resize bar hover effect
 .LayoutResizer__resize-bar {

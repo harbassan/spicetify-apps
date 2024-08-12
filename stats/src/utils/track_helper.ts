@@ -1,7 +1,8 @@
 import { getAlbumMetas, queryInLibrary } from "../api/platform";
 import { getArtistMetas, getAudioFeatures } from "../api/spotify";
+import { batchCacher } from "../extensions/cache";
 import type { AlbumUnion } from "../types/graph_ql";
-import type { Album, Artist, ContentsEpisode, ContentsTrack } from "../types/platform";
+import type { Album, Artist, ContentsEpisode, ContentsTrack } from "../../../shared/types/platform";
 import type { LastFMMinifiedTrack, SpotifyMinifiedAlbum, SpotifyMinifiedTrack } from "../types/stats_types";
 import { minifyAlbum, minifyArtist } from "./converter";
 
@@ -12,7 +13,7 @@ export const batchRequest = <T>(size: number, request: (batch: string[]) => Prom
 			chunks.push(ids.slice(i, i + size));
 		}
 
-		return Promise.all(chunks.map(request)).then((res) => res.flat());
+		return Promise.all(chunks.map((chunk) => request(chunk).catch(() => []))).then((res) => res.flat());
 	};
 };
 
@@ -28,7 +29,7 @@ export const getMeanAudioFeatures = async (ids: string[]) => {
 		tempo: 0,
 	};
 
-	const audioFeaturesList = await batchRequest(100, getAudioFeatures)(ids);
+	const audioFeaturesList = await batchCacher("features", batchRequest(100, getAudioFeatures))(ids);
 
 	for (const audioFeatures of audioFeaturesList) {
 		if (!audioFeatures) continue;
@@ -66,11 +67,13 @@ export const parseAlbums = async (albumsRaw: Album[]) => {
 	const uris = Object.keys(frequencyMap)
 		.sort((a, b) => frequencyMap[b] - frequencyMap[a])
 		.slice(0, 500);
-	const albums = await getAlbumMetas(uris);
+	const albums = await batchCacher("album", getAlbumMetas)(uris);
 	const releaseYears = {} as Record<string, number>;
 	const uniqueAlbums = albums.map((album) => {
-		const year = new Date(album.date.isoString).getFullYear().toString();
-		releaseYears[year] = (releaseYears[year] || 0) + 1;
+		if (album?.date?.isoString) {
+			const year = new Date(album.date.isoString).getFullYear().toString();
+			releaseYears[year] = (releaseYears[year] || 0) + frequencyMap[album.uri];
+		}
 		return { ...minifyAlbumUnion(album), frequency: frequencyMap[album.uri] };
 	});
 	return { releaseYears, albums: { contents: uniqueAlbums, length: Object.keys(frequencyMap).length } };
@@ -81,7 +84,7 @@ export const parseAlbums = async (albumsRaw: Album[]) => {
  * @param artistsRaw - The raw artist data to be parsed.
  * @returns An object containing the top 250 artists with their frequencies and genres calculated from them.
  */
-export const parseArtists = async (artistsRaw: Artist[]) => {
+export const parseArtists = async (artistsRaw: Omit<Artist, "type">[]) => {
 	const frequencyMap = {} as Record<string, number>;
 	const artistIDs = artistsRaw.map((artist) => artist.uri.split(":")[2]);
 	for (const id of artistIDs) {
@@ -90,11 +93,11 @@ export const parseArtists = async (artistsRaw: Artist[]) => {
 	const ids = Object.keys(frequencyMap)
 		.sort((a, b) => frequencyMap[b] - frequencyMap[a])
 		.slice(0, 250);
-	const artists = await batchRequest(50, getArtistMetas)(ids);
+	const artists = await batchCacher("artist", batchRequest(50, getArtistMetas))(ids);
 	const genres = {} as Record<string, number>;
 	const uniqueArtists = artists.map((artist) => {
 		for (const genre of artist.genres) {
-			genres[genre] = (genres[genre] || 0) + 1;
+			genres[genre] = (genres[genre] || 0) + frequencyMap[artist.id];
 		}
 		return { ...minifyArtist(artist), frequency: frequencyMap[artist.id] };
 	});
