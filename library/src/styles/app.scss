@@ -12,6 +12,11 @@
         grid-template-columns: repeat(auto-fill, minmax(var(--library-card-size), 1fr)) !important;
     }
 
+    .main-card-cardContainer {
+        width: 100%;
+        height: 100%;
+    }
+
     .load-more-card {
         div:nth-child(2) {
             text-align: center;

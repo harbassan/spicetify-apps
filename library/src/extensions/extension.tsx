@@ -54,16 +54,16 @@ const FolderPlaceholder = () => {
 class SpicetifyLibrary {
 	ConfigWrapper = new ConfigWrapper(
 		[
-			// {
-			// 	name: "Card Size",
-			// 	key: "cardSize",
-			// 	type: "slider",
-			// 	min: 100,
-			// 	max: 200,
-			// 	step: 0.05,
-			// 	def: 180,
-			// 	callback: setCardSize,
-			// },
+			{
+				name: "Card Size",
+				key: "cardSize",
+				type: "slider",
+				min: 100,
+				max: 200,
+				step: 0.05,
+				def: 180,
+				callback: setCardSize,
+			},
 			{
 				name: "Extend Search Bar",
 				key: "extendSearchBar",
