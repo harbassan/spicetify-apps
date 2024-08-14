@@ -119,7 +119,7 @@ const CollectionsPage = ({ collection, configWrapper }: { configWrapper: ConfigW
 			type={item.type}
 			uri={item.uri}
 			header={item.name}
-			subheader={item.type === "collection" ? "Collection" : item.artists?.[0]?.name}
+			subheader={item.type === "collection" ? `${item.items.length} Albums` : item.artists?.[0]?.name}
 			imageUrl={item.type === "collection" ? item.image : item.images?.[0]?.url}
 		/>
 	));

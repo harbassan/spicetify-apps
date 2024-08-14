@@ -151,7 +151,11 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
 			type={item.type}
 			uri={item.uri}
 			header={item.name}
-			subheader={item.type === "playlist" ? item.owner.name : "Folder"}
+			subheader={
+				item.type === "playlist"
+					? item.owner.name
+					: `${item.numberOfPlaylists} Playlists${item.numberOfFolders ? ` • ${item.numberOfFolders} Folders` : ""}`
+			}
 			imageUrl={item.images?.[0]?.url || images[item.uri]}
 			badge={item.pinned ? <PinIcon /> : undefined}
 		/>
