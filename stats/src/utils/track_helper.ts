@@ -67,7 +67,7 @@ export const parseAlbums = async (albumsRaw: Album[]) => {
 	const uris = Object.keys(frequencyMap)
 		.sort((a, b) => frequencyMap[b] - frequencyMap[a])
 		.slice(0, 500);
-	const albums = await batchCacher("album", getAlbumMetas)(uris);
+	const albums = (await batchCacher("album", getAlbumMetas)(uris)).filter(Boolean);
 	const releaseYears = {} as Record<string, number>;
 	const uniqueAlbums = albums.map((album) => {
 		if (album?.date?.isoString) {

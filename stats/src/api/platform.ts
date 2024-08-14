@@ -20,7 +20,7 @@ export const getAlbumMeta = (uri: string) => {
 			limit: 1,
 			locale: Spicetify.Locale.getLocale(),
 		}) as Promise<getAlbumResponse>
-	).then((res) => res.data.albumUnion);
+	).then((res) => res?.data?.albumUnion);
 };
 
 export const getAlbumMetas = (uris: string[]) => {
