@@ -12,6 +12,7 @@ import LeadingIcon from "../components/leading_icon";
 import useStatus from "@shared/status/useStatus";
 import { useInfiniteQuery } from "@shared/types/react_query";
 import type { AlbumItem, GetContentsResponse, UpdateEvent } from "../types/platform";
+import PinIcon from "../components/pin_icon";
 
 const AddMenu = () => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -111,6 +112,7 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 				subheader={item.artists[0].name}
 				imageUrl={item.images?.[0]?.url}
 				artistUri={item.artists[0].uri}
+				badge={item.pinned ? <PinIcon /> : undefined}
 			/>
 		);
 	});

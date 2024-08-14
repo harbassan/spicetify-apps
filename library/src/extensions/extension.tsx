@@ -166,7 +166,6 @@ function main(LocalStorageAPI: any) {
 	// handle button injection on maximise/minimise
 	LocalStorageAPI.getEvents()._emitter.addListener("update", (e: { data: Record<string, unknown> }) => {
 		const { key, value } = e.data;
-		console.log("Haa");
 		if (key === "ylx-sidebar-state" && value === 0) {
 			injectFolderImages();
 			injectYLXButtons();

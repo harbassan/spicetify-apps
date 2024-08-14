@@ -12,6 +12,7 @@ import TextInputDialog from "../components/text_input_dialog";
 import { useInfiniteQuery } from "@shared/types/react_query";
 import type { GetContentsResponse, ShowItem, UpdateEvent } from "../types/platform";
 import useStatus from "@shared/status/useStatus";
+import PinIcon from "../components/pin_icon";
 
 const AddMenu = () => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -107,6 +108,7 @@ const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 			header={show.name}
 			subheader={show.publisher}
 			imageUrl={show.images?.[0]?.url}
+			badge={show.pinned ? <PinIcon /> : undefined}
 		/>
 	));
 

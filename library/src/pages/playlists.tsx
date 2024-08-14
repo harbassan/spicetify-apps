@@ -13,6 +13,7 @@ import { useInfiniteQuery } from "@shared/types/react_query";
 import type { FolderItem, GetContentsResponse, PlaylistItem, UpdateEvent } from "../types/platform";
 import useStatus from "@shared/status/useStatus";
 import FolderImageWrapper from "../extensions/folder_image_wrapper";
+import PinIcon from "../components/pin_icon";
 
 const AddMenu = ({ folder }: { folder?: string }) => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -152,6 +153,7 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
 			header={item.name}
 			subheader={item.type === "playlist" ? item.owner.name : "Folder"}
 			imageUrl={item.images?.[0]?.url || images[item.uri]}
+			badge={item.pinned ? <PinIcon /> : undefined}
 		/>
 	));
 

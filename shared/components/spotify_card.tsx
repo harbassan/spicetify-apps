@@ -10,7 +10,7 @@ interface SpotifyCardProps {
 	subheader: string;
 	imageUrl?: string;
 	artistUri?: string;
-	badge?: string;
+	badge?: string | React.ReactElement;
 	provider: "spotify" | "lastfm";
 }
 

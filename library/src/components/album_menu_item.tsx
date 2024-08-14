@@ -29,7 +29,6 @@ const CollectionSearchMenu = () => {
 	React.useEffect(() => {
 		const fetchCollections = async () => {
 			setCollections(await CollectionsWrapper.getContents({ textFilter, limit: 20, offset: 0 }));
-			console.log(CollectionsWrapper);
 		};
 		fetchCollections();
 	}, [textFilter]);

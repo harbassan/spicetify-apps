@@ -12,6 +12,7 @@ import TextInputDialog from "../components/text_input_dialog";
 import useStatus from "@shared/status/useStatus";
 import { useInfiniteQuery } from "@shared/types/react_query";
 import type { ArtistItem, GetContentsResponse, UpdateEvent } from "../types/platform";
+import PinIcon from "../components/pin_icon";
 
 const AddMenu = () => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -107,6 +108,7 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 			header={artist.name}
 			subheader={""}
 			imageUrl={artist.images?.at(0)?.url}
+			badge={artist.pinned ? <PinIcon /> : undefined}
 		/>
 	));
 
