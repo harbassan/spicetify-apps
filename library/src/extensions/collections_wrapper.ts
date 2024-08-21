@@ -152,10 +152,40 @@ class CollectionsWrapper extends EventTarget {
 		}
 	}
 
+	async createCollectionFromDiscog(artistUri: string) {
+		const [raw, info] = await Promise.all([
+			Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.queryArtistDiscographyAlbums, {
+				uri: artistUri,
+				offset: 0,
+				limit: 50,
+			}),
+			Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.queryArtistOverview, {
+				uri: artistUri,
+				locale: Spicetify.Locale.getLocale(),
+				includePrerelease: false,
+			}),
+		]);
+		const items = raw?.data?.artistUnion.discography.albums?.items;
+		const name = info?.data?.artistUnion.profile.name;
+		const image = info?.data?.artistUnion.visuals.avatarImage?.sources?.[0]?.url;
+
+		if (!name || !items?.length) {
+			Spicetify.showNotification("Artist not found or has no albums");
+			return;
+		}
+
+		const collectionUri = this.createCollection(`${name} Albums`);
+		if (image) this.setCollectionImage(collectionUri, image);
+		for (const album of items) {
+			this.addAlbumToCollection(collectionUri, album.releases.items[0].uri);
+		}
+	}
+
 	createCollection(name: string, parentCollection = "") {
+		const id = uuidv4();
 		this._collections.push({
 			type: "collection" as CollectionItem["type"],
-			uri: uuidv4(),
+			uri: id,
 			name,
 			items: [],
 			addedAt: new Date(),
@@ -165,6 +195,8 @@ class CollectionsWrapper extends EventTarget {
 
 		this.saveCollections();
 		Spicetify.showNotification("Collection created");
+
+		return id;
 	}
 
 	deleteCollection(uri: string) {

@@ -98,7 +98,6 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
 			limit,
 			flattenTree: JSON.parse(flattenOption.id),
 		})) as GetContentsResponse<PlaylistItem | FolderItem>;
-		console.log(res);
 		if (!res.items?.length) throw new Error("No playlists found");
 		return res;
 	};

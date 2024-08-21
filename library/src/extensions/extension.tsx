@@ -4,6 +4,7 @@ import ReactDOM from "react-dom";
 import ToggleFiltersButton from "../components/toggle_filters";
 import CollapseButton from "../components/collapse_button";
 import AlbumMenuItem from "../components/album_menu_item";
+import ArtistMenuItem from "../components/artist_menu_item";
 import "../extensions/collections_wrapper";
 
 // inject css
@@ -97,13 +98,15 @@ window.SpicetifyLibrary = new SpicetifyLibrary();
 	main(LocalStorageAPI);
 })();
 
+// biome-ignore lint:
 function main(LocalStorageAPI: any) {
-	const isAlbum = (props: { uri: string }) => {
-		return props.uri?.includes("album");
-	};
+	const isAlbum = (props: { uri: string }) => props.uri?.includes("album");
+	const isArtist = (props: { uri: string }) => props.uri?.includes("artist");
 
 	// @ts-expect-error
 	Spicetify.ContextMenuV2.registerItem(<AlbumMenuItem />, isAlbum);
+	// @ts-expect-error
+	Spicetify.ContextMenuV2.registerItem(<ArtistMenuItem />, isArtist);
 
 	Spicetify.Platform.LibraryAPI.getEvents()._emitter.addListener("update", () => CollectionsWrapper.cleanCollections());
 

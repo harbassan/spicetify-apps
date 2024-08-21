@@ -29,6 +29,18 @@ const AddMenu = ({ collection }: { collection?: string }) => {
 		});
 	};
 
+	const createDiscogCollection = () => {
+		const onSave = (value: string) => {
+			CollectionsWrapper.createCollectionFromDiscog(value);
+		};
+
+		Spicetify.PopupModal.display({
+			title: "Create Discog Collection",
+			// @ts-ignore
+			content: <TextInputDialog def={""} placeholder="Artist URI" onSave={onSave} />,
+		});
+	};
+
 	const addAlbum = () => {
 		if (!collection) return;
 		const onSave = (value: string) => {
@@ -46,6 +58,9 @@ const AddMenu = ({ collection }: { collection?: string }) => {
 		<Menu>
 			<MenuItem onClick={createCollection} leadingIcon={<LeadingIcon path={SVGIcons["playlist-folder"]} />}>
 				Create Collection
+			</MenuItem>
+			<MenuItem onClick={createDiscogCollection} leadingIcon={<LeadingIcon path={SVGIcons.artist} />}>
+				Create Discog Collection
 			</MenuItem>
 			{collection && (
 				<MenuItem onClick={addAlbum} leadingIcon={<LeadingIcon path={SVGIcons.album} />}>
@@ -68,7 +83,6 @@ const CollectionsPage = ({ collection, configWrapper }: { configWrapper: ConfigW
 			offset: pageParam,
 			limit,
 		});
-		console.log(res);
 		if (!res.items.length) throw new Error("No collections found");
 		return res;
 	};
@@ -87,7 +101,6 @@ const CollectionsPage = ({ collection, configWrapper }: { configWrapper: ConfigW
 
 	useEffect(() => {
 		const update = (e: CustomEvent | Event) => {
-			console.log("recieved");
 			refetch();
 		};
 		CollectionsWrapper.addEventListener("update", update);
