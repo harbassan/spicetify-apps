@@ -206,6 +206,16 @@ class CollectionsWrapper extends EventTarget {
 		Spicetify.showNotification("Collection deleted");
 	}
 
+	deleteCollectionAndAlbums(uri: string) {
+		const collection = this.getCollection(uri);
+		if (!collection) return;
+
+		for (const album of collection.items) {
+			Spicetify.Platform.LibraryAPI.remove({ uris: [album] });
+		}
+		this.deleteCollection(uri);
+	}
+
 	async addAlbumToCollection(collectionUri: string, albumUri: string) {
 		const collection = this.getCollection(collectionUri);
 		if (!collection) return;

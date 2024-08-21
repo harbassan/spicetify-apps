@@ -18,6 +18,10 @@ const CollectionMenu = ({ id }: { id: string }) => {
 		CollectionsWrapper.deleteCollection(id);
 	};
 
+	const deleteCollectionAndAlbums = () => {
+		CollectionsWrapper.deleteCollectionAndAlbums(id);
+	};
+
 	const renameCollection = () => {
 		const name = CollectionsWrapper.getCollection(id)?.name;
 
@@ -64,7 +68,10 @@ const CollectionMenu = ({ id }: { id: string }) => {
 				Rename
 			</MenuItem>
 			<MenuItem leadingIcon={<LeadingIcon path={deleteIconPath} />} onClick={deleteCollection}>
-				Delete
+				Delete (Only Collection)
+			</MenuItem>
+			<MenuItem leadingIcon={<LeadingIcon path={deleteIconPath} />} onClick={deleteCollectionAndAlbums}>
+				Delete (Collection and Albums)
 			</MenuItem>
 			{synced ? (
 				<MenuItem leadingIcon={<LeadingIcon path={deleteIconPath} />} onClick={unsyncPlaylist}>
