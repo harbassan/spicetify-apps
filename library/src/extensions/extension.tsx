@@ -6,6 +6,7 @@ import CollapseButton from "../components/collapse_button";
 import AlbumMenuItem from "../components/album_menu_item";
 import ArtistMenuItem from "../components/artist_menu_item";
 import "../extensions/collections_wrapper";
+import "../extensions/folder_image_wrapper";
 
 // inject css
 const styleLink = document.createElement("link");
@@ -116,12 +117,12 @@ function main(LocalStorageAPI: any) {
 
 		setTimeout(() => {
 			for (const el of Array.from(rootlist.children)) {
-				const uri = el.querySelector(".main-yourLibraryX-listItemGroup")?.getAttribute("aria-labelledby")?.slice(14);
+				const uri = el.querySelector("[aria-labelledby]")?.getAttribute("aria-labelledby")?.slice(14);
 				if (uri?.includes("folder")) {
 					const imageBox = el.querySelector(".x-entityImage-imageContainer");
 					if (!imageBox) return; // for compact view
 
-					const imageUrl = window.SpicetifyLibrary.FolderImageWrapper.getFolderImage(uri);
+					const imageUrl = FolderImageWrapper.getFolderImage(uri);
 
 					if (!imageUrl) ReactDOM.render(<FolderPlaceholder />, imageBox);
 					else ReactDOM.render(<FolderImage url={imageUrl} />, imageBox);
@@ -131,6 +132,8 @@ function main(LocalStorageAPI: any) {
 	}
 
 	injectFolderImages();
+
+	FolderImageWrapper.addEventListener("update", injectFolderImages);
 
 	function injectYLXButtons() {
 		// wait for the sidebar to load

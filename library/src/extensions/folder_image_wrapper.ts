@@ -36,4 +36,6 @@ class FolderImageWrapper extends EventTarget {
 	}
 }
 
-export default FolderImageWrapper.INSTANCE;
+window.FolderImageWrapper = FolderImageWrapper.INSTANCE;
+
+export default FolderImageWrapper;
