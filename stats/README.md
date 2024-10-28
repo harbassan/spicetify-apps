@@ -50,13 +50,6 @@
 ```sh
 sh <(curl -s https://raw.githubusercontent.com/harbassan/spicetify-apps/main/stats/install.sh)
 ```
-
-### Automatic Installation (Windows, Powershell)
-
-```ps1
-iwr -useb "https://raw.githubusercontent.com/harbassan/spicetify-apps/main/stats/install.ps1" | iex
-```
-
 ### Manual Installation
 
 Download the zip file in the [latest release](https://github.com/harbassan/spicetify-apps/releases?q=stats&expanded=true), rename the unzipped folder to `stats`, then place that folder into your `CustomApps` folder in the `spicetify` directory and you're all done. If everything's correct, the structure should be similar to this:
