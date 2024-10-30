@@ -40,4 +40,3 @@ Remove-Item -Path $zipFile, $tempDir -Recurse -Force
 
 Write-Host "success " -ForegroundColor DarkGreen -NoNewline
 Write-Host "Installation complete. Enjoy your new stats app!"
-#>
