@@ -1,5 +1,5 @@
 # Define variables
-$customAppsDir = "$env:USERPROFILE\AppData\Roaming\spicetify\CustomApps"
+$customAppsDir = "$env:APPDATA\Roaming\spicetify\CustomApps"
 $statsAppDir = "$customAppsDir\stats"
 $repo = "harbassan/spicetify-apps"
 $zipFile = "$env:TEMP\spicetify-stats.zip"
