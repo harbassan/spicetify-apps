@@ -16,10 +16,13 @@ const ArtistLink = ({ name, uri, index, length }: { name: string; uri: string; i
 const ExplicitBadge = React.memo(() => {
 	return (
 		<>
-			<span className="TypeElement-ballad-textSubdued-type main-trackList-rowBadges" data-encore-id="type">
-				<span aria-label="Explicit" className="main-tag-container" title="Explicit">
-					E
-				</span>
+			<span
+				className="TypeElement-ballad-textSubdued-type main-trackList-rowBadges"
+				data-encore-id="type"
+				aria-label="Explicit"
+				title="Explicit"
+			>
+				🅴
 			</span>
 		</>
 	);
