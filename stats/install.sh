@@ -11,7 +11,7 @@ TEMP_DIR="/tmp/spicetify-stats"
 mkdir -p "$CUSTOM_APPS_DIR"
 
 # Get the latest release download URL
-LATEST_RELEASE_URL=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep "browser_download_url.*spicetify-stats.release.zip" | cut -d '"' -f 4)
+LATEST_RELEASE_URL=$(curl -s "https://api.github.com/repos/$REPO/releases" | grep -B10 "spicetify-stats.release.zip" | grep "browser_download_url" | head -n1 | cut -d '"' -f 4)
 
 # Download the zip file
 curl -L -o "$ZIP_FILE" "$LATEST_RELEASE_URL"
@@ -20,7 +20,8 @@ curl -L -o "$ZIP_FILE" "$LATEST_RELEASE_URL"
 unzip "$ZIP_FILE" -d "$TEMP_DIR"
 
 # Move the unzipped folder to the correct location
-mv "$TEMP_DIR"/* "$STATS_APP_DIR"
+rm -rf "$STATS_APP_DIR/stats"  # Ensure the target is empty
+cp -r "$TEMP_DIR/stats" "$STATS_APP_DIR/"
 
 # Apply Spicetify configuration
 spicetify config custom_apps stats
