@@ -12,7 +12,7 @@
         "@tanstack/react-query": "^5.49.0",
         "@types/react": "^18.0.33",
         "@types/react-dom": "^18.0.11",
-        "spicetify-creator": "^1.0.13"
+        "spicetify-creator": "^1.0.17"
     },
     "dependencies": {
         "lodash": "^4.17.21",

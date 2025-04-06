@@ -25,12 +25,12 @@
 }
 
 .badge {
-    position:absolute;
+    position: absolute;
     top: 3%;
     left: 3%;
     height: 30px;
     width: 30px;
-    border-radius:50%;
+    border-radius: 50%;
     background-color: rgb(65, 110, 170);
     color: white;
     display: flex;
@@ -46,16 +46,17 @@
     justify-content: space-between;
     margin: 16px 0;
 
-    .header-right, .header-left {
+    .header-right,
+    .header-left {
         display: flex;
         align-items: center;
         gap: 8px;
     }
-    
+
     .header-right {
         justify-content: flex-end;
     }
-    
+
     .header-left {
         justify-content: flex-start;
     }
@@ -68,4 +69,13 @@
     padding: 2px 12px;
     margin: 0 24px;
     border: 0px;
+}
+
+.x-sortBox-sortDropdown {
+    fill: rgba(var(--spice-rgb-selected-row), .7);
+}
+
+#stats-app .contentSpacing,
+#library-app .contentSpacing {
+    margin-top: 64px;
 }

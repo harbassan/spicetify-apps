@@ -5,36 +5,40 @@
         overflow-x: hidden;
         scroll-behavior: smooth;
         margin-top: 5px;
+        transform: none !important;
+        will-change: auto !important;
     }
 
     .grid:nth-child(2) {
         margin-top: 24px;
     }
 
-    
-    
+
+
     [data-scroll="both"] {
         mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
     }
+
     [data-scroll="end"] {
         mask-image: linear-gradient(to right, transparent, black 10%);
     }
+
     [data-scroll="start"] {
         mask-image: linear-gradient(to right, black 90%, transparent);
     }
-    
+
     .stats-libraryOverview {
         display: flex;
         gap: 24px;
         align-items: center;
     }
-    
+
     .stats-trackPageTitle {
         display: flex;
         gap: 24px;
         align-items: center;
     }
-    
+
     .stats-scrollButton {
         width: 40px;
         border-radius: 8px;
@@ -43,24 +47,24 @@
         margin-right: 5px;
         background-color: var(--spice-player);
         color: var(--spice-subtext);
-    
+
         &:hover {
             background-color: var(--spice-card);
             color: var(--spice-text);
         }
     }
-    
-    .stats-tracklistHeader > div {
+
+    .stats-tracklistHeader>div {
         display: flex;
         -webkit-app-region: no-drag;
         gap: 20px;
         align-items: center;
     }
-    
+
     .stats-make-playlist-button {
         margin-inline-start: 12px;
     }
-    
+
     .stats-genreCard {
         display: flex;
         flex-direction: column;
@@ -70,14 +74,14 @@
         background: var(--spice-player);
         position: relative;
     }
-    
+
     .stats-genreRow {
         width: 100%;
         height: 20px;
         display: flex;
         gap: 10px;
     }
-    
+
     .stats-genreRowFill {
         background: var(--spice-button);
         height: 100%;
@@ -85,7 +89,7 @@
         display: flex;
         align-items: center;
     }
-    
+
     .stats-genreText {
         color: var(--spice-player);
         font-size: 0.875rem;
@@ -95,13 +99,13 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    
+
     .stats-genreValue {
         color: var(--spice-text);
         font-size: 0.875rem;
     }
-    
-    .stats-genreCard + .stats-gridInlineSection {
+
+    .stats-genreCard+.stats-gridInlineSection {
         margin-top: 3px;
     }
 
@@ -110,10 +114,14 @@
     .main-trackList-rowMoreButton {
         background-color: transparent;
         border: none;
-    }
-    .main-trackList-rowPlayPauseIcon {
         fill: currentColor;
     }
+
+    .main-trackList-rowPlayPauseIcon,
+    .main-trackList-durationHeader {
+        fill: currentColor;
+    }
+
     .main-trackList-rowBadges {
         color: var(--spice-text);
     }
@@ -144,6 +152,7 @@
     height: 80vh;
     background-color: var(--spice-main);
 }
+
 .GenericModal[aria-label="Playlist Stats"] .main-shelf-title {
     color: var(--spice-text);
 }

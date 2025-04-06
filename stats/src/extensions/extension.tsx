@@ -93,7 +93,7 @@ window.SpicetifyStats = new SpicetifyStats();
 		const playlistUri = `spotify:playlist:${History.location.pathname.split("/")[2]}`;
 		// @ts-ignore
 		PopupModal.display({ title: "Playlist Stats", content: <PlaylistPage uri={playlistUri} />, isLarge: true });
-	});
+	}, false, true);
 	playlistEdit.element.classList.toggle("hidden", true);
 
 	function setTopbarButtonVisibility(pathname: string): void {
