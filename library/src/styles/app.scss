@@ -7,7 +7,7 @@
     .header-right .x-filterBox-expandedOrHasFilter .x-filterBox-filterInput {
         width: var(--library-searchbar-size);
     }
-    
+
     .grid {
         grid-template-columns: repeat(auto-fill, minmax(var(--library-card-size), 1fr)) !important;
     }
@@ -22,6 +22,7 @@
             text-align: center;
             font-size: var(--encore-text-size-base);
         }
+
         div:first-child {
             fill: var(--text-subdued);
             width: 80%;
@@ -37,7 +38,12 @@
         flex-direction: column;
         justify-content: center;
     }
-    
+
+    .x-filterBox-searchIcon {
+        --encore-icon-height: var(--encore-graphic-size-decorative-smaller);
+        --encore-icon-width: var(--encore-graphic-size-decorative-smaller);
+    }
+
 }
 
 .text-input-form {
@@ -46,7 +52,7 @@
     gap: 18px;
 
     .text-input {
-        background: rgba(var(--spice-rgb-selected-row),.1);
+        background: rgba(var(--spice-rgb-selected-row), .1);
         border: 1px solid transparent;
         border-radius: 4px;
         color: var(--spice-text);
@@ -55,11 +61,11 @@
         height: 32px;
         padding: 0 12px;
         width: 100%;
-      
+
         &:focus {
-          background-color: var(--spice-tab-active);
-          border: 1px solid var(--spice-button-disabled);
-          outline: none;
+            background-color: var(--spice-tab-active);
+            border: 1px solid var(--spice-button-disabled);
+            outline: none;
         }
     }
 

@@ -103,12 +103,20 @@ const ToggleInput = (props: ToggleInputProps) => {
 const SliderInput = (props: SliderInputProps) => {
     const { Slider } = Spicetify.ReactComponent;
 
-    const handleSliderChange = (newValue: number) => {
+    // TODO: Fix the slider so that dragging works properly
+    
+    const [value, setValue] = React.useState((props.value - props.min) / (props.max - props.min));
+
+    const handleSliderChange = React.useCallback((newValue: number) => {
+        setValue(newValue);
         const calculatedValue = props.min + newValue * (props.max - props.min);
         props.callback(calculatedValue);
-    };
+    }, [props]);
 
-    const value = (props.value - props.min) / (props.max - props.min);
+    const handleDragMove = React.useCallback((v: number) => {
+        console.log(v);
+    }, []);
+
     return (
         <Slider
             id={`slider:${props.storageKey}`}
@@ -116,8 +124,8 @@ const SliderInput = (props: SliderInputProps) => {
             min={0}
             max={1}
             step={0.1}
-            onDragMove={(newValue: number) => handleSliderChange(newValue)}
-            onDragStart={() => {}}
+            onDragMove={handleDragMove}
+            onDragStart={handleSliderChange}
             onDragEnd={() => {}}
         />
     );
