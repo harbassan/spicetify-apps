@@ -1,34 +1,37 @@
-// hide sidebar heading element
-body:not(.show-ylx-filters) .main-yourLibraryX-filterArea:not(:has(> .main-yourLibraryX-libraryFilter)),
-.main-yourLibraryX-header:not(:has(> .main-yourLibraryX-headerContent > .main-yourLibraryX-collapseButton > button:nth-child(2))),
-// hide back button and default collapse button
-.main-yourLibraryX-collapseButton > button:first-child,
-.main-yourLibraryX-headerContent > button {
-    display: none;
-}
-
-// adjust sidebar padding
-.main-yourLibraryX-library {
-    padding-top: 8px;
-}
-.main-yourLibraryX-header {
-    margin-top: -8px;
-}
-
-.main-yourLibraryX-libraryFilter {
-    --encore-spacing-base: 8px;
-
-    // hide sort-by text
-    span[role="presentation"] button span:first-child,
-    span[role="presentation"] button span:first-child {
+body.hide-library-button {
+    // hide sidebar heading element
+    &:not(.show-ylx-filters) .main-yourLibraryX-filterArea:not(:has(> .main-yourLibraryX-libraryFilter)),
+    .main-yourLibraryX-header:not(:has(> .main-yourLibraryX-headerContent > .main-yourLibraryX-collapseButton > button:nth-child(2))),
+    // hide back button and default collapse button
+    .main-yourLibraryX-collapseButton > button:first-child,
+    .main-yourLibraryX-headerContent > button {
         display: none;
     }
 
-    // push sort button to the right within its flex parent
-    span[role="presentation"] {
-        margin-left: auto;
+    // adjust sidebar padding
+    .main-yourLibraryX-library {
+        padding-top: 8px;
+    }
+    .main-yourLibraryX-header {
+        margin-top: -8px;
+    }
+
+    .main-yourLibraryX-libraryFilter {
+        --encore-spacing-base: 8px;
+
+        // hide sort-by text
+        span[role="presentation"] button span:first-child,
+        span[role="presentation"] button span:first-child {
+            display: none;
+        }
+
+        // push sort button to the right within its flex parent
+        span[role="presentation"] {
+            margin-left: auto;
+        }
     }
 }
+
 
 // hide weird button effect
 .toggle-filters-button > button:after,

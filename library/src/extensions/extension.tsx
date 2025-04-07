@@ -74,6 +74,14 @@ class SpicetifyLibrary {
 				callback: setSearchBarSize,
 			},
 			{
+				name: "Hide 'Your Library' Button",
+				key: "hideLibraryButton",
+				type: "toggle",
+				def: false,
+				desc: "This is experimental and may break the sidebar layout in some cases. Requires a spotify restart to take effect.",
+				sectionHeader: "Left Sidebar",
+			},
+			{
 				name: "Playlists Page",
 				key: "show-playlists",
 				type: "toggle",
@@ -160,6 +168,12 @@ function main(LocalStorageAPI: any) {
 		ylx_filter.appendChild(collapseButton);
 		ReactDOM.render(<CollapseButton />, collapseButton);
 	}
+
+	if (!window.SpicetifyLibrary.ConfigWrapper.Config.hideLibraryButton) {
+		return;
+	}
+
+	document.body.classList.add("hide-library-button");
 
 	// check if ylx is expanded on load
 	const state = LocalStorageAPI.getItem("left-sidebar-state");
