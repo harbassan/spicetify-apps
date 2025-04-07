@@ -132,8 +132,7 @@ function main(LocalStorageAPI: any) {
 
 					const imageUrl = FolderImageWrapper.getFolderImage(uri);
 
-					if (!imageUrl) ReactDOM.render(<FolderPlaceholder />, imageBox);
-					else ReactDOM.render(<FolderImage url={imageUrl} />, imageBox);
+					if (imageUrl) ReactDOM.render(<FolderImage url={imageUrl} />, imageBox);
 				}
 			}
 		}, 500); // timeout is easier than waiting for certain elements

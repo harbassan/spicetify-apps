@@ -123,8 +123,12 @@ class CollectionsWrapper extends EventTarget {
 
 		return Promise.all(
 			collection.items.map(async (uri) => {
-				const album = await Spicetify.Platform.LibraryAPI.getAlbum(uri);
-				return album.items.map((t) => t.uri);
+				const res = await Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.queryAlbumTrackUris, {
+					offset: 0,
+					limit: 50,
+					uri: uri,
+				});
+				return res.data.albumUnion.tracksV2.items.map((t: any) => t.track.uri);
 			}),
 		).then((tracks) => tracks.flat());
 	}
@@ -158,6 +162,7 @@ class CollectionsWrapper extends EventTarget {
 				uri: artistUri,
 				offset: 0,
 				limit: 50,
+				order: "DATE_DESC",
 			}),
 			Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.queryArtistOverview, {
 				uri: artistUri,
