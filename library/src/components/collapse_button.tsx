@@ -1,7 +1,7 @@
 import React from "react";
 
 const collapseLibrary = () => {
-	Spicetify.Platform.LocalStorageAPI.setItem("ylx-sidebar-state", 1);
+	Spicetify.Platform.LocalStorageAPI.setItem("left-sidebar-state", 1);
 };
 
 const CollapseIcon = () => {

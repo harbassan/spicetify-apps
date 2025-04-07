@@ -137,7 +137,7 @@ function main(LocalStorageAPI: any) {
 
 	function injectYLXButtons() {
 		// wait for the sidebar to load
-		const ylx_filter = document.querySelector(".main-yourLibraryX-libraryRootlist > .main-yourLibraryX-libraryFilter");
+		const ylx_filter = document.querySelector(".main-yourLibraryX-libraryRootlist .main-yourLibraryX-libraryFilter");
 		if (!ylx_filter) {
 			return setTimeout(injectYLXButtons, 100);
 		}
@@ -145,6 +145,7 @@ function main(LocalStorageAPI: any) {
 		injectFiltersButton(ylx_filter);
 		injectCollapseButton(ylx_filter);
 	}
+
 	function injectFiltersButton(ylx_filter: Element) {
 		// inject ylx button
 		const toggleFiltersButton = document.createElement("span");
@@ -157,26 +158,21 @@ function main(LocalStorageAPI: any) {
 		const collapseButton = document.createElement("span");
 		collapseButton.classList.add("collapse-button");
 		ylx_filter.appendChild(collapseButton);
-		ReactDOM.render(
-			<Spicetify.ReactComponent.TooltipWrapper label="Collapse Sidebar" placement="top">
-				<CollapseButton />
-			</Spicetify.ReactComponent.TooltipWrapper>,
-			collapseButton,
-		);
+		ReactDOM.render(<CollapseButton />, collapseButton);
 	}
 
 	// check if ylx is expanded on load
-	const state = LocalStorageAPI.getItem("ylx-sidebar-state");
+	const state = LocalStorageAPI.getItem("left-sidebar-state");
 	if (state === 0) injectYLXButtons();
 
 	// handle button injection on maximise/minimise
 	LocalStorageAPI.getEvents()._emitter.addListener("update", (e: { data: Record<string, unknown> }) => {
 		const { key, value } = e.data;
-		if (key === "ylx-sidebar-state" && value === 0) {
+		if (key === "left-sidebar-state" && value === 0) {
 			injectFolderImages();
 			injectYLXButtons();
 		}
-		if (key === "ylx-sidebar-state" && value === 1) {
+		if (key === "left-sidebar-state" && value === 1) {
 			injectFolderImages();
 		}
 	});

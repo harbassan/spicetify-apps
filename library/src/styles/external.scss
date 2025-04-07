@@ -16,14 +16,15 @@ body:not(.show-ylx-filters) .main-yourLibraryX-filterArea:not(:has(> .main-yourL
 }
 
 .main-yourLibraryX-libraryFilter {
+    --encore-spacing-base: 8px;
+
     // hide sort-by text
-    .main-yourLibraryX-librarySortWrapper button span:first-child,
-    span[role="presentation"] span[role="presentation"] button span:first-child {
+    span[role="presentation"] button span:first-child,
+    span[role="presentation"] button span:first-child {
         display: none;
     }
 
     // push sort button to the right within its flex parent
-    .main-yourLibraryX-librarySortWrapper,
     span[role="presentation"] {
         margin-left: auto;
     }
