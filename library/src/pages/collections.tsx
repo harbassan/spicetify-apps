@@ -11,6 +11,7 @@ import TextInputDialog from "../components/text_input_dialog";
 import LeadingIcon from "../components/leading_icon";
 import { useInfiniteQuery } from "@shared/types/react_query";
 import useStatus from "@shared/status/useStatus";
+import { useNavigation } from "../components/nav_context";
 
 const AddMenu = ({ collection }: { collection?: string }) => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -73,8 +74,11 @@ const AddMenu = ({ collection }: { collection?: string }) => {
 
 const limit = 200;
 
-const CollectionsPage = ({ collection, configWrapper }: { configWrapper: ConfigWrapper; collection?: string }) => {
+const CollectionsPage = ({ configWrapper }: { configWrapper: ConfigWrapper; }) => {
 	const [textFilter, setTextFilter] = React.useState("");
+
+	const { getParam } = useNavigation();
+	const collection = getParam();
 
 	const fetchRootlist = async ({ pageParam }: { pageParam: number }) => {
 		const res = await CollectionsWrapper.getContents({
@@ -112,6 +116,7 @@ const CollectionsPage = ({ collection, configWrapper }: { configWrapper: ConfigW
 	const Status = useStatus(status, error);
 
 	const props = {
+		hasHistory: collection !== undefined,
 		title: data?.pages[0].openedCollectionName || "Collections",
 		headerEls: [
 			<AddButton Menu={<AddMenu collection={collection} />} />,

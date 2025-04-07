@@ -12,6 +12,7 @@ import "./styles/external.scss";
 import "../../shared/config/config_modal.scss";
 import "../../shared/shared.scss";
 import CollectionsPage from "./pages/collections";
+import { NavigationProvider, useNavigation } from "./components/nav_context";
 
 const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
 	fetch("https://api.github.com/repos/harbassan/spicetify-apps/releases")
@@ -44,6 +45,8 @@ const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapperProps 
 	const [firstUpdate, setFirstUpdate] = React.useState(true);
 	const [newUpdate, setNewUpdate] = React.useState(false);
 
+	const { navigate, current } = useNavigation();
+
 	React.useEffect(() => {
 		setActiveLink(Spicetify.LocalStorage.get("library:active-link") || "Playlists");
 		checkForUpdates(setNewUpdate);
@@ -52,6 +55,7 @@ const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapperProps 
 
 	React.useEffect(() => {
 		Spicetify.LocalStorage.set("library:active-link", activeLink);
+		navigate(activeLink);
 	}, [activeLink]);
 
 	if (firstUpdate) return <></>;
@@ -65,7 +69,7 @@ const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapperProps 
 					<a href="https://github.com/harbassan/spicetify-apps/releases">harbassan/spicetify-apps</a> to install.
 				</div>
 			)}
-			{pages[activeLink]}
+			{pages[current.split("/")[0]]}
 		</>
 	);
 };
@@ -82,32 +86,11 @@ const App = () => {
 		launchModal,
 	};
 
-	// handle folder navigation
-	const { pathname } = Spicetify.Platform.History.location;
-	const route = pathname.slice(8);
-
-	// playlist folder route
-	if (/^\/folder\/.+/.test(route)) {
-		return (
-			<div id="library-app">
-				<PlaylistsPage folder={route.split("/").pop()} configWrapper={configWrapper} />
-			</div>
-		);
-	}
-
-	// album collection route
-	if (/^\/collection\/.+/.test(route)) {
-		return (
-			<div id="library-app">
-				<CollectionsPage collection={route.split("/").pop()} configWrapper={configWrapper} />
-			</div>
-		);
-	}
-
-	// default route
 	return (
 		<div id="library-app">
-			<NavbarContainer configWrapper={configWrapper} />
+			<NavigationProvider>
+				<NavbarContainer configWrapper={configWrapper} />
+			</NavigationProvider>
 		</div>
 	);
 };

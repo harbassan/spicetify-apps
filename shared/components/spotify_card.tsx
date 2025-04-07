@@ -2,6 +2,7 @@ import CollectionMenu from "library/src/components/collection_menu";
 import FolderMenu from "library/src/components/folder_menu";
 import React from "react";
 import FolderSVG from "./folder_fallback";
+import { useNavigation } from "library/src/components/nav_context";
 
 interface SpotifyCardProps {
 	type: "artist" | "album" | "lastfm" | "playlist" | "folder" | "show" | "collection";
@@ -19,7 +20,7 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
 	const { Cards, TextComponent, ArtistMenu, AlbumMenu, PodcastShowMenu, PlaylistMenu, ContextMenu } =
 		Spicetify.ReactComponent;
 	const { FeatureCard: Card, CardImage } = Cards;
-	const { createHref, push } = Spicetify.Platform.History;
+	const { navigate } = useNavigation();
 	const { type, header, uri, imageUrl, subheader, artistUri, badge, provider } = props;
 
 	const Menu = () => {
@@ -54,9 +55,7 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
 			? {
 					delegateNavigation: true,
 					onClick: () => {
-						// send the user to the folder page
-						createHref({ pathname: `/library/folder/${uri}` });
-						push({ pathname: `/library/folder/${uri}` });
+						navigate(`Playlists/${uri}`);
 					},
 				}
 			: {};
@@ -66,8 +65,7 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
 			? {
 					delegateNavigation: true,
 					onClick: () => {
-						createHref({ pathname: `/library/collection/${uri}` });
-						push({ pathname: `/library/collection/${uri}` });
+						navigate(`Collections/${uri}`);
 					},
 				}
 			: {};

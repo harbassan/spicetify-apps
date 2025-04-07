@@ -13,6 +13,7 @@ import { useInfiniteQuery } from "@shared/types/react_query";
 import type { FolderItem, GetContentsResponse, PlaylistItem, UpdateEvent } from "../types/platform";
 import useStatus from "@shared/status/useStatus";
 import PinIcon from "../components/pin_icon";
+import { useNavigation } from "../components/nav_context";
 
 const AddMenu = ({ folder }: { folder?: string }) => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -79,12 +80,15 @@ const flattenOptions = [
 	{ id: "true", name: "Flattened" },
 ];
 
-const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper; folder?: string }) => {
+const PlaylistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper; }) => {
 	const [sortDropdown, sortOption] = useDropdownMenu(dropdownOptions, "library:playlists-sort");
 	const [filterDropdown, filterOption] = useDropdownMenu(filterOptions);
 	const [flattenDropdown, flattenOption] = useDropdownMenu(flattenOptions);
 	const [textFilter, setTextFilter] = React.useState("");
 	const [images, setImages] = React.useState({ ...FolderImageWrapper.getFolderImages() });
+
+	const { getParam } = useNavigation();
+	const folder = getParam();
 
 	const fetchRootlist = async ({ pageParam }: { pageParam: number }) => {
 		const filters = filterOption.id === "all" ? ["2"] : ["2", filterOption.id];
@@ -126,6 +130,7 @@ const PlaylistsPage = ({ folder, configWrapper }: { configWrapper: ConfigWrapper
 	const Status = useStatus(status, error);
 
 	const props = {
+		hasHistory: folder !== undefined,
 		title: data?.pages[0].openedFolderName || "Playlists",
 		headerEls: [
 			<AddButton Menu={<AddMenu folder={folder} />} />,
