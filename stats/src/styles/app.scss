@@ -156,3 +156,7 @@
 .GenericModal[aria-label="Playlist Stats"] .main-shelf-title {
     color: var(--spice-text);
 }
+
+.playlist-stats-button.hidden {
+    display: none;
+}

@@ -94,6 +94,7 @@ window.SpicetifyStats = new SpicetifyStats();
 		// @ts-ignore
 		PopupModal.display({ title: "Playlist Stats", content: <PlaylistPage uri={playlistUri} />, isLarge: true });
 	}, false, true);
+	playlistEdit.element.classList.add("playlist-stats-button");
 	playlistEdit.element.classList.toggle("hidden", true);
 
 	function setTopbarButtonVisibility(pathname: string): void {
