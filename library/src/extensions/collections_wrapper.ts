@@ -1,7 +1,7 @@
 // @ts-ignore
 import { v4 as uuidv4 } from "uuid";
 import type { AlbumItem, GetContentsResponse } from "../types/platform";
-import type { PlaylistResponse } from "@shared/types/platform";
+import type { ContentsTrack, PlaylistResponse } from "@shared/types/platform";
 
 export interface CollectionItem {
 	type: "collection";
@@ -104,10 +104,18 @@ class CollectionsWrapper extends EventTarget {
 		for (const collection of this._collections) {
 			const boolArray = (await Spicetify.Platform.LibraryAPI.contains(...collection.items)) as boolean[];
 			if (boolArray.includes(false)) {
-				collection.items = collection.items.filter((uri, i) => boolArray[i] || uri.includes("local"));
-				this.saveCollections();
-				Spicetify.showNotification("Album removed from collection");
-				this.syncCollection(collection.uri);
+				const result = [];
+				for (let i = 0; i < boolArray.length; i++) {
+					if (boolArray[i] || collection.items[i].includes("local")) {
+						result.push(collection.items[i]);
+					}
+				}
+				if (result.length !== collection.items.length) {
+					collection.items = collection.items.filter((uri, i) => boolArray[i] || uri.includes("local"));
+					this.saveCollections();
+					Spicetify.showNotification("Album removed from collection");
+					this.syncCollection(collection.uri);
+				}
 			}
 		}
 	}
@@ -124,13 +132,15 @@ class CollectionsWrapper extends EventTarget {
 		const playlistTracks = playlist.contents.items.filter((t) => t.type === "track").map((t) => t.uri);
 		const collectionTracks = await this.getTracklist(uri);
 
-		const wanted = collectionTracks.filter((track) => !playlistTracks.includes(track));
+		const wanted = collectionTracks.filter((track: string) => !playlistTracks.includes(track));
 		const unwanted = playlistTracks
 			.filter((track) => !collectionTracks.includes(track))
 			.map((uri) => ({ uri, uid: [] }));
 
 		if (wanted.length) await PlaylistAPI.add(collection.syncedPlaylistUri, wanted, { before: "end" });
 		if (unwanted.length) await PlaylistAPI.remove(collection.syncedPlaylistUri, unwanted);
+
+		Spicetify.showNotification("Playlist synced");
 	}
 
 	unsyncCollection(uri: string) {
@@ -140,6 +150,8 @@ class CollectionsWrapper extends EventTarget {
 		collection.syncedPlaylistUri = undefined;
 
 		this.saveCollections();
+
+		Spicetify.showNotification("Collection unsynced");
 	}
 
 	async getTracklist(collectionUri: string) {
@@ -151,14 +163,14 @@ class CollectionsWrapper extends EventTarget {
 				if (uri.includes("local")) {
 					const localAlbums = await this.getLocalAlbums();
 					const localAlbum = localAlbums.get(uri);
-					return localAlbum?.getTracks().map((t) => t.uri) || [];
+					return localAlbum?.getTracks().map((t: ContentsTrack) => t.uri) || [];
 				}
 				const res = await Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.queryAlbumTrackUris, {
 					offset: 0,
 					limit: 50,
 					uri: uri,
 				});
-				return res.data.albumUnion.tracksV2.items.map((t) => t.track.uri);
+				return res.data.albumUnion.tracksV2.items.map((t: { track: ContentsTrack }) => t.track.uri);
 			}),
 		).then((tracks) => tracks.flat());
 	}
@@ -255,14 +267,22 @@ class CollectionsWrapper extends EventTarget {
 		const collection = this.getCollection(collectionUri);
 		if (!collection) return;
 
-		if (!albumUri.includes("local")) await Spicetify.Platform.LibraryAPI.add({ uris: [albumUri] });
+		if (!albumUri.includes("local")) {
+			if (!(await Spicetify.Platform.LibraryAPI.contains(albumUri))) {
+				Spicetify.Platform.LibraryAPI.add({ uris: [albumUri] });
+			}
+		}
 
-		collection.items.push(albumUri);
+		if (!collection.items.includes(albumUri)) {
+			collection.items.push(albumUri);
 
-		this.saveCollections();
-		Spicetify.showNotification("Album added to collection");
+			this.saveCollections();
+			Spicetify.showNotification("Album added to collection");
 
-		this.syncCollection(collectionUri);
+			this.syncCollection(collectionUri);
+		} else {
+			Spicetify.showNotification("Album already in collection");
+		}
 	}
 
 	removeAlbumFromCollection(collectionUri: string, albumUri: string) {
