@@ -116,7 +116,7 @@ window.SpicetifyLibrary = new SpicetifyLibrary();
 
 // biome-ignore lint:
 function main(LocalStorageAPI: any) {
-	const isAlbum = (props: { uri: string }) => props.uri?.includes("album");
+	const isAlbum = (props: { uri: string; id: string }) => props.uri?.includes("album") || props.id?.includes("local");
 	const isArtist = (props: { uri: string }) => props.uri?.includes("artist");
 
 	// @ts-expect-error

@@ -43,12 +43,31 @@ class CollectionsWrapper extends EventTarget {
 		return this._collections.find((collection) => collection.uri === uri);
 	}
 
+	async getLocalAlbums() {
+		// @ts-ignore global provided by better-local-files
+		const localAlbumsIntegration = window.localTracksService;
+		if (!localAlbumsIntegration) return new Map<string, AlbumItem>();
+		if (!localAlbumsIntegration.isReady) {
+			await new Promise((resolve) => {
+				const sub = localAlbumsIntegration.isReady$.subscribe((ready: boolean) => {
+					if (ready) {
+						resolve(true);
+						sub.unsubscribe();
+					}
+				});
+				localAlbumsIntegration.init();
+			});
+		}
+		return localAlbumsIntegration.getAlbums();
+	}
+
 	async getCollectionContents(uri: string) {
 		const collection = this.getCollection(uri);
 		if (!collection) throw new Error("Collection not found");
 
 		const items: CollectionChild[] = this._collections.filter((collection) => collection.parentCollection === uri);
 
+		// TODO: better implementation for getting album contents
 		const albums = (await Spicetify.Platform.LibraryAPI.getContents({
 			filters: ["0"],
 			offset: 0,
@@ -56,6 +75,12 @@ class CollectionsWrapper extends EventTarget {
 		})) as GetContentsResponse<AlbumItem>;
 
 		items.push(...albums.items.filter((album) => collection.items.includes(album.uri)));
+		const localAlbumUris = collection.items.filter((item) => item.includes("local"));
+		if (localAlbumUris.length > 0) {
+			const localAlbums = await this.getLocalAlbums();
+			const inCollection = localAlbumUris.map((uri) => localAlbums.get(uri) as AlbumItem);
+			items.push(...inCollection.filter(Boolean));
+		}
 		return items;
 	}
 
@@ -79,7 +104,7 @@ class CollectionsWrapper extends EventTarget {
 		for (const collection of this._collections) {
 			const boolArray = (await Spicetify.Platform.LibraryAPI.contains(...collection.items)) as boolean[];
 			if (boolArray.includes(false)) {
-				collection.items = collection.items.filter((_, i) => boolArray[i]);
+				collection.items = collection.items.filter((uri, i) => boolArray[i] || uri.includes("local"));
 				this.saveCollections();
 				Spicetify.showNotification("Album removed from collection");
 				this.syncCollection(collection.uri);
@@ -123,12 +148,17 @@ class CollectionsWrapper extends EventTarget {
 
 		return Promise.all(
 			collection.items.map(async (uri) => {
+				if (uri.includes("local")) {
+					const localAlbums = await this.getLocalAlbums();
+					const localAlbum = localAlbums.get(uri);
+					return localAlbum?.getTracks().map((t) => t.uri) || [];
+				}
 				const res = await Spicetify.GraphQL.Request(Spicetify.GraphQL.Definitions.queryAlbumTrackUris, {
 					offset: 0,
 					limit: 50,
 					uri: uri,
 				});
-				return res.data.albumUnion.tracksV2.items.map((t: any) => t.track.uri);
+				return res.data.albumUnion.tracksV2.items.map((t) => t.track.uri);
 			}),
 		).then((tracks) => tracks.flat());
 	}
@@ -216,7 +246,7 @@ class CollectionsWrapper extends EventTarget {
 		if (!collection) return;
 
 		for (const album of collection.items) {
-			Spicetify.Platform.LibraryAPI.remove({ uris: [album] });
+			if (!album.includes("local")) Spicetify.Platform.LibraryAPI.remove({ uris: [album] });
 		}
 		this.deleteCollection(uri);
 	}
@@ -225,7 +255,8 @@ class CollectionsWrapper extends EventTarget {
 		const collection = this.getCollection(collectionUri);
 		if (!collection) return;
 
-		await Spicetify.Platform.LibraryAPI.add({ uris: [albumUri] });
+		if (!albumUri.includes("local")) await Spicetify.Platform.LibraryAPI.add({ uris: [albumUri] });
+
 		collection.items.push(albumUri);
 
 		this.saveCollections();

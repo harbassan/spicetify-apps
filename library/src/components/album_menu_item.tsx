@@ -24,7 +24,7 @@ const CollectionSearchMenu = () => {
 	> | null>(null);
 
 	const context = React.useContext(Spicetify.ContextMenuV2._context);
-	const uri = context?.props?.uri;
+	const uri = context?.props?.uri || context?.props?.id;
 
 	React.useEffect(() => {
 		const fetchCollections = async () => {

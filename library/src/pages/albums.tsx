@@ -56,12 +56,8 @@ const compare = (sortOption: string) => {
 
 const getLocalAlbums = async ({ sortOrder, textFilter }: { sortOrder: string; textFilter: string }) => {
 	// @ts-ignore global provided by pithaya's better-local-files app
-	const localFilesIntegration = window.localTracksService;
-	if (!localFilesIntegration) return null;
-
-	if (!localFilesIntegration.isReady) await localFilesIntegration.init();
-
-	let albums = localFilesIntegration.getAlbums().values().toArray() as AlbumItem[];
+	const localAlbums = await CollectionsWrapper.getLocalAlbums();
+	let albums = localAlbums.values().toArray() as AlbumItem[];
 
 	if (textFilter) {
 		const regex = new RegExp(`\\b${textFilter}`, "i");

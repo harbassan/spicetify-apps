@@ -74,7 +74,7 @@ const AddMenu = ({ collection }: { collection?: string }) => {
 
 const limit = 200;
 
-const CollectionsPage = ({ configWrapper }: { configWrapper: ConfigWrapper; }) => {
+const CollectionsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const [textFilter, setTextFilter] = React.useState("");
 
 	const { getParam } = useNavigation();
@@ -134,7 +134,7 @@ const CollectionsPage = ({ configWrapper }: { configWrapper: ConfigWrapper; }) =
 	const rootlistCards = items.map((item) => (
 		<SpotifyCard
 			provider="spotify"
-			type={item.type}
+			type={item.type || "localalbum"}
 			uri={item.uri}
 			header={item.name}
 			subheader={item.type === "collection" ? `${item.items.length} Albums` : item.artists?.[0]?.name}

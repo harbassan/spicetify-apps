@@ -3,6 +3,7 @@ import FolderMenu from "library/src/components/folder_menu";
 import React from "react";
 import FolderSVG from "./folder_fallback";
 import { useNavigation } from "library/src/components/nav_context";
+import LocalAlbumMenu from "library/src/components/local_album_menu";
 
 interface SpotifyCardProps {
 	type: "artist" | "album" | "lastfm" | "playlist" | "folder" | "show" | "collection" | "localalbum";
@@ -38,6 +39,8 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
 				return <CollectionMenu id={uri} />;
 			case "folder":
 				return <FolderMenu uri={uri} />;
+			case "localalbum":
+				return <LocalAlbumMenu id={uri} />;
 			default:
 				return <></>;
 		}
