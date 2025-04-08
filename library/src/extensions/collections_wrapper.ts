@@ -268,8 +268,9 @@ class CollectionsWrapper extends EventTarget {
 		if (!collection) return;
 
 		if (!albumUri.includes("local")) {
-			if (!(await Spicetify.Platform.LibraryAPI.contains(albumUri))) {
-				Spicetify.Platform.LibraryAPI.add({ uris: [albumUri] });
+			const isSaved = await Spicetify.Platform.LibraryAPI.contains(albumUri)[0];
+			if (!isSaved) {
+				await Spicetify.Platform.LibraryAPI.add({ uris: [albumUri] });
 			}
 		}
 
