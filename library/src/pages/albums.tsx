@@ -48,40 +48,38 @@ const sortOptions = [
 	{ id: "6", name: "Recents" },
 ];
 
+const filterOptions = [
+	{ id: "0", name: "All" },
+	{ id: "1", name: "Albums" },
+	{ id: "2", name: "Local Albums" },
+];
+
 const compare = (sortOption: string) => {
 	if (sortOption === "0") return (a: AlbumItem, b: AlbumItem) => a.name.localeCompare(b.name);
 	if (sortOption === "2") return (a: AlbumItem, b: AlbumItem) => a.artists[0].name.localeCompare(b.artists[0].name);
 	return () => 0;
 };
 
-const getLocalAlbums = async ({ sortOrder, textFilter }: { sortOrder: string; textFilter: string }) => {
-	// @ts-ignore global provided by pithaya's better-local-files app
-	const localAlbums = await CollectionsWrapper.getLocalAlbums();
-	let albums = localAlbums.values().toArray() as AlbumItem[];
-
-	if (textFilter) {
-		const regex = new RegExp(`\\b${textFilter}`, "i");
-		albums = albums.filter((album) => {
-			return regex.test(album.name) || album.artists.some((artist) => regex.test(artist.name));
-		});
-	}
-
-	return albums.sort(compare(sortOrder));
-};
-
 const sortfulMerge = (a: AlbumItem[], b: AlbumItem[], sortOrder: string) => {
+	let j = 0;
+	const result: AlbumItem[] = [];
 	for (let i = 0; i < a.length; i++) {
-		if (b.length === 0) break;
-		if (a[i].pinned) continue;
-		if (compare(sortOrder)(b[0], a[i]) < 0) {
-			a.splice(i, 0, b.shift() as AlbumItem);
+		if (a[i].pinned) {
+			result.push(a[i]);
+		} else {
+			while (j < b.length && compare(sortOrder)(b[j], a[i]) < 0) {
+				result.push(b[j++]);
+			}
+			result.push(a[i]);
 		}
 	}
-	if (b.length) a.push(...b);
+	while (j < b.length) result.push(b[j++]);
+	return result;
 };
 
 const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const [dropdown, sortOption] = useDropdownMenu(sortOptions, "library:albums");
+	const [filterDropdown, filterOption] = useDropdownMenu(filterOptions);
 	const [textFilter, setTextFilter] = React.useState("");
 
 	const fetchAlbums = async ({ pageParam }: { pageParam: number }) => {
@@ -93,6 +91,20 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 			limit,
 		})) as GetContentsResponse<AlbumItem>;
 		return res;
+	};
+
+	const fetchLocalAlbums = async () => {
+		const localAlbums = await CollectionsWrapper.getLocalAlbums();
+		let albums = localAlbums.values().toArray() as AlbumItem[];
+
+		if (textFilter) {
+			const regex = new RegExp(`\\b${textFilter}`, "i");
+			albums = albums.filter((album) => {
+				return regex.test(album.name) || album.artists.some((artist) => regex.test(artist.name));
+			});
+		}
+
+		return albums.sort(compare(sortOption.id));
 	};
 
 	const { data, status, error, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
@@ -111,7 +123,7 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 		error: localError,
 	} = useQuery({
 		queryKey: ["library:localAlbums", sortOption.id, textFilter],
-		queryFn: () => getLocalAlbums({ sortOrder: sortOption.id, textFilter }),
+		queryFn: fetchLocalAlbums,
 		enabled: configWrapper.config.localAlbums,
 	});
 
@@ -133,6 +145,7 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 		title: "Albums",
 		headerEls: [
 			<AddButton Menu={<AddMenu />} />,
+			filterDropdown,
 			dropdown,
 			<SearchBar setSearch={setTextFilter} placeholder="Albums" />,
 			<SettingsButton configWrapper={configWrapper} />,
@@ -144,8 +157,8 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
 	const contents = data as NonNullable<typeof data>;
 
-	const albums = contents.pages.flatMap((page) => page.items);
-	if (localData) sortfulMerge(albums, localData, sortOption.id);
+	let albums = filterOption.id !== "2" ? contents.pages.flatMap((page) => page.items) : [];
+	if (localData && filterOption.id !== "1") albums = sortfulMerge(albums, localData, sortOption.id);
 
 	if (albums.length === 0) return <PageContainer {...props}>{EmptyStatus}</PageContainer>;
 
