@@ -5,7 +5,7 @@ import FolderSVG from "./folder_fallback";
 import { useNavigation } from "library/src/components/nav_context";
 
 interface SpotifyCardProps {
-	type: "artist" | "album" | "lastfm" | "playlist" | "folder" | "show" | "collection";
+	type: "artist" | "album" | "lastfm" | "playlist" | "folder" | "show" | "collection" | "localalbum";
 	uri: string;
 	header: string;
 	subheader: string;
@@ -20,7 +20,8 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
 	const { Cards, TextComponent, ArtistMenu, AlbumMenu, PodcastShowMenu, PlaylistMenu, ContextMenu } =
 		Spicetify.ReactComponent;
 	const { FeatureCard: Card, CardImage } = Cards;
-	const { navigate } = useNavigation();
+	const { History } = Spicetify.Platform;
+	const { navigate } = useNavigation() ?? {};
 	const { type, header, uri, imageUrl, subheader, artistUri, badge, provider } = props;
 
 	const Menu = () => {
@@ -70,6 +71,16 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
 				}
 			: {};
 
+	const localAlbumProps =
+		type === "localalbum"
+			? {
+					delegateNavigation: true,
+					onClick: () => {
+						History.push({ pathname: "better-local-files/album", state: { uri } });
+					},
+				}
+			: {};
+
 	return (
 		<ContextMenu menu={Menu()} trigger="right-click">
 			<div style={{ position: "relative" }}>
@@ -90,12 +101,15 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
 						/>
 					)}
 					renderSubHeaderContent={() => (
-						<TextComponent as="div" variant="mesto" semanticColor="textSubdued" children={subheader} />
+						<TextComponent as="div" variant="mesto" semanticColor="textSubdued">
+							{subheader}
+						</TextComponent>
 					)}
 					uri={uri}
 					{...lastfmProps}
 					{...folderProps}
 					{...collectionProps}
+					{...localAlbumProps}
 				/>
 				{badge && <div className="badge">{badge}</div>}
 			</div>
