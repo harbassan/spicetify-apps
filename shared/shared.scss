@@ -75,7 +75,7 @@
     fill: rgba(var(--spice-rgb-selected-row), .7);
 }
 
-#stats-app .page-header,
-#library-app .page-header {
+#stats-app>:first-child,
+#library-app>:first-child {
     margin-top: 64px;
 }
