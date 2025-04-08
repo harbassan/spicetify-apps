@@ -74,6 +74,13 @@ class SpicetifyLibrary {
 				callback: setSearchBarSize,
 			},
 			{
+				name: "Add Local Albums Integration",
+				key: "localAlbums",
+				type: "toggle",
+				def: true,
+				desc: "You need to install the better-local-files app for this to work.",
+			},
+			{
 				name: "Hide 'Your Library' Button",
 				key: "hideLibraryButton",
 				type: "toggle",

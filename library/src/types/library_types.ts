@@ -10,6 +10,7 @@ declare global {
 export interface Config {
 	"card-size": number;
 	"extended-search": boolean;
+	localAlbums: boolean;
 }
 
 export interface ConfigWrapper {

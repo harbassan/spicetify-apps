@@ -116,6 +116,7 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	} = useQuery({
 		queryKey: ["library:localAlbums", sortOption.id, textFilter],
 		queryFn: () => getLocalAlbums({ sortOrder: sortOption.id, textFilter }),
+		enabled: configWrapper.config.localAlbums,
 	});
 
 	useEffect(() => {
