@@ -22,6 +22,7 @@ type GetContentsProps = {
 	textFilter?: string;
 	limit: number;
 	offset: number;
+	sortOrder: string;
 };
 
 class CollectionsWrapper extends EventTarget {
@@ -61,7 +62,7 @@ class CollectionsWrapper extends EventTarget {
 		return localAlbumsIntegration.getAlbums();
 	}
 
-	async getCollectionContents(uri: string) {
+	async getCollectionContents(uri: string, sortOrder?: string) {
 		const collection = this.getCollection(uri);
 		if (!collection) throw new Error("Collection not found");
 
@@ -70,6 +71,7 @@ class CollectionsWrapper extends EventTarget {
 		// TODO: better implementation for getting album contents
 		const albums = (await Spicetify.Platform.LibraryAPI.getContents({
 			filters: ["0"],
+			sortOrder,
 			offset: 0,
 			limit: 9999,
 		})) as GetContentsResponse<AlbumItem>;
@@ -85,14 +87,20 @@ class CollectionsWrapper extends EventTarget {
 	}
 
 	async getContents(props: GetContentsProps) {
-		const { collectionUri, offset, limit, textFilter } = props;
+		const { collectionUri, offset, limit, textFilter, sortOrder } = props;
 
-		let items = collectionUri ? await this.getCollectionContents(collectionUri) : this._collections;
+		let items = collectionUri ? await this.getCollectionContents(collectionUri, sortOrder) : this._collections;
 		const openedCollectionName = collectionUri ? this.getCollection(collectionUri)?.name : undefined;
 
 		if (textFilter) {
 			const regex = new RegExp(`\\b${textFilter}`, "i");
 			items = items.filter((collection) => regex.test(collection.name));
+		}
+
+		if (sortOrder === "0") {
+			items.sort((a, b) => a.name.localeCompare(b.name));
+		} else if (sortOrder === "1") {
+			items.sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
 		}
 
 		items = items.slice(offset, offset + limit);
