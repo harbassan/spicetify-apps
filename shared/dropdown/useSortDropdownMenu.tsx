@@ -10,7 +10,7 @@ interface OptionProps {
 type ReturnType = [
 	dropdown: React.JSX.Element,
 	activeOption: OptionProps,
-    isReversed: boolean,
+	isReversed: boolean,
 	setActiveOption: React.Dispatch<React.SetStateAction<OptionProps>>,
 	setAvailableOptions: React.Dispatch<React.SetStateAction<OptionProps[]>>,
 ];
@@ -27,8 +27,8 @@ const useSortDropdownMenu = (options: OptionProps[], storageVariable?: string) =
 			isReversed={isReversed}
 			activeOption={activeOption}
 			switchCallback={(option: OptionProps) => {
+				setIsReversed((prev) => option.id === activeOption.id ? !prev : prev);
 				setActiveOption(option);
-				setIsReversed((prev) => !prev);
 				if (storageVariable) Spicetify.LocalStorage.set(`${storageVariable}:active-option`, option.id);
 			}}
 		/>
