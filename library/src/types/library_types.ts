@@ -13,6 +13,11 @@ export interface Config {
 	localAlbums: boolean;
 	includeLikedSongs: boolean;
 	includeLocalFiles: boolean;
+	"show-artists": boolean;
+	"show-albums": boolean;
+	"show-playlists": boolean;
+	"show-shows": boolean;
+	"show-collections": boolean;
 }
 
 export interface ConfigWrapper {

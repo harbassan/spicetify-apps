@@ -11,6 +11,7 @@ import { version } from "../package.json";
 import "./styles/app.scss";
 import "../../shared/config/config_modal.scss";
 import "../../shared/shared.scss";
+import { ConfigWrapper } from "./types/stats_types";
 
 const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
 	fetch("https://api.github.com/repos/harbassan/spicetify-apps/releases")
@@ -26,20 +27,7 @@ const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
 		);
 };
 
-const App = () => {
-	const [config, setConfig] = React.useState({
-		...SpicetifyStats.ConfigWrapper.Config,
-	});
-
-	const launchModal = () => {
-		SpicetifyStats.ConfigWrapper.launchModal(setConfig);
-	};
-
-	const configWrapper = {
-		config: config,
-		launchModal,
-	};
-
+const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const pages: Record<string, React.ReactElement> = {
 		["Artists"]: <ArtistsPage configWrapper={configWrapper} />,
 		["Tracks"]: <TracksPage configWrapper={configWrapper} />,
@@ -50,29 +38,27 @@ const App = () => {
 	};
 
 	const tabPages = ["Artists", "Tracks", "Albums", "Genres", "Library", "Charts"].filter(
-		(page) => configWrapper.config[`show-${page.toLowerCase()}`],
+		(page) => configWrapper.config[`show-${page.toLowerCase()}` as keyof ConfigWrapper["config"]],
 	);
 
 	const [navBar, activeLink, setActiveLink] = useNavigationBar(tabPages);
-	const [hasPageSwitched, setHasPageSwitched] = React.useState(false); // TODO: edit spcr-navigation-bar to include initial active link
+	const [firstUpdate, setFirstUpdate] = React.useState(true);
 	const [newUpdate, setNewUpdate] = React.useState(false);
 
 	React.useEffect(() => {
 		setActiveLink(Spicetify.LocalStorage.get("stats:active-link") || "Artists");
 		checkForUpdates(setNewUpdate);
-		setHasPageSwitched(true);
+		setFirstUpdate(false);
 	}, []);
 
 	React.useEffect(() => {
 		Spicetify.LocalStorage.set("stats:active-link", activeLink);
 	}, [activeLink]);
 
-	if (!hasPageSwitched) {
-		return <></>;
-	}
+	if (firstUpdate) return <></>;
 
 	return (
-		<div id="stats-app">
+		<>
 			{navBar}
 			{newUpdate && (
 				<div className="new-update">
@@ -81,8 +67,46 @@ const App = () => {
 				</div>
 			)}
 			{pages[activeLink]}
+		</>
+	);
+};
+
+const waitForReady = async (callback: () => void) => {
+	if (Spicetify.Platform && Spicetify.Platform.RootlistAPI && Spicetify.ReactQuery && SpicetifyStats) {
+		callback();
+	} else {
+		setTimeout(() => waitForReady(callback), 1000);
+	}
+}
+
+const App = () => {
+	const [config, setConfig] = React.useState({} as ConfigWrapper["config"]);
+	const [ready, setReady] = React.useState(false);
+
+	// otherwise app crashes if its first page on spotify load
+	if (!ready) {
+		waitForReady(() => {
+			setConfig({ ...SpicetifyStats.ConfigWrapper.Config });
+			setReady(true);
+		});
+		return <></>;
+	}
+
+	const launchModal = () => {
+		SpicetifyStats.ConfigWrapper.launchModal(setConfig);
+	};
+
+	const configWrapper = {
+		config: config,
+		launchModal,
+	};
+
+	return (
+		<div id="stats-app">
+			<NavbarContainer configWrapper={configWrapper} />
 		</div>
 	);
+
 };
 
 export default App;

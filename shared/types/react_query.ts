@@ -4,16 +4,11 @@ import type {
 	useQuery as useQueryT,
 	useInfiniteQuery as useInfiniteQueryT,
 } from "@tanstack/react-query";
-interface ReactQueryTypes {
-	useQuery: typeof useQueryT;
-	QueryClient: typeof QueryClientT;
-	QueryClientProvider: typeof QueryClientProviderT;
-	useInfiniteQuery: typeof useInfiniteQueryT;
-}
 
-export const ReactQuery = Spicetify.ReactQuery as ReactQueryTypes;
 
-export const useQuery = ReactQuery.useQuery;
-export const QueryClient = ReactQuery.QueryClient;
-export const QueryClientProvider = ReactQuery.QueryClientProvider;
-export const useInfiniteQuery = ReactQuery.useInfiniteQuery;
+export const ReactQuery = Spicetify.ReactQuery;
+
+export const useQuery: typeof useQueryT = (...args) => ReactQuery.useQuery(...args);
+export const useInfiniteQuery: typeof useInfiniteQueryT = (...args) => ReactQuery.useInfiniteQuery(...args);
+export const getQueryClient = () => ReactQuery.QueryClient as QueryClientT;
+export const QueryClientProvider: typeof QueryClientProviderT = (...args) => ReactQuery.QueryClientProvider(...args);

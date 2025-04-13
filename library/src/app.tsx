@@ -4,7 +4,7 @@ import AlbumsPage from "./pages/albums";
 import ArtistsPage from "./pages/artists";
 import ShowsPage from "./pages/shows";
 import PlaylistsPage from "./pages/playlists";
-import type { ConfigWrapperProps } from "./types/library_types";
+import type { ConfigWrapper } from "./types/library_types";
 import { version } from "../package.json";
 
 import "./styles/app.scss";
@@ -28,7 +28,7 @@ const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
 		);
 };
 
-const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapperProps }) => {
+const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const pages: Record<string, React.ReactElement> = {
 		["Artists"]: <ArtistsPage configWrapper={configWrapper} />,
 		["Albums"]: <AlbumsPage configWrapper={configWrapper} />,
@@ -38,7 +38,7 @@ const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapperProps 
 	};
 
 	const tabPages = ["Playlists", "Albums", "Collections", "Artists", "Shows"].filter(
-		(page) => configWrapper.config[`show-${page.toLowerCase()}`],
+		(page) => configWrapper.config[`show-${page.toLowerCase()}` as keyof ConfigWrapper["config"]],
 	);
 
 	const [navBar, activeLink, setActiveLink] = useNavigationBar(tabPages);
@@ -74,8 +74,27 @@ const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapperProps 
 	);
 };
 
+const waitForReady = async (callback: () => void) => {
+	if (Spicetify.Platform && Spicetify.Platform.LibraryAPI && Spicetify.ReactQuery && SpicetifyLibrary) {
+		callback();
+	} else {
+		setTimeout(() => waitForReady(callback), 1000);
+	}
+}
+
 const App = () => {
-	const [config, setConfig] = React.useState({ ...SpicetifyLibrary.ConfigWrapper.Config });
+	const [config, setConfig] = React.useState({} as ConfigWrapper["config"]);
+	const [ready, setReady] = React.useState(false);
+
+	// otherwise app crashes if its first page on spotify load
+	if (!ready) {
+		waitForReady(() => {
+			setConfig({ ...SpicetifyLibrary.ConfigWrapper.Config });
+			setReady(true);
+		});
+		return <></>;
+	}
+
 
 	const launchModal = () => {
 		SpicetifyLibrary.ConfigWrapper.launchModal(setConfig);
