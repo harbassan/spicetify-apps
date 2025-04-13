@@ -2,6 +2,7 @@
 import { v4 as uuidv4 } from "uuid";
 import type { AlbumItem, GetContentsResponse } from "../types/platform";
 import type { ContentsTrack, PlaylistResponse } from "@shared/types/platform";
+import collectionSort from "../utils/collection_sort";
 
 export interface CollectionItem {
 	type: "collection";
@@ -98,10 +99,8 @@ class CollectionsWrapper extends EventTarget {
 			items = items.filter((collection) => regex.test(collection.name));
 		}
 
-		if (sortOrder === "0") {
-			items.sort((a, b) => a.name.localeCompare(b.name));
-		} else if (sortOrder === "1") {
-			items.sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
+		if (sortOrder) {
+			items.sort(collectionSort(sortOrder, sortDirection === "reverse"));	
 		}
 
 		items = items.slice(offset, offset + limit);

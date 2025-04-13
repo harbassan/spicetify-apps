@@ -14,6 +14,7 @@ import { useInfiniteQuery, useQuery } from "@shared/types/react_query";
 import type { AlbumItem, GetContentsResponse, UpdateEvent } from "../types/platform";
 import PinIcon from "../components/pin_icon";
 import useSortDropdownMenu from "@shared/dropdown/useSortDropdownMenu";
+import collectionSort from "../utils/collection_sort";
 
 const AddMenu = () => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -55,29 +56,6 @@ const filterOptions = [
 	{ id: "2", name: "Local Albums" },
 ];
 
-const compare = (sortOption: string) => {
-	if (sortOption === "0") return (a: AlbumItem, b: AlbumItem) => a.name.localeCompare(b.name);
-	if (sortOption === "2") return (a: AlbumItem, b: AlbumItem) => a.artists[0].name.localeCompare(b.artists[0].name);
-	return () => 0;
-};
-
-const sortfulMerge = (a: AlbumItem[], b: AlbumItem[], sortOrder: string) => {
-	let j = 0;
-	const result: AlbumItem[] = [];
-	for (let i = 0; i < a.length; i++) {
-		if (a[i].pinned) {
-			result.push(a[i]);
-		} else {
-			while (j < b.length && compare(sortOrder)(b[j], a[i]) < 0) {
-				result.push(b[j++]);
-			}
-			result.push(a[i]);
-		}
-	}
-	while (j < b.length) result.push(b[j++]);
-	return result;
-};
-
 const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const [sortDropdown, sortOption, isReversed] = useSortDropdownMenu(sortOptions, "library:albums");
 	const [filterDropdown, filterOption] = useDropdownMenu(filterOptions);
@@ -108,7 +86,7 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 			});
 		}
 
-		return albums.sort(compare(sortOption.id));
+		return albums;
 	};
 
 	const { data, status, error, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
@@ -162,7 +140,9 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const contents = data as NonNullable<typeof data>;
 
 	let albums = filterOption.id !== "2" ? contents.pages.flatMap((page) => page.items) : [];
-	if (localData && filterOption.id !== "1") albums = sortfulMerge(albums, localData, sortOption.id);
+	if (localData && filterOption.id !== "1") {
+		albums = albums.concat(localData).sort(collectionSort(sortOption.id, isReversed));
+	}
 
 	if (albums.length === 0) return <PageContainer {...props}>{EmptyStatus}</PageContainer>;
 
