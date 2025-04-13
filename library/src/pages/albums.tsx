@@ -104,7 +104,7 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 		status: localStatus,
 		error: localError,
 	} = useQuery({
-		queryKey: ["library:localAlbums", sortOption.id, textFilter],
+		queryKey: ["library:localAlbums", textFilter],
 		queryFn: fetchLocalAlbums,
 		enabled: configWrapper.config.localAlbums,
 	});
@@ -120,7 +120,7 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	}, [refetch]);
 
 	const Status = useStatus(status, error);
-	const LocalStatus = useStatus(localStatus, localError);
+	const LocalStatus = configWrapper.config.localAlbums && useStatus(localStatus, localError);
 	const EmptyStatus = useStatus("error", new Error("No albums found")) as React.ReactElement;
 
 	const props = {
@@ -140,7 +140,7 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const contents = data as NonNullable<typeof data>;
 
 	let albums = filterOption.id !== "2" ? contents.pages.flatMap((page) => page.items) : [];
-	if (localData && filterOption.id !== "1") {
+	if (localData?.length && filterOption.id !== "1") {
 		albums = albums.concat(localData).sort(collectionSort(sortOption.id, isReversed));
 	}
 
