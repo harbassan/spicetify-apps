@@ -86,6 +86,11 @@
     }
 }
 
+// make sure the popup modal close button is always clickable
+.main-trackCreditsModal-closeBtn {
+    -webkit-app-region: no-drag;
+}
+
 #stats-app>:first-child,
 #library-app>:first-child {
     margin-top: 64px;
