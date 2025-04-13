@@ -11,6 +11,8 @@ export interface Config {
 	"card-size": number;
 	"extended-search": boolean;
 	localAlbums: boolean;
+	includeLikedSongs: boolean;
+	includeLocalFiles: boolean;
 }
 
 export interface ConfigWrapper {

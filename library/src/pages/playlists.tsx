@@ -100,6 +100,8 @@ const PlaylistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 			folderUri: folder,
 			textFilter,
 			offset: pageParam,
+			includeLikedSongs: configWrapper.config.includeLikedSongs,
+			includeLocalFiles: configWrapper.config.includeLocalFiles,
 			limit,
 			flattenTree: JSON.parse(flattenOption.id),
 		})) as GetContentsResponse<PlaylistItem | FolderItem>;
@@ -154,12 +156,14 @@ const PlaylistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 		<SpotifyCard
 			provider="spotify"
 			type={item.type}
-			uri={item.uri}
+			// spotify returns the wrong uri for the local files playlist
+			uri={item.uri !== "spotify:local-files" ? item.uri : "spotify:collection:local-files"}
 			header={item.name}
 			subheader={
-				item.type === "playlist"
-					? item.owner.name
-					: `${item.numberOfPlaylists} Playlists${item.numberOfFolders ? ` • ${item.numberOfFolders} Folders` : ""}`
+				item.type === "playlist" ? item.owner.name
+					: item.type === "folder"
+						? `${item.numberOfPlaylists} Playlists${item.numberOfFolders ? ` • ${item.numberOfFolders} Folders` : ""}`
+						: "System Playlist"
 			}
 			imageUrl={item.images?.[0]?.url || images[item.uri]}
 			badge={item.pinned ? <PinIcon /> : undefined}

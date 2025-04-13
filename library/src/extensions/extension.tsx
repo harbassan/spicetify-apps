@@ -81,6 +81,18 @@ class SpicetifyLibrary {
 				desc: "You need to install the better-local-files app for this to work.",
 			},
 			{
+				name: "Include Liked Songs Playlist",
+				key: "includeLikedSongs",
+				type: "toggle",
+				def: true,
+			},
+			{
+				name: "Include Local Files Playlist",
+				key: "includeLocalFiles",
+				type: "toggle",
+				def: true,
+			},
+			{
 				name: "Hide 'Your Library' Button",
 				key: "hideLibraryButton",
 				type: "toggle",
