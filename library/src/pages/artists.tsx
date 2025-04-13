@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import SearchBar from "../components/searchbar";
-import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import PageContainer from "@shared/components/page_container";
 import SpotifyCard from "@shared/components/spotify_card";
 import SettingsButton from "@shared/components/settings_button";
@@ -13,6 +12,7 @@ import useStatus from "@shared/status/useStatus";
 import { useInfiniteQuery } from "@shared/types/react_query";
 import type { ArtistItem, GetContentsResponse, UpdateEvent } from "../types/platform";
 import PinIcon from "../components/pin_icon";
+import useSortDropdownMenu from "@shared/dropdown/useSortDropdownMenu";
 
 const AddMenu = () => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -47,7 +47,7 @@ const sortOptions = [
 ];
 
 const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
-	const [dropdown, sortOption] = useDropdownMenu(sortOptions, "library:artists");
+	const [sortDropdown, sortOption, isReversed] = useSortDropdownMenu(sortOptions, "library:artists");
 	const [textFilter, setTextFilter] = React.useState("");
 
 	const fetchArtists = async ({ pageParam }: { pageParam: number }) => {
@@ -56,6 +56,7 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 			sortOrder: sortOption.id,
 			textFilter,
 			offset: pageParam,
+			sortDirection: isReversed ? "reverse" : undefined,
 			limit,
 		})) as GetContentsResponse<ArtistItem>;
 		if (!res.items?.length) throw new Error("No artists found");
@@ -63,7 +64,7 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	};
 
 	const { data, status, error, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
-		queryKey: ["library:artists", sortOption.id, textFilter],
+		queryKey: ["library:artists", sortOption.id, isReversed, textFilter],
 		queryFn: fetchArtists,
 		initialPageParam: 0,
 		getNextPageParam: (lastPage) => {
@@ -88,7 +89,7 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 		title: "Artists",
 		headerEls: [
 			<AddButton Menu={<AddMenu />} />,
-			dropdown,
+			sortDropdown,
 			<SearchBar setSearch={setTextFilter} placeholder="Artists" />,
 			<SettingsButton configWrapper={configWrapper} />,
 		],

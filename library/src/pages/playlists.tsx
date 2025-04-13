@@ -14,6 +14,7 @@ import type { FolderItem, GetContentsResponse, PlaylistItem, UpdateEvent } from 
 import useStatus from "@shared/status/useStatus";
 import PinIcon from "../components/pin_icon";
 import { useNavigation } from "../components/nav_context";
+import useSortDropdownMenu from "@shared/dropdown/useSortDropdownMenu";
 
 const AddMenu = ({ folder }: { folder?: string }) => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -80,8 +81,8 @@ const flattenOptions = [
 	{ id: "true", name: "Flattened" },
 ];
 
-const PlaylistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper; }) => {
-	const [sortDropdown, sortOption] = useDropdownMenu(dropdownOptions, "library:playlists-sort");
+const PlaylistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
+	const [sortDropdown, sortOption, isReversed] = useSortDropdownMenu(dropdownOptions, "library:playlists-sort");
 	const [filterDropdown, filterOption] = useDropdownMenu(filterOptions);
 	const [flattenDropdown, flattenOption] = useDropdownMenu(flattenOptions);
 	const [textFilter, setTextFilter] = React.useState("");
@@ -95,6 +96,7 @@ const PlaylistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper; }) => 
 		const res = (await Spicetify.Platform.LibraryAPI.getContents({
 			filters,
 			sortOrder: sortOption.id,
+			sortDirection: isReversed ? "reverse" : undefined,
 			folderUri: folder,
 			textFilter,
 			offset: pageParam,
@@ -106,7 +108,7 @@ const PlaylistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper; }) => 
 	};
 
 	const { data, status, error, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
-		queryKey: ["library:playlists", sortOption.id, filterOption.id, flattenOption.id, textFilter, folder],
+		queryKey: ["library:playlists", sortOption.id, isReversed, filterOption.id, flattenOption.id, textFilter, folder],
 		queryFn: fetchRootlist,
 		initialPageParam: 0,
 		getNextPageParam: (lastPage) => {

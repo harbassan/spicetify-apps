@@ -13,6 +13,7 @@ import useStatus from "@shared/status/useStatus";
 import { useInfiniteQuery, useQuery } from "@shared/types/react_query";
 import type { AlbumItem, GetContentsResponse, UpdateEvent } from "../types/platform";
 import PinIcon from "../components/pin_icon";
+import useSortDropdownMenu from "@shared/dropdown/useSortDropdownMenu";
 
 const AddMenu = () => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -78,15 +79,18 @@ const sortfulMerge = (a: AlbumItem[], b: AlbumItem[], sortOrder: string) => {
 };
 
 const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
-	const [dropdown, sortOption] = useDropdownMenu(sortOptions, "library:albums");
+	const [sortDropdown, sortOption, isReversed] = useSortDropdownMenu(sortOptions, "library:albums");
 	const [filterDropdown, filterOption] = useDropdownMenu(filterOptions);
 	const [textFilter, setTextFilter] = React.useState("");
+
+	console.log(isReversed);
 
 	const fetchAlbums = async ({ pageParam }: { pageParam: number }) => {
 		const res = (await Spicetify.Platform.LibraryAPI.getContents({
 			filters: ["0"],
 			sortOrder: sortOption.id,
 			textFilter,
+			sortDirection: isReversed ? "reverse" : undefined,
 			offset: pageParam,
 			limit,
 		})) as GetContentsResponse<AlbumItem>;
@@ -108,7 +112,7 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	};
 
 	const { data, status, error, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
-		queryKey: ["library:albums", sortOption.id, textFilter],
+		queryKey: ["library:albums", sortOption.id, isReversed, textFilter],
 		queryFn: fetchAlbums,
 		initialPageParam: 0,
 		getNextPageParam: (lastPage) => {
@@ -146,7 +150,7 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 		headerEls: [
 			<AddButton Menu={<AddMenu />} />,
 			filterDropdown,
-			dropdown,
+			sortDropdown,
 			<SearchBar setSearch={setTextFilter} placeholder="Albums" />,
 			<SettingsButton configWrapper={configWrapper} />,
 		],

@@ -12,6 +12,7 @@ import LeadingIcon from "../components/leading_icon";
 import { useInfiniteQuery } from "@shared/types/react_query";
 import useStatus from "@shared/status/useStatus";
 import { useNavigation } from "../components/nav_context";
+import useSortDropdownMenu from "@shared/dropdown/useSortDropdownMenu";
 
 const AddMenu = ({ collection }: { collection?: string }) => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -82,7 +83,7 @@ const sortOptions = [
 ];
 
 const CollectionsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
-	const [dropdown, sortOption] = useDropdownMenu(sortOptions, "library:collections");
+	const [sortDropdown, sortOption, isReversed] = useSortDropdownMenu(sortOptions, "library:collections");
 	const [textFilter, setTextFilter] = React.useState("");
 
 	const { getParam } = useNavigation();
@@ -94,6 +95,7 @@ const CollectionsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) =>
 			textFilter,
 			offset: pageParam,
 			sortOrder: sortOption.id,
+			sortDirection: isReversed ? "reverse" : undefined,
 			limit,
 		});
 		if (!res.items.length) throw new Error("No collections found");
@@ -101,7 +103,7 @@ const CollectionsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) =>
 	};
 
 	const { data, status, error, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
-		queryKey: ["library:collections", textFilter, collection, sortOption.id],
+		queryKey: ["library:collections", textFilter, collection, isReversed, sortOption.id],
 		queryFn: fetchRootlist,
 		initialPageParam: 0,
 		getNextPageParam: (lastPage) => {
@@ -129,7 +131,7 @@ const CollectionsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) =>
 		title: data?.pages[0].openedCollectionName || "Collections",
 		headerEls: [
 			<AddButton Menu={<AddMenu collection={collection} />} />,
-			dropdown,
+			sortDropdown,
 			<SearchBar setSearch={setTextFilter} placeholder="Collections" />,
 			<SettingsButton configWrapper={configWrapper} />,
 		],

@@ -73,6 +73,17 @@
 
 .x-sortBox-sortDropdown {
     fill: rgba(var(--spice-rgb-selected-row), .7);
+
+    &>span {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        &>svg {
+            width: 14px;
+            height: 14px;
+        }
+    }
 }
 
 #stats-app>:first-child,

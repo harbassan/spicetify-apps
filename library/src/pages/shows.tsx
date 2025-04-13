@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import SearchBar from "../components/searchbar";
-import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import PageContainer from "@shared/components/page_container";
 import SettingsButton from "@shared/components/settings_button";
 import type { ConfigWrapper } from "../types/library_types";
@@ -13,6 +12,7 @@ import { useInfiniteQuery } from "@shared/types/react_query";
 import type { GetContentsResponse, ShowItem, UpdateEvent } from "../types/platform";
 import useStatus from "@shared/status/useStatus";
 import PinIcon from "../components/pin_icon";
+import useSortDropdownMenu from "@shared/dropdown/useSortDropdownMenu";
 
 const AddMenu = () => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -47,7 +47,7 @@ const sortOptions = [
 ];
 
 const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
-	const [dropdown, sortOption] = useDropdownMenu(sortOptions, "library:shows");
+	const [sortDropdown, sortOption, isReversed] = useSortDropdownMenu(sortOptions, "library:shows");
 	const [textFilter, setTextFilter] = React.useState("");
 
 	const fetchShows = async ({ pageParam }: { pageParam: number }) => {
@@ -55,6 +55,7 @@ const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 			filters: ["3"],
 			sortOrder: sortOption.id,
 			textFilter,
+			sortDirection: isReversed ? "reverse" : undefined,
 			offset: pageParam,
 			limit,
 		})) as GetContentsResponse<ShowItem>;
@@ -63,7 +64,7 @@ const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	};
 
 	const { data, status, error, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery({
-		queryKey: ["library:shows", sortOption.id, textFilter],
+		queryKey: ["library:shows", sortOption.id, isReversed, textFilter],
 		queryFn: fetchShows,
 		initialPageParam: 0,
 		getNextPageParam: (lastPage) => {
@@ -88,7 +89,7 @@ const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 		title: "Shows",
 		headerEls: [
 			<AddButton Menu={<AddMenu />} />,
-			dropdown,
+			sortDropdown,
 			<SearchBar setSearch={setTextFilter} placeholder="Shows" />,
 			<SettingsButton configWrapper={configWrapper} />,
 		],
