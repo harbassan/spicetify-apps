@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigation } from "./nav_context";
 
 function BackIcon(): React.ReactElement<SVGElement> {
 	return (
@@ -17,12 +16,11 @@ function BackIcon(): React.ReactElement<SVGElement> {
 function BackButton(): React.ReactElement<HTMLButtonElement> {
 	const { ReactComponent } = Spicetify;
 	const { TooltipWrapper, ButtonTertiary } = ReactComponent;
-    const { goBack } = useNavigation();
 
 	return (
 		<TooltipWrapper label={"Back"} placement="top">
 			<span>
-                <ButtonTertiary buttonSize="sm" aria-label="Back" iconOnly={BackIcon} onClick={() => { goBack() }}/>
+				<ButtonTertiary buttonSize="sm" aria-label="Back" iconOnly={BackIcon} />
 			</span>
 		</TooltipWrapper>
 	);

@@ -11,7 +11,6 @@ import TextInputDialog from "../components/text_input_dialog";
 import LeadingIcon from "../components/leading_icon";
 import { useInfiniteQuery } from "@shared/types/react_query";
 import useStatus from "@shared/status/useStatus";
-import { useNavigation } from "../components/nav_context";
 import useSortDropdownMenu from "@shared/dropdown/useSortDropdownMenu";
 
 const AddMenu = ({ collection }: { collection?: string }) => {
@@ -86,8 +85,7 @@ const CollectionsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) =>
 	const [sortDropdown, sortOption, isReversed] = useSortDropdownMenu(sortOptions, "library:collections");
 	const [textFilter, setTextFilter] = React.useState("");
 
-	const { getParam } = useNavigation();
-	const collection = getParam();
+	const collection = Spicetify.Platform.History.location.pathname.split("/")[3];
 
 	const fetchRootlist = async ({ pageParam }: { pageParam: number }) => {
 		const res = await CollectionsWrapper.getContents({

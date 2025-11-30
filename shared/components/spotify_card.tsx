@@ -2,7 +2,6 @@ import CollectionMenu from "library/src/components/collection_menu";
 import FolderMenu from "library/src/components/folder_menu";
 import React from "react";
 import FolderSVG from "./folder_fallback";
-import { useNavigation } from "library/src/components/nav_context";
 import LocalAlbumMenu from "library/src/components/local_album_menu";
 
 interface SpotifyCardProps {
@@ -22,7 +21,6 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
 		Spicetify.ReactComponent;
 	const { FeatureCard: Card, CardImage } = Cards;
 	const { History } = Spicetify.Platform;
-	const { navigate } = useNavigation() ?? {};
 	const { type, header, uri, imageUrl, subheader, artistUri, badge, provider } = props;
 
 	const Menu = () => {
@@ -48,40 +46,42 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
 	const lastfmProps =
 		provider === "lastfm"
 			? {
-					onClick: () => window.open(uri, "_blank"),
-					isPlayable: false,
-					delegateNavigation: true,
-				}
+				onClick: () => window.open(uri, "_blank"),
+				isPlayable: false,
+				delegateNavigation: true,
+			}
 			: {};
 
 	const folderProps =
 		type === "folder"
 			? {
-					delegateNavigation: true,
-					onClick: () => {
-						navigate(`Playlists/${uri}`);
-					},
-				}
+				delegateNavigation: true,
+				onClick: () => {
+					Spicetify.Platform.History.replace(`/library/Playlists/${uri}`);
+					Spicetify.LocalStorage.set("library:active-link", `Playlists/${uri}`);
+				},
+			}
 			: {};
 
 	const collectionProps =
 		type === "collection"
 			? {
-					delegateNavigation: true,
-					onClick: () => {
-						navigate(`Collections/${uri}`);
-					},
-				}
+				delegateNavigation: true,
+				onClick: () => {
+					Spicetify.Platform.History.replace(`/library/Collections/${uri}`);
+					Spicetify.LocalStorage.set("library:active-link", `Collections/${uri}`);
+				},
+			}
 			: {};
 
 	const localAlbumProps =
 		type === "localalbum"
 			? {
-					delegateNavigation: true,
-					onClick: () => {
-						History.push({ pathname: "better-local-files/album", state: { uri } });
-					},
-				}
+				delegateNavigation: true,
+				onClick: () => {
+					History.push({ pathname: "better-local-files/album", state: { uri } });
+				},
+			}
 			: {};
 
 	return (

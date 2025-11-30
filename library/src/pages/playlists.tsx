@@ -13,7 +13,6 @@ import { useInfiniteQuery } from "@shared/types/react_query";
 import type { FolderItem, GetContentsResponse, PlaylistItem, UpdateEvent } from "../types/platform";
 import useStatus from "@shared/status/useStatus";
 import PinIcon from "../components/pin_icon";
-import { useNavigation } from "../components/nav_context";
 import useSortDropdownMenu from "@shared/dropdown/useSortDropdownMenu";
 
 const AddMenu = ({ folder }: { folder?: string }) => {
@@ -88,8 +87,7 @@ const PlaylistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const [textFilter, setTextFilter] = React.useState("");
 	const [images, setImages] = React.useState({ ...FolderImageWrapper.getFolderImages() });
 
-	const { getParam } = useNavigation();
-	const folder = getParam();
+	const folder = Spicetify.Platform.History.location.pathname.split("/")[3];
 
 	const fetchRootlist = async ({ pageParam }: { pageParam: number }) => {
 		const filters = filterOption.id === "all" ? ["2"] : ["2", filterOption.id];

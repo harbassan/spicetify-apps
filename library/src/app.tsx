@@ -1,5 +1,4 @@
 import React from "react";
-import useNavigationBar from "spcr-navigation-bar";
 import AlbumsPage from "./pages/albums";
 import ArtistsPage from "./pages/artists";
 import ShowsPage from "./pages/shows";
@@ -12,7 +11,7 @@ import "./styles/external.scss";
 import "../../shared/config/config_modal.scss";
 import "../../shared/shared.scss";
 import CollectionsPage from "./pages/collections";
-import { NavigationProvider, useNavigation } from "./components/nav_context";
+import NavigationBar from "../../shared/components/navigation/navigation_bar.tsx"
 
 const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
 	fetch("https://api.github.com/repos/harbassan/spicetify-apps/releases")
@@ -41,35 +40,33 @@ const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapper }) =>
 		(page) => configWrapper.config[`show-${page.toLowerCase()}` as keyof ConfigWrapper["config"]],
 	);
 
-	const [navBar, activeLink, setActiveLink] = useNavigationBar(tabPages);
-	const [firstUpdate, setFirstUpdate] = React.useState(true);
 	const [newUpdate, setNewUpdate] = React.useState(false);
 
-	const { navigate, current } = useNavigation();
+	const activePage = Spicetify.Platform.History.location.pathname.split("/")[2];
 
 	React.useEffect(() => {
-		setActiveLink(Spicetify.LocalStorage.get("library:active-link") || "Playlists");
 		checkForUpdates(setNewUpdate);
-		setFirstUpdate(false);
 	}, []);
 
 	React.useEffect(() => {
-		Spicetify.LocalStorage.set("library:active-link", activeLink);
-		navigate(activeLink);
-	}, [activeLink]);
+		if (activePage === undefined) {
+			const stored = Spicetify.LocalStorage.get("library:active-link") || "Albums";
+			Spicetify.Platform.History.replace(`library/${stored}`);
+		}
+	}, [activePage]);
 
-	if (firstUpdate) return <></>;
+	if (activePage === undefined) return <></>;
 
 	return (
 		<>
-			{navBar}
+			<NavigationBar links={tabPages} selected={activePage} storekey="library:active-link" />
 			{newUpdate && (
 				<div className="new-update">
 					New app update available! Visit{" "}
 					<a href="https://github.com/harbassan/spicetify-apps/releases">harbassan/spicetify-apps</a> to install.
 				</div>
 			)}
-			{pages[current.split("/")[0]]}
+			{pages[activePage]}
 		</>
 	);
 };
@@ -107,9 +104,9 @@ const App = () => {
 
 	return (
 		<div id="library-app">
-			<NavigationProvider>
-				<NavbarContainer configWrapper={configWrapper} />
-			</NavigationProvider>
+			{/* <NavigationProvider> */}
+			<NavbarContainer configWrapper={configWrapper} />
+			{/* </NavigationProvider> */}
 		</div>
 	);
 };
