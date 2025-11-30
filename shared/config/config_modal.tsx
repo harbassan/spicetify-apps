@@ -84,50 +84,62 @@ const Dropdown = (props: DrowpdownInputProps) => {
 };
 
 const ToggleInput = (props: ToggleInputProps) => {
-    // @ts-ignore
-    const { Toggle } = Spicetify.ReactComponent;
-
-    const handleToggleChange = (newValue: boolean) => {
-        props.callback(newValue);
+    const handleToggleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.stopPropagation();
+        props.callback(e.target.checked);
     };
 
     return (
-        <Toggle
-            id={`toggle:${props.storageKey}`}
-            value={props.value}
-            onSelected={(newValue: boolean) => handleToggleChange(newValue)}
-        />
+        <label className="x-toggle-wrapper">
+            <input id={`toggle:${props.storageKey}`} className="x-toggle-input" type="checkbox" checked={props.value} onChange={handleToggleChange} />
+            <span className="x-toggle-indicatorWrapper">
+                <span className="x-toggle-indicator"></span>
+            </span>
+        </label>
     );
 };
 
 const SliderInput = (props: SliderInputProps) => {
-    const { Slider } = Spicetify.ReactComponent;
+    const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log("hello");
+        props.callback(parseFloat(e.target.value));
+    };
 
-    // TODO: Fix the slider so that dragging works properly
-    
-    const [value, setValue] = React.useState((props.value - props.min) / (props.max - props.min));
-
-    const handleSliderChange = React.useCallback((newValue: number) => {
-        setValue(newValue);
-        const calculatedValue = props.min + newValue * (props.max - props.min);
-        props.callback(calculatedValue);
-    }, [props]);
-
-    const handleDragMove = React.useCallback((v: number) => {
-        console.log(v);
-    }, []);
+    const percentage = ((props.value - props.min) / (props.max - props.min)) * 100;
 
     return (
-        <Slider
-            id={`slider:${props.storageKey}`}
-            value={value}
-            min={0}
-            max={1}
-            step={0.1}
-            onDragMove={handleDragMove}
-            onDragStart={handleSliderChange}
-            onDragEnd={() => {}}
-        />
+        <div className="playback-progressbar playback-progressbar-isInteractive">
+            <div className="progress-bar" style={{
+                position: 'relative',
+                height: '24px',
+                "--progress-bar-transform": `${percentage}%`,
+            } as React.CSSProperties}>
+                {/* hidden input */}
+                <input
+                    type="range"
+                    min={props.min}
+                    max={props.max}
+                    step={props.step}
+                    value={props.value}
+                    onChange={handleSliderChange}
+                    style={{
+                        position: "absolute",
+                        zIndex: 2,
+                        width: '100%',
+                        height: '100%',
+                        opacity: 0,
+                        cursor: 'pointer',
+                    }}
+                />
+                <div className="x-progressBar-progressBarBg">
+                    <div className="x-progressBar-sliderArea">
+                        <div className="x-progressBar-fillColor"></div>
+                    </div>
+                    {/* thumb */}
+                    <div className="progress-bar__slider" />
+                </div>
+            </div>
+        </div>
     );
 };
 
@@ -195,7 +207,7 @@ const ConfigModal = (props: ConfigModalProps) => {
 
         const header = modalRow.sectionHeader;
 
-        const element = () => {
+        const Element = () => {
             switch (modalRow.type) {
                 case "toggle":
                     return <ToggleInput storageKey={key} value={currentValue} callback={updateItem} />;
@@ -221,6 +233,8 @@ const ConfigModal = (props: ConfigModalProps) => {
                             callback={updateItem}
                         />
                     );
+                default:
+                    return null;
             }
         };
 
@@ -229,7 +243,7 @@ const ConfigModal = (props: ConfigModalProps) => {
                 {header && index !== 0 && <br />}
                 {header && <h2 className="section-header">{modalRow.sectionHeader}</h2>}
                 <ConfigRow name={modalRow.name} desc={modalRow.desc}>
-                    {element()}
+                    <Element />
                 </ConfigRow>
             </>
         );
