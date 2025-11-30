@@ -104,9 +104,7 @@ const App = () => {
 
 	return (
 		<div id="library-app">
-			{/* <NavigationProvider> */}
 			<NavbarContainer configWrapper={configWrapper} />
-			{/* </NavigationProvider> */}
 		</div>
 	);
 };

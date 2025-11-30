@@ -14,7 +14,6 @@
         "spicetify-creator": "^1.0.17"
     },
     "dependencies": {
-        "spcr-navigation-bar": "^0.0.3",
         "uuid": "^9.0.1"
     },
     "description": "---",

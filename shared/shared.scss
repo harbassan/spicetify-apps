@@ -91,7 +91,15 @@
     -webkit-app-region: no-drag;
 }
 
-#stats-app>:first-child,
-#library-app>:first-child {
+.navbar-container {
+    padding-inline: 40px;
+    margin-inline: auto;
+    display: flex;
+    align-items: center;
+    height: 56px;
+    padding: 0 var(--content-spacing);
+}
+
+#library-app > :first-child, #stats-app > :first-child {
     margin-top: 64px;
 }
