@@ -86,8 +86,8 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const Status = useStatus(status, error);
 
 	const props = {
-		title: "Artists",
-		headerEls: [
+		lhs: ["Artists"],
+		rhs: [
 			<AddButton Menu={<AddMenu />} />,
 			sortDropdown,
 			<SearchBar setSearch={setTextFilter} placeholder="Artists" />,

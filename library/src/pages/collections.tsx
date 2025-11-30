@@ -12,6 +12,7 @@ import LeadingIcon from "../components/leading_icon";
 import { useInfiniteQuery } from "@shared/types/react_query";
 import useStatus from "@shared/status/useStatus";
 import useSortDropdownMenu from "@shared/dropdown/useSortDropdownMenu";
+import BackButton from "../components/back_button";
 
 const AddMenu = ({ collection }: { collection?: string }) => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -125,9 +126,11 @@ const CollectionsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) =>
 	const Status = useStatus(status, error);
 
 	const props = {
-		hasHistory: collection !== undefined,
-		title: data?.pages[0].openedCollectionName || "Collections",
-		headerEls: [
+		lhs: [
+			collection ? <BackButton url={`Collections/${data?.pages[0].parentCollectionUri}`} /> : null,
+			data?.pages[0].openedCollectionName || "Collections"
+		],
+		rhs: [
 			<AddButton Menu={<AddMenu collection={collection} />} />,
 			sortDropdown,
 			<SearchBar setSearch={setTextFilter} placeholder="Collections" />,

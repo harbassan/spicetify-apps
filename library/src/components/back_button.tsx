@@ -13,14 +13,18 @@ function BackIcon(): React.ReactElement<SVGElement> {
 	);
 }
 
-function BackButton(): React.ReactElement<HTMLButtonElement> {
-	const { ReactComponent } = Spicetify;
-	const { TooltipWrapper, ButtonTertiary } = ReactComponent;
+function BackButton({ url }: { url: string }) {
+	const { TooltipWrapper, ButtonTertiary } = Spicetify.ReactComponent;
+
+	function navigate() {
+		Spicetify.Platform.History.replace(`/library/${url}`);
+		Spicetify.LocalStorage.set("library:active-link", url);
+	}
 
 	return (
 		<TooltipWrapper label={"Back"} placement="top">
 			<span>
-				<ButtonTertiary buttonSize="sm" aria-label="Back" iconOnly={BackIcon} />
+				<ButtonTertiary buttonSize="sm" aria-label="Back" iconOnly={BackIcon} onClick={navigate} />
 			</span>
 		</TooltipWrapper>
 	);

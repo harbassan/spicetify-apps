@@ -91,8 +91,11 @@ class CollectionsWrapper extends EventTarget {
 	async getContents(props: GetContentsProps) {
 		const { collectionUri, offset, limit, textFilter, sortOrder, sortDirection } = props;
 
-		let items = collectionUri ? await this.getCollectionContents(collectionUri, {sortOrder, sortDirection, textFilter}) : this._collections;
-		const openedCollectionName = collectionUri ? this.getCollection(collectionUri)?.name : undefined;
+		let items = collectionUri ? await this.getCollectionContents(collectionUri, { sortOrder, sortDirection, textFilter }) : this._collections;
+
+		const collection = collectionUri ? this.getCollection(collectionUri) : undefined;
+		const openedCollectionName = collection?.name;
+		const parentCollectionUri = collection?.parentCollection;
 
 		if (textFilter) {
 			const regex = new RegExp(`\\b${textFilter}`, "i");
@@ -100,12 +103,12 @@ class CollectionsWrapper extends EventTarget {
 		}
 
 		if (sortOrder) {
-			items.sort(collectionSort(sortOrder, sortDirection === "reverse"));	
+			items.sort(collectionSort(sortOrder, sortDirection === "reverse"));
 		}
 
 		items = items.slice(offset, offset + limit);
 
-		return { items, totalLength: this._collections.length, offset, openedCollectionName };
+		return { items, totalLength: this._collections.length, offset, openedCollectionName, parentCollectionUri };
 	}
 
 	async cleanCollections() {

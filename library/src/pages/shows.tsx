@@ -86,8 +86,8 @@ const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const Status = useStatus(status, error);
 
 	const props = {
-		title: "Shows",
-		headerEls: [
+		lhs: ["Shows"],
+		rhs: [
 			<AddButton Menu={<AddMenu />} />,
 			sortDropdown,
 			<SearchBar setSearch={setTextFilter} placeholder="Shows" />,

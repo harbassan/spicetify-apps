@@ -61,8 +61,6 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const [filterDropdown, filterOption] = useDropdownMenu(filterOptions);
 	const [textFilter, setTextFilter] = React.useState("");
 
-	console.log(isReversed);
-
 	const fetchAlbums = async ({ pageParam }: { pageParam: number }) => {
 		const res = (await Spicetify.Platform.LibraryAPI.getContents({
 			filters: ["0"],
@@ -124,8 +122,8 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const EmptyStatus = useStatus("error", new Error("No albums found")) as React.ReactElement;
 
 	const props = {
-		title: "Albums",
-		headerEls: [
+		lhs: ["Albums"],
+		rhs: [
 			<AddButton Menu={<AddMenu />} />,
 			filterDropdown,
 			sortDropdown,

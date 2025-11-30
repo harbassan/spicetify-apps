@@ -14,6 +14,7 @@ import type { FolderItem, GetContentsResponse, PlaylistItem, UpdateEvent } from 
 import useStatus from "@shared/status/useStatus";
 import PinIcon from "../components/pin_icon";
 import useSortDropdownMenu from "@shared/dropdown/useSortDropdownMenu";
+import BackButton from "../components/back_button";
 
 const AddMenu = ({ folder }: { folder?: string }) => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -132,9 +133,11 @@ const PlaylistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const Status = useStatus(status, error);
 
 	const props = {
-		hasHistory: folder !== undefined,
-		title: data?.pages[0].openedFolderName || "Playlists",
-		headerEls: [
+		lhs: [
+			folder ? <BackButton url={`Playlists/${data?.pages[0].parentFolderUri}`} /> : null,
+			data?.pages[0].openedFolderName || "Playlists",
+		],
+		rhs: [
 			<AddButton Menu={<AddMenu folder={folder} />} />,
 			sortDropdown,
 			filterDropdown,
