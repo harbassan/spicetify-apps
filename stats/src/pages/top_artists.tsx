@@ -43,8 +43,8 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const Status = useStatus(status, error);
 
 	const props = {
-		title: "Top Artists",
-		headerEls: [
+		lhs: ["Top Artists"],
+		rhs: [
 			dropdown,
 			<RefreshButton callback={() => invalidator(["top-artists", activeOption.id], refetch)} />,
 			<SettingsButton configWrapper={configWrapper} />,

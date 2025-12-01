@@ -38,8 +38,8 @@ const LibraryPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	});
 
 	const props = {
-		title: "Library Analysis",
-		headerEls: [
+		lhs: ["Library Analysis"],
+		rhs: [
 			dropdown,
 			<RefreshButton callback={() => invalidator(["library", activeOption.id], refetch)} />,
 			<SettingsButton configWrapper={configWrapper} />,

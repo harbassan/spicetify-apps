@@ -98,8 +98,8 @@ const ChartsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const Status = useStatus(status, error);
 
 	const props = {
-		title: `Top Charts - ${_.startCase(activeOption.id)}`,
-		headerEls: [
+		lhs: [`Top Charts - ${_.startCase(activeOption.id)}`],
+		rhs: [
 			dropdown,
 			<RefreshButton callback={() => invalidator(["top-charts", activeOption.id], refetch)} />,
 			<SettingsButton configWrapper={configWrapper} />,

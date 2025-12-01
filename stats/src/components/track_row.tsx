@@ -15,16 +15,9 @@ const ArtistLink = ({ name, uri, index, length }: { name: string; uri: string; i
 
 const ExplicitBadge = React.memo(() => {
 	return (
-		<>
-			<span
-				className="TypeElement-ballad-textSubdued-type main-trackList-rowBadges"
-				data-encore-id="type"
-				aria-label="Explicit"
-				title="Explicit"
-			>
-				🅴
-			</span>
-		</>
+		<span aria-label="Explicit" className="x-explicit-label" title="Explicit">
+			<span className="x-explicit-icon">E</span>
+		</span>
 	);
 });
 
@@ -46,14 +39,14 @@ const LikedIcon = ({ active, uri }: { active: boolean; uri: string }) => {
 
 	return (
 		<Spicetify.ReactComponent.TooltipWrapper
-			label={liked ? "Remove from Your Library" : "Save to Your Library"}
+			label={liked ? "Remove from your library" : "Save to your library"}
 			placement="top"
 		>
 			<button
 				type="button"
 				role="switch"
 				aria-checked={liked}
-				aria-label="Remove from Your Library"
+				aria-label={liked ? "Remove from your library" : "Save to your library"}
 				onClick={toggleLike}
 				className={
 					liked
@@ -125,7 +118,10 @@ const TrackRow = (props: TrackRowProps) => {
 						className="main-trackList-trackListRow main-trackList-trackListRowGrid"
 						role="presentation"
 						onClick={(event) => event.detail === 2 && playAndQueue(props.uri)}
-						style={{ height: 56 }}
+						style={{
+							height: 56,
+							gridTemplateColumns: "[index] var(--tracklist-index-column-width,16px) [first] minmax(120px,var(--col1,6fr)) [var1] minmax(120px,var(--col2,4fr)) [var2] minmax(120px,var(--col3,3fr)) [last] minmax(120px,var(--col4,1fr))"
+						}}
 					>
 						<div className="main-trackList-rowSectionIndex" role="gridcell" aria-colindex={1} tabIndex={-1}>
 							{/* @ts-ignore - needs uri prop to work with playlist-labels extension*/}
@@ -176,17 +172,29 @@ const TrackRow = (props: TrackRowProps) => {
 							<div className="main-trackList-rowMainContent">
 								<div
 									dir="auto"
-									className="TypeElement-ballad-textBase TypeElement-ballad-textBase-type main-trackList-rowTitle standalone-ellipsis-one-line"
+									className="TypeElement-ballad-textBase TypeElement-ballad-textBase-type main-trackList-rowTitle standalone-ellipsis-one-line encore-text-body-medium encore-internal-color-text-base"
 									data-encore-id="type"
+									style={{ gridArea: "title", justifySelf: "start" }}
 								>
 									{props.name}
 								</div>
-								{props.explicit && <ExplicitBadge />}
+								{props.explicit &&
+									<span
+										className="TypeElement-mesto-textSubdued TypeElement-mesto-textSubdued-type main-trackList-rowSubTitle standalone-ellipsis-one-line encore-text-body-medium encore-internal-color-text-subdued"
+										data-encore-id="text"
+										style={{ gridArea: "badges", display: "inline-flex", alignItems: "center", justifyContent: "center" }}
+									>
+										<ExplicitBadge />
+									</span>
+								}
 								<span
-									className="TypeElement-mesto-textSubdued TypeElement-mesto-textSubdued-type main-trackList-rowSubTitle standalone-ellipsis-one-line"
+									className="TypeElement-mesto-textSubdued TypeElement-mesto-textSubdued-type main-trackList-rowSubTitle standalone-ellipsis-one-line encore-text-body-small encore-internal-color-text-subdued"
 									data-encore-id="type"
+									style={{ gridColumnStart: "subtitle", gridArea: "subtitle" }}
 								>
-									{ArtistLinks}
+									<div className="encore-text-body-small" data-encore-id="text" >
+										{ArtistLinks}
+									</div>
 								</span>
 							</div>
 						</div>

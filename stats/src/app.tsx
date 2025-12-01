@@ -1,5 +1,4 @@
 import React from "react";
-import useNavigationBar from "spcr-navigation-bar";
 import ArtistsPage from "./pages/top_artists";
 import TracksPage from "./pages/top_tracks";
 import GenresPage from "./pages/top_genres";
@@ -12,6 +11,7 @@ import "./styles/app.scss";
 import "../../shared/config/config_modal.scss";
 import "../../shared/shared.scss";
 import { ConfigWrapper } from "./types/stats_types";
+import NavigationBar from "../../shared/components/navigation/navigation_bar.tsx"
 
 const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
 	fetch("https://api.github.com/repos/harbassan/spicetify-apps/releases")
@@ -41,32 +41,33 @@ const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapper }) =>
 		(page) => configWrapper.config[`show-${page.toLowerCase()}` as keyof ConfigWrapper["config"]],
 	);
 
-	const [navBar, activeLink, setActiveLink] = useNavigationBar(tabPages);
-	const [firstUpdate, setFirstUpdate] = React.useState(true);
 	const [newUpdate, setNewUpdate] = React.useState(false);
 
+	const activePage = Spicetify.Platform.History.location.pathname.split("/")[2];
+
 	React.useEffect(() => {
-		setActiveLink(Spicetify.LocalStorage.get("stats:active-link") || "Artists");
 		checkForUpdates(setNewUpdate);
-		setFirstUpdate(false);
 	}, []);
 
 	React.useEffect(() => {
-		Spicetify.LocalStorage.set("stats:active-link", activeLink);
-	}, [activeLink]);
+		if (activePage === undefined) {
+			const stored = Spicetify.LocalStorage.get("stats:active-link") || "Artists";
+			Spicetify.Platform.History.replace(`stats/${stored}`);
+		}
+	}, [activePage]);
 
-	if (firstUpdate) return <></>;
+	if (activePage === undefined) return <></>;
 
 	return (
 		<>
-			{navBar}
+			<NavigationBar links={tabPages} selected={activePage} storekey="stats:active-link" />
 			{newUpdate && (
 				<div className="new-update">
 					New app update available! Visit{" "}
 					<a href="https://github.com/harbassan/spicetify-apps/releases">harbassan/spicetify-apps</a> to install.
 				</div>
 			)}
-			{pages[activeLink]}
+			{pages[activePage]}
 		</>
 	);
 };

@@ -15,6 +15,9 @@ const Tracklist = ({ playcount = false, minified = false, children }) => {
 						className="main-trackList-trackListHeaderRow main-trackList-trackListRowGrid"
 						role="row"
 						aria-rowindex={1}
+						style={{
+							gridTemplateColumns: '[index] var(--tracklist-index-column-width,16px) [first] minmax(120px,var(--col1,6fr)) [var1] minmax(120px,var(--col2,4fr)) [var2] minmax(120px,var(--col3,3fr)) [last] minmax(120px,var(--col4,1fr))'
+						}}
 					>
 						<div
 							className="main-trackList-rowSectionIndex"

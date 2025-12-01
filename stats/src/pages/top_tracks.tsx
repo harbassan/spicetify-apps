@@ -39,8 +39,8 @@ const TracksPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const Status = useStatus(status, error);
 
 	const props = {
-		title: "Top Tracks",
-		headerEls: [
+		lhs: ["Top Tracks"],
+		rhs: [
 			dropdown,
 			<RefreshButton callback={() => invalidator(["top-tracks", activeOption.id], refetch)} />,
 			<SettingsButton configWrapper={configWrapper} />,

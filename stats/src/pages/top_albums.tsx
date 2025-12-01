@@ -31,8 +31,8 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const Status = useStatus(status, error);
 
 	const props = {
-		title: "Top Albums",
-		headerEls: [
+		lhs: ["Top Albums"],
+		rhs: [
 			dropdown,
 			<RefreshButton callback={() => invalidator(["top-albums", activeOption.id], refetch)} />,
 			<SettingsButton configWrapper={configWrapper} />,

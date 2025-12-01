@@ -1,6 +1,6 @@
 {
     "name": "spicetify-stats",
-    "version": "1.1.2",
+    "version": "1.1.3",
     "private": true,
     "scripts": {
         "build": "spicetify-creator",
@@ -15,8 +15,7 @@
         "spicetify-creator": "^1.0.17"
     },
     "dependencies": {
-        "lodash": "^4.17.21",
-        "spcr-navigation-bar": "^0.0.3"
+        "lodash": "^4.17.21"
     },
     "description": "---",
     "main": "index.js",

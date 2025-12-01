@@ -68,8 +68,8 @@ const GenresPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const Status = useStatus(status, error);
 
 	const props = {
-		title: "Top Genres",
-		headerEls: [
+		lhs: ["Top Genres"],
+		rhs: [
 			dropdown,
 			<RefreshButton callback={() => invalidator(["top-genres", activeOption.id], refetch)} />,
 			<SettingsButton configWrapper={configWrapper} />,

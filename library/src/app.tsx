@@ -50,7 +50,7 @@ const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapper }) =>
 
 	React.useEffect(() => {
 		if (activePage === undefined) {
-			const stored = Spicetify.LocalStorage.get("library:active-link") || "Albums";
+			const stored = Spicetify.LocalStorage.get("library:active-link") || "Playlists";
 			Spicetify.Platform.History.replace(`library/${stored}`);
 		}
 	}, [activePage]);
