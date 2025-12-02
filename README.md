@@ -1,5 +1,9 @@
 # Spicetify Apps
 
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/harbassan/spicetify-apps/total?style=for-the-badge)
+![GitHub Downloads (stats, all releases)](https://img.shields.io/github/downloads/harbassan/spicetify-apps/spicetify-stats.release.zip?displayAssetName=false&style=for-the-badge&label=stats%20dls&color=red)
+![GitHub Downloads (library, all releases)](https://img.shields.io/github/downloads/harbassan/spicetify-apps/spicetify-library.release.zip?displayAssetName=false&style=for-the-badge&label=library%20dls&color=blue)
+
 ---
 
 ## [Statistics](stats/README.md)
