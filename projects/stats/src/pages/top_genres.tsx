@@ -12,7 +12,7 @@ import RefreshButton from "../components/buttons/refresh_button";
 import SettingsButton from "@shared/components/settings_button";
 import type { SpotifyRange } from "../types/spotify";
 import { getMeanAudioFeatures, parseArtists, parseStat } from "../utils/track_helper";
-import { useQuery } from "../../../shared/types/react_query";
+import { useQuery } from "@shared/types/react_query";
 import useStatus from "@shared/status/useStatus";
 import { cacher, invalidator } from "../extensions/cache";
 

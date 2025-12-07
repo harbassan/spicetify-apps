@@ -1,5 +1,5 @@
 import React from "react";
-import { DownArrow, UpArrow } from "./icons/arrows";
+import { DownArrow, UpArrow } from "../../../shared/src/icons/arrows";
 
 const ToggleFiltersButton = () => {
 	const [direction, setDirection] = React.useState(

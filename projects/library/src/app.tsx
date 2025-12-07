@@ -1,17 +1,21 @@
 import React from "react";
+
 import AlbumsPage from "./pages/albums";
 import ArtistsPage from "./pages/artists";
 import ShowsPage from "./pages/shows";
 import PlaylistsPage from "./pages/playlists";
-import type { ConfigWrapper } from "./types/library_types";
+import CollectionsPage from "./pages/collections";
+
 import { version } from "../package.json";
+
+import NavigationBar from "@shared/components/navigation/navigation_bar"
 
 import "./styles/app.scss";
 import "./styles/external.scss";
-import "../../shared/config/config_modal.scss";
-import "../../shared/shared.scss";
-import CollectionsPage from "./pages/collections";
-import NavigationBar from "../../shared/components/navigation/navigation_bar.tsx"
+import "../../shared/src/config/config_modal.scss";
+import "../../shared/src/shared.scss";
+
+import { ConfigWrapper } from "./types/library_types";
 
 const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
 	fetch("https://api.github.com/repos/harbassan/spicetify-apps/releases")

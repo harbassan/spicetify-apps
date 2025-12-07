@@ -1,5 +1,4 @@
 import React from "react";
-import _ from "lodash";
 
 interface StatCardProps {
 	label: string;
@@ -15,7 +14,7 @@ function StatCard({ label, value }: StatCardProps) {
 				{value}
 			</TextComponent>
 			<TextComponent as="div" semanticColor="textBase" variant="balladBold">
-				{_.startCase(label)}
+				{label}
 			</TextComponent>
 		</div>
 	);

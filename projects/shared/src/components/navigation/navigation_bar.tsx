@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 function NavigationBar({ links, selected, storekey }: { links: string[], selected: string, storekey: string }) {
+    // @ts-ignore
     const { Chip } = Spicetify.ReactComponent;
 
     function navigate(page: string) {

@@ -1,4 +1,4 @@
-import { DownArrow, UpArrow } from "library/src/components/icons/arrows";
+import { DownArrow, UpArrow } from "../icons/arrows";
 import React from "react";
 
 interface Option {

@@ -1,10 +1,7 @@
 {
+    "name": "spicetify-apps",
     "private": true,
     "version": "1.0.0",
-    "devDependencies": {},
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
     "author": "harbassan",
     "license": "MIT",
     "workspaces": [
