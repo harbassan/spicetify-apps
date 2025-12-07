@@ -10,7 +10,7 @@
 
 |                Top Artists                 |                Library Analysis                 |                Top Tracks                 |               |
 | :----------------------------------------: | :---------------------------------------------: | :---------------------------------------: | :-----------: |
-| ![Image 1](stats/previews/top_artists.png) | ![Image 2](stats/previews/library_analysis.png) | ![Image 3](stats/previews/top_tracks.png) | And Much More |
+| ![Image 1](projects/stats/previews/top_artists.png) | ![Image 2](projects/stats/previews/library_analysis.png) | ![Image 3](projects/stats/previews/top_tracks.png) | And Much More |
 
 
 ---
@@ -19,7 +19,7 @@
 
 |                Full Pages                  |                Album Collections                |                Folder Images              |
 | :----------------------------------------: | :---------------------------------------------: | :---------------------------------------: | 
-| ![Image 1](library/previews/artists.png)   | ![Image 2](library/previews/albums.png)         | ![Image 3](library/previews/playlists.png) |
+| ![Image 1](projects/library/previews/artists.png)   | ![Image 2](projects/library/previews/albums.png)         | ![Image 3](projects/library/previews/playlists.png) |
 
 
 ---
