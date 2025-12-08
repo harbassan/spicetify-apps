@@ -13,6 +13,7 @@ import type { GetContentsResponse, ShowItem, UpdateEvent } from "../types/platfo
 import useStatus from "@shared/status/useStatus";
 import PinIcon from "../components/pin_icon";
 import useSortDropdownMenu from "@shared/dropdown/useSortDropdownMenu";
+import CustomCard from "../components/custom_card";
 
 const AddMenu = () => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -38,6 +39,10 @@ const AddMenu = () => {
 		</Menu>
 	);
 };
+
+function isValidShow(show: ShowItem) {
+	return show.name && show.uri;
+}
 
 const limit = 200;
 
@@ -101,9 +106,8 @@ const ShowsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
 	const shows = contents.pages.flatMap((page) => page.items);
 
-	const showCards = shows.map((show) => (
-		<SpotifyCard
-			provider="spotify"
+	const showCards = shows.filter(isValidShow).map((show) => (
+		<CustomCard
 			type="show"
 			uri={show.uri}
 			header={show.name}

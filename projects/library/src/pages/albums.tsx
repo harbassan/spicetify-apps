@@ -56,6 +56,11 @@ const filterOptions = [
 	{ id: "2", name: "Local Albums" },
 ];
 
+function isValidAlbum(album: AlbumItem) {
+	const primaryArtist = album.artists?.[0];
+	return album.name && album.uri && primaryArtist?.name && primaryArtist?.uri;
+}
+
 const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const [sortDropdown, sortOption, isReversed] = useSortDropdownMenu(sortOptions, "library:albums");
 	const [filterDropdown, filterOption] = useDropdownMenu(filterOptions);
@@ -144,20 +149,17 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
 	if (albums.length === 0) return <PageContainer {...props}>{EmptyStatus}</PageContainer>;
 
-	const albumCards = albums.map((item) => {
-		return (
-			<SpotifyCard
-				provider="spotify"
-				type={item.type || "localalbum"}
-				uri={item.uri}
-				header={item.name}
-				subheader={item.artists[0].name}
-				imageUrl={item.images?.[0]?.url}
-				artistUri={item.artists[0].uri}
-				badge={item.pinned ? <PinIcon /> : undefined}
-			/>
-		);
-	});
+	const albumCards = albums.filter(isValidAlbum).map((item) => (
+		<SpotifyCard
+			type={item.type || "localalbum"}
+			uri={item.uri}
+			header={item.name}
+			subheader={item.artists[0].name}
+			imageUrl={item.images?.[0]?.url}
+			artistUri={item.artists[0].uri}
+			badge={item.pinned ? <PinIcon /> : undefined}
+		/>
+	));
 
 	if (hasNextPage) albumCards.push(<LoadMoreCard callback={fetchNextPage} />);
 

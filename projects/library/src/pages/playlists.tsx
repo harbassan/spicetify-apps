@@ -15,6 +15,7 @@ import useStatus from "@shared/status/useStatus";
 import PinIcon from "../components/pin_icon";
 import useSortDropdownMenu from "@shared/dropdown/useSortDropdownMenu";
 import BackButton from "../components/back_button";
+import CustomCard from "../components/custom_card";
 
 const AddMenu = ({ folder }: { folder?: string }) => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
@@ -58,6 +59,10 @@ const AddMenu = ({ folder }: { folder?: string }) => {
 		</Menu>
 	);
 };
+
+function isValidRootlistItem(item: PlaylistItem | FolderItem) {
+	return item.name && item.uri;
+}
 
 const limit = 200;
 
@@ -153,22 +158,27 @@ const PlaylistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
 	const items = contents.pages.flatMap((page) => page.items);
 
-	const rootlistCards = items.map((item) => (
-		<SpotifyCard
-			provider="spotify"
-			type={item.type}
-			// spotify returns the wrong uri for the local files playlist
-			uri={item.uri !== "spotify:local-files" ? item.uri : "spotify:collection:local-files"}
-			header={item.name}
-			subheader={
-				item.type === "playlist" ? item.owner.name
-					: item.type === "folder"
-						? `${item.numberOfPlaylists} Playlists${item.numberOfFolders ? ` • ${item.numberOfFolders} Folders` : ""}`
-						: "System Playlist"
-			}
-			imageUrl={item.images?.[0]?.url || images[item.uri]}
-			badge={item.pinned ? <PinIcon /> : undefined}
-		/>
+	const rootlistCards = items.filter(isValidRootlistItem).map((item) => (
+		item.type === "folder" ?
+			<CustomCard
+				type={item.type}
+				uri={item.uri}
+				header={item.name}
+				subheader={
+					`${item.numberOfPlaylists} Playlists${item.numberOfFolders ? ` • ${item.numberOfFolders} Folders` : ""}`
+				}
+				imageUrl={images[item.uri]}
+				badge={item.pinned ? <PinIcon /> : undefined}
+			/> :
+			<SpotifyCard
+				type={item.type}
+				// NOTE: spotify returns the wrong uri for the local files playlist
+				uri={item.uri === "spotify:local-files" ? "spotify:collection:local-files" : item.uri}
+				header={item.name}
+				subheader={item.owner?.name || "System Playlist"}
+				imageUrl={item.images?.[0]?.url}
+				badge={item.pinned ? <PinIcon /> : undefined}
+			/>
 	));
 
 	if (hasNextPage) rootlistCards.push(<LoadMoreCard callback={fetchNextPage} />);

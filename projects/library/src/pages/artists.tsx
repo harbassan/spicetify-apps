@@ -39,6 +39,10 @@ const AddMenu = () => {
 	);
 };
 
+function isValidArtist(artist: ArtistItem) {
+	return artist.name && artist.uri;
+}
+
 const limit = 200;
 
 const sortOptions = [
@@ -101,9 +105,8 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
 	const artists = contents.pages.flatMap((page) => page.items);
 
-	const artistCards = artists.map((artist) => (
+	const artistCards = artists.filter(isValidArtist).map((artist) => (
 		<SpotifyCard
-			provider="spotify"
 			type="artist"
 			uri={artist.uri}
 			header={artist.name}

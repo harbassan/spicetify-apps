@@ -8,7 +8,7 @@ interface SpotifyCardProps {
 	imageUrl?: string;
 	artistUri?: string;
 	badge?: string | React.ReactElement;
-	provider: "spotify" | "lastfm";
+	provider?: "spotify" | "lastfm";
 }
 
 /**
@@ -20,7 +20,7 @@ function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement
 	// @ts-ignore
 	const { Cards, TextComponent, ArtistMenu, AlbumMenu, PlaylistMenu, ContextMenu } = Spicetify.ReactComponent;
 	const { FeatureCard: Card, CardImage } = Cards;
-	const { type, header, uri, imageUrl, subheader, artistUri, badge, provider } = props;
+	const { type, header, uri, imageUrl, subheader, artistUri, badge, provider = "spotify" } = props;
 
 	const Menu = () => {
 		switch (type) {

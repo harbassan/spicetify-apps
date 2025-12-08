@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import SearchBar from "../components/searchbar";
-import useDropdownMenu from "@shared/dropdown/useDropdownMenu";
 import PageContainer from "@shared/components/page_container";
 import SpotifyCard from "@shared/components/spotify_card";
 import SettingsButton from "@shared/components/settings_button";
@@ -13,10 +12,11 @@ import { useInfiniteQuery } from "@shared/types/react_query";
 import useStatus from "@shared/status/useStatus";
 import useSortDropdownMenu from "@shared/dropdown/useSortDropdownMenu";
 import BackButton from "../components/back_button";
+import CustomCard from "../components/custom_card";
+import { CollectionChild } from "../extensions/collections_wrapper";
 
 const AddMenu = ({ collection }: { collection?: string }) => {
 	const { MenuItem, Menu } = Spicetify.ReactComponent;
-	const { RootlistAPI } = Spicetify.Platform;
 	const { SVGIcons } = Spicetify;
 
 	const createCollection = () => {
@@ -26,7 +26,6 @@ const AddMenu = ({ collection }: { collection?: string }) => {
 
 		Spicetify.PopupModal.display({
 			title: "Create Collection",
-			// @ts-ignore
 			content: <TextInputDialog def={"New Collection"} placeholder="Collection Name" onSave={onSave} />,
 		});
 	};
@@ -38,7 +37,6 @@ const AddMenu = ({ collection }: { collection?: string }) => {
 
 		Spicetify.PopupModal.display({
 			title: "Create Discog Collection",
-			// @ts-ignore
 			content: <TextInputDialog def={""} placeholder="Artist URI" onSave={onSave} />,
 		});
 	};
@@ -51,7 +49,6 @@ const AddMenu = ({ collection }: { collection?: string }) => {
 
 		Spicetify.PopupModal.display({
 			title: "Add Album",
-			// @ts-ignore
 			content: <TextInputDialog def={""} placeholder="Album URI" onSave={onSave} />,
 		});
 	};
@@ -72,6 +69,10 @@ const AddMenu = ({ collection }: { collection?: string }) => {
 		</Menu>
 	);
 };
+
+function isValidCollectionItem(item: CollectionChild) {
+	return item.name && item.uri;
+}
 
 const limit = 200;
 
@@ -144,15 +145,23 @@ const CollectionsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) =>
 
 	const items = contents.pages.flatMap((page) => page.items);
 
-	const rootlistCards = items.map((item) => (
-		<SpotifyCard
-			provider="spotify"
-			type={item.type || "localalbum"}
-			uri={item.uri}
-			header={item.name}
-			subheader={item.type === "collection" ? `${item.items.length} Albums` : item.artists?.[0]?.name}
-			imageUrl={item.type === "collection" ? item.image : item.images?.[0]?.url}
-		/>
+	// TODO: fix the typing to explictly allow localalbums
+	const rootlistCards = items.filter(isValidCollectionItem).map((item) => (
+		item.type === "album" ?
+			<SpotifyCard
+				type={item.type}
+				uri={item.uri}
+				header={item.name}
+				subheader={item.artists?.[0]?.name}
+				imageUrl={item.images?.[0]?.url}
+			/> :
+			<CustomCard
+				type={item.type || "localalbum"}
+				uri={item.uri}
+				header={item.name}
+				subheader={item.type ? `${item.items.length} Albums` : item.artists?.[0]?.name}
+				imageUrl={item.type ? item.image : item.images?.[0]?.url}
+			/>
 	));
 
 	if (hasNextPage) rootlistCards.push(<LoadMoreCard callback={fetchNextPage} />);
