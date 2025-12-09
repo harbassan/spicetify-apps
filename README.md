@@ -6,7 +6,7 @@
 
 ---
 
-## [Statistics](stats/README.md)
+## [Statistics](projects/stats/README.md)
 
 |                Top Artists                 |                Library Analysis                 |                Top Tracks                 |               |
 | :----------------------------------------: | :---------------------------------------------: | :---------------------------------------: | :-----------: |
@@ -15,7 +15,7 @@
 
 ---
 
-## [Library](library/README.md)
+## [Library](projects/library/README.md)
 
 |                Full Pages                  |                Album Collections                |                Folder Images              |
 | :----------------------------------------: | :---------------------------------------------: | :---------------------------------------: | 
