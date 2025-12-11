@@ -54,7 +54,7 @@ sh <(curl -s https://raw.githubusercontent.com/harbassan/spicetify-apps/main/sta
 ### Automatic Installation (Windows, Powershell)
 
 ```ps1
-iwr -useb "https://raw.githubusercontent.com/harbassan/spicetify-apps/main/stats/install.ps1" | iex
+iwr -useb "https://raw.githubusercontent.com/harbassan/spicetify-apps/refs/heads/main/projects/stats/install.ps1" | iex
 ```
 
 ### Manual Installation
