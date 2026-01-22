@@ -48,7 +48,7 @@
 ### Automatic Installation (Linux)
 
 ```sh
-sh <(curl -s https://raw.githubusercontent.com/harbassan/spicetify-apps/main/stats/install.sh)
+sh <(curl -s https://raw.githubusercontent.com/harbassan/spicetify-apps/refs/heads/main/projects/stats/install.sh)
 ```
 
 ### Automatic Installation (Windows, Powershell)
