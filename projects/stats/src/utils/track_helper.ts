@@ -153,7 +153,9 @@ export const parseStat = (name: string) => {
 };
 
 export const parseLiked = async (tracks: (SpotifyMinifiedTrack | LastFMMinifiedTrack)[]) => {
+	if (!tracks || tracks.length === 0) return [];
 	const trackURIs = tracks.filter((t) => t.type === "spotify").map((t) => t.uri);
+	if (trackURIs.length === 0) return tracks.map(t => ({ ...t, liked: false }));
 	const liked = await queryInLibrary(trackURIs);
 	const likedMap = new Map(trackURIs.map((id, i) => [id, liked[i]]));
 	return tracks.map((t) => ({ ...t, liked: t.type === "spotify" ? (likedMap.get(t.uri) as boolean) : false }));

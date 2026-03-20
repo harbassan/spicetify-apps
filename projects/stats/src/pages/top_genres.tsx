@@ -12,8 +12,8 @@ import RefreshButton from "../components/buttons/refresh_button";
 import SettingsButton from "@shared/components/settings_button";
 import type { SpotifyRange } from "../types/spotify";
 import { getMeanAudioFeatures, parseArtists, parseStat } from "../utils/track_helper";
-import { useQuery } from "@shared/types/react_query";
-import useStatus from "@shared/status/useStatus";
+import { useQuery } from "../hooks/use_query";
+import useStatus from "../hooks/use_status";
 import { cacher, invalidator } from "../extensions/cache";
 
 const parseAlbums = (albums: SpotifyMinifiedTrack["album"][]) => {
@@ -63,9 +63,10 @@ const GenresPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const { status, error, data, refetch } = useQuery({
 		queryKey: ["top-genres", activeOption.id],
 		queryFn: cacher(() => getGenres(activeOption.id as SpotifyRange, configWrapper.config)),
+		retry: false,
 	});
 
-	const Status = useStatus(status, error);
+	const Status = useStatus(status, error, refetch);
 
 	const props = {
 		lhs: ["Top Genres"],
@@ -104,4 +105,4 @@ const GenresPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	);
 };
 
-export default React.memo(GenresPage);
+export default GenresPage;

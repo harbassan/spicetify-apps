@@ -9,8 +9,8 @@ import * as lastFM from "../api/lastfm";
 import * as spotify from "../api/spotify";
 import { SpotifyRange } from "../types/spotify";
 import { convertArtist, minifyArtist } from "../utils/converter";
-import useStatus from "@shared/status/useStatus";
-import { useQuery } from "@shared/types/react_query";
+import useStatus from "../hooks/use_status";
+import { useQuery } from "../hooks/use_query";
 import { cacher, invalidator } from "../extensions/cache";
 
 export const getTopArtists = async (timeRange: SpotifyRange, config: Config) => {
@@ -38,9 +38,10 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const { status, error, data, refetch } = useQuery({
 		queryKey: ["top-artists", activeOption.id],
 		queryFn: cacher(() => getTopArtists(activeOption.id as SpotifyRange, configWrapper.config)),
+		retry: false,
 	});
 
-	const Status = useStatus(status, error);
+	const Status = useStatus(status, error, refetch);
 
 	const props = {
 		lhs: ["Top Artists"],
@@ -57,6 +58,7 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
 	const artistCards = topArtists.map((artist, index) => (
 		<SpotifyCard
+			key={`${artist.uri}-${index}`}
 			type={"artist"}
 			provider={artist.type}
 			uri={artist.uri}
@@ -76,4 +78,4 @@ const ArtistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	);
 };
 
-export default React.memo(ArtistsPage);
+export default ArtistsPage;

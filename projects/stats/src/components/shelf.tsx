@@ -6,7 +6,6 @@ interface ShelfProps {
 }
 
 function Shelf(props: ShelfProps): React.ReactElement {
-	const { TextComponent } = Spicetify.ReactComponent;
 	const { title, children } = props;
 
 	return (
@@ -14,7 +13,7 @@ function Shelf(props: ShelfProps): React.ReactElement {
 			<div className="main-shelf-header">
 				<div className="main-shelf-topRow">
 					<div className="main-shelf-titleWrapper">
-						<TextComponent children={title} as="h2" variant="canon" semanticColor="textBase" />
+						<h2 style={{ fontSize: "24px", fontWeight: "bold", color: "white" }}>{title}</h2>
 					</div>
 				</div>
 			</div>
@@ -23,4 +22,4 @@ function Shelf(props: ShelfProps): React.ReactElement {
 	);
 }
 
-export default React.memo(Shelf);
+export default Shelf;

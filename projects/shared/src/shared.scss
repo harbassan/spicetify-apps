@@ -39,11 +39,91 @@
     font-size: 12px;
 }
 
+.stats-spotifyCard {
+    width: 100%;
+    height: 100%;
+
+    .main-card-cardContainer,
+    .main-card-card {
+        width: 100%;
+        height: 100%;
+    }
+
+    .main-card-cardMetadata {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+.stats-spotifyCard-imageFrame {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(var(--spice-rgb-selected-row), 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.is-artist {
+        border-radius: 999px;
+    }
+}
+
+.stats-spotifyCard-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.stats-spotifyCard-subheader {
+    color: var(--spice-subtext);
+    line-height: 1.35;
+}
+
+.stats-spotifyCard-fallback {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+    height: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(var(--spice-rgb-selected-row), 0.16);
+    background: var(--spice-card);
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.stats-spotifyCard-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.stats-spotifyCard-title {
+    color: var(--spice-text);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
 .page-header {
     align-content: space-between;
     align-items: center;
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
+    row-gap: 10px;
     margin: 16px 0;
 
     .header-right,
@@ -60,6 +140,107 @@
     .header-left {
         justify-content: flex-start;
     }
+}
+
+.stats-controlButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    border-radius: 999px;
+    border: 1px solid rgba(var(--spice-rgb-selected-row), 0.22);
+    background: rgba(var(--spice-rgb-player), 0.72);
+    color: var(--spice-text);
+    cursor: pointer;
+    transition: background-color 120ms ease, border-color 120ms ease;
+
+    &:hover {
+        background: var(--spice-card);
+        border-color: rgba(var(--spice-rgb-selected-row), 0.32);
+    }
+}
+
+.stats-filterDropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    padding: 0;
+    border-radius: 999px;
+    border: 1px solid rgba(var(--spice-rgb-selected-row), 0.22);
+    background: rgba(var(--spice-rgb-player), 0.96);
+    color: var(--spice-text);
+}
+
+.stats-filterDropdown-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    min-width: 132px;
+    height: 100%;
+    padding: 0 34px 0 12px;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    text-align: left;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.stats-filterDropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 20;
+    min-width: 100%;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    border-radius: 10px;
+    border: 1px solid rgba(var(--spice-rgb-selected-row), 0.28);
+    background: rgba(var(--spice-rgb-player), 0.98);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.stats-filterDropdown-option {
+    width: 100%;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 10px;
+    background: transparent;
+    color: var(--spice-text);
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+
+    &:hover {
+        background: rgba(var(--spice-rgb-selected-row), 0.18);
+    }
+
+    &.is-active {
+        background: rgba(var(--spice-rgb-button), 0.25);
+    }
+}
+
+.stats-filterDropdown::after {
+    content: "";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: translateY(-65%) rotate(45deg);
+    pointer-events: none;
+    opacity: 0.75;
 }
 
 .new-update {

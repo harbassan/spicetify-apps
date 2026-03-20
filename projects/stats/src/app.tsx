@@ -1,5 +1,4 @@
-import React from "react";
-
+const React = window.Spicetify.React;
 import ArtistsPage from "./pages/top_artists";
 import TracksPage from "./pages/top_tracks";
 import GenresPage from "./pages/top_genres";
@@ -61,10 +60,10 @@ const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapper }) =>
 		}
 	}, [activePage]);
 
-	if (activePage === undefined) return <></>;
+	if (activePage === undefined) return null;
 
 	return (
-		<>
+		<React.Fragment>
 			<NavigationBar links={tabPages} selected={activePage} storekey="stats:active-link" />
 			{newUpdate && (
 				<div className="new-update">
@@ -73,15 +72,19 @@ const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapper }) =>
 				</div>
 			)}
 			{pages[activePage]}
-		</>
+		</React.Fragment>
 	);
 };
 
 const waitForReady = async (callback: () => void) => {
-	if (Spicetify.Platform && Spicetify.Platform.RootlistAPI && Spicetify.ReactQuery && SpicetifyStats) {
+    // Robust check for Spicetify and sub-modules
+	if (
+        window.Spicetify?.Platform?.RootlistAPI && 
+        window.SpicetifyStats?.ConfigWrapper?.Config
+    ) {
 		callback();
 	} else {
-		setTimeout(() => waitForReady(callback), 1000);
+		setTimeout(() => waitForReady(callback), 300);
 	}
 }
 
@@ -92,14 +95,14 @@ const App = () => {
 	// otherwise app crashes if its first page on spotify load
 	if (!ready) {
 		waitForReady(() => {
-			setConfig({ ...SpicetifyStats.ConfigWrapper.Config });
+			setConfig({ ...window.SpicetifyStats.ConfigWrapper.Config });
 			setReady(true);
 		});
-		return <></>;
+		return null;
 	}
 
 	const launchModal = () => {
-		SpicetifyStats.ConfigWrapper.launchModal(setConfig);
+		window.SpicetifyStats.ConfigWrapper.launchModal(setConfig);
 	};
 
 	const configWrapper = {

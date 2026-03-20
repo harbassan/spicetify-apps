@@ -5,7 +5,7 @@
     "author": "harbassan",
     "license": "MIT",
     "workspaces": [
-        "stats",
-        "library"
+        "projects/stats",
+        "projects/library"
     ]
 }

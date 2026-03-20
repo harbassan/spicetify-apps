@@ -1,33 +1,44 @@
 #!/bin/bash
 
-# Define variables
-CUSTOM_APPS_DIR="$HOME/.config/spicetify/CustomApps"
-STATS_APP_DIR="$CUSTOM_APPS_DIR/stats"
-REPO="harbassan/spicetify-apps"
-ZIP_FILE="/tmp/spicetify-stats.zip"
-TEMP_DIR="/tmp/spicetify-stats"
+# Spicetify Stats Installation Script (Fixed Version)
+# Source: https://github.com/Akshay-86/spicetify-apps
 
-# Create CustomApps directory if it doesn't exist
-mkdir -p "$CUSTOM_APPS_DIR"
+GITHUB_USER="Akshay-86"
+REPO_NAME="spicetify-apps"
+BRANCH="main"
 
-# Get the latest release download URL
-LATEST_RELEASE_URL=$(curl -s "https://api.github.com/repos/$REPO/releases" | grep -B10 "spicetify-stats.release.zip" | grep "browser_download_url" | head -n1 | cut -d '"' -f 4)
+SPICETIFY_DIR="$HOME/.config/spicetify"
+CUSTOM_APPS_DIR="$SPICETIFY_DIR/CustomApps"
+EXTENSIONS_DIR="$SPICETIFY_DIR/Extensions"
+STATS_DIR="$CUSTOM_APPS_DIR/stats"
 
-# Download the zip file
-curl -L -o "$ZIP_FILE" "$LATEST_RELEASE_URL"
+echo "Downloading and Installing Fixed Spicetify Stats..."
 
-# Unzip the file
-unzip "$ZIP_FILE" -d "$TEMP_DIR"
+# Create folders
+mkdir -p "$STATS_DIR"
+mkdir -p "$EXTENSIONS_DIR"
 
-# Move the unzipped folder to the correct location
-rm -rf "$STATS_APP_DIR/stats"  # Ensure the target is empty
-cp -r "$TEMP_DIR/stats" "$STATS_APP_DIR/"
+# Download files from GitHub 'dist' folder
+BASE_URL="https://raw.githubusercontent.com/$GITHUB_USER/$REPO_NAME/$BRANCH/projects/stats/dist"
 
-# Apply Spicetify configuration
+# Download core files
+for file in index.js style.css manifest.json cache.js debug.js extension.js; do
+    echo "Downloading $file..."
+    curl -fsSL "$BASE_URL/$file" -o "$STATS_DIR/$file" || echo "Warning: Could not download $file"
+done
+
+# Install extension
+echo "Installing extension..."
+cp "$STATS_DIR/extension.js" "$EXTENSIONS_DIR/stats_extension.js"
+
+# Apply Spicetify config
+echo "Applying Spicetify configuration..."
 spicetify config custom_apps stats
+# Make sure it's in the extensions list
+if ! spicetify config extensions | grep -q "stats_extension.js"; then
+    spicetify config extensions stats_extension.js
+fi
+
 spicetify apply
 
-# Clean up
-rm -rf "$ZIP_FILE" "$TEMP_DIR"
-
-echo "Installation complete. Enjoy your new stats app!"
+echo "Success! Stats installed and applied."

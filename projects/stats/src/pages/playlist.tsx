@@ -3,7 +3,7 @@ import StatCard from "../components/cards/stat_card";
 import ChartCard from "../components/cards/chart_card";
 import SpotifyCard from "@shared/components/spotify_card";
 import Shelf from "../components/shelf";
-import useStatus from "@shared/status/useStatus";
+import useStatus from "../hooks/use_status";
 import { parseStat, parseTracks } from "../utils/track_helper";
 import { getFullPlaylist } from "../api/platform";
 
@@ -18,31 +18,32 @@ const useQueryShitty = <T,>(callback: () => Promise<T>) => {
 	const [data, setData] = React.useState<null | T>(null);
 	const [status, setStatus] = React.useState<"pending" | "error" | "success">("pending");
 
-	React.useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const data = await callback();
-				setData(data);
-				setStatus("success");
-			} catch (e) {
-				console.log(e);
-				setError(e as Error);
-				setStatus("error");
-			}
-		};
-
-		fetchData();
+	const fetchData = React.useCallback(async () => {
+		setStatus("pending");
+		try {
+			const data = await callback();
+			setData(data);
+			setStatus("success");
+		} catch (e) {
+			console.log(e);
+			setError(e as Error);
+			setStatus("error");
+		}
 	}, [callback]);
 
-	return { status, error, data };
+	React.useEffect(() => {
+		fetchData();
+	}, [fetchData]);
+
+	return { status, error, data, refetch: fetchData };
 };
 
 const PlaylistPage = ({ uri }: { uri: string }) => {
-	const query = useCallback(() => getPlaylist(uri), [uri]);
+	const query = React.useCallback(() => getPlaylist(uri), [uri]);
 
-	const { status, error, data } = useQueryShitty(query);
+	const { status, error, data, refetch } = useQueryShitty(query);
 
-	const Status = useStatus(status, error);
+	const Status = useStatus(status, error, refetch);
 
 	if (Status) return Status;
 
@@ -104,4 +105,4 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
 	);
 };
 
-export default React.memo(PlaylistPage);
+export default PlaylistPage;

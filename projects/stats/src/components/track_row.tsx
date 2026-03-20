@@ -1,4 +1,4 @@
-import React from "react";
+const React = window.Spicetify.React;
 import type { LastFMMinifiedTrack, SpotifyMinifiedTrack } from "../types/stats_types";
 import { formatNumber } from "../pages/charts";
 
@@ -120,7 +120,7 @@ const TrackRow = (props: TrackRowProps) => {
 						onClick={(event) => event.detail === 2 && playAndQueue(props.uri)}
 						style={{
 							height: 56,
-							gridTemplateColumns: "[index] var(--tracklist-index-column-width,16px) [first] minmax(120px,var(--col1,6fr)) [var1] minmax(120px,var(--col2,4fr)) [var2] minmax(120px,var(--col3,3fr)) [last] minmax(120px,var(--col4,1fr))"
+							gridTemplateColumns: "var(--stats-track-grid-template, [index] var(--tracklist-index-column-width,16px) [first] minmax(72px,var(--col1,6fr)) [var1] minmax(72px,var(--col2,4fr)) [var2] minmax(72px,var(--col3,3fr)) [last] minmax(64px,var(--col4,1fr)))"
 						}}
 					>
 						<div className="main-trackList-rowSectionIndex" role="gridcell" aria-colindex={1} tabIndex={-1}>

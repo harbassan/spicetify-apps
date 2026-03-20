@@ -1,42 +1,49 @@
-# Define variables
-$customAppsDir = "$env:APPDATA\spicetify\CustomApps"
-$statsAppDir = "$customAppsDir\stats"
-$repo = "harbassan/spicetify-apps"
-$zipFile = "$env:TEMP\spicetify-stats.zip"
-$tempDir = "$env:TEMP\spicetify-stats"
+# Spicetify Stats Installation Script (Fixed Version)
+# Source: https://github.com/Akshay-86/spicetify-apps
 
-# Create CustomApps directory if it doesn't exist
-If (!(Test-Path -Path $customAppsDir)) {
-  New-Item -ItemType Directory -Path $customAppsDir
+$githubUser = "Akshay-86"
+$repoName = "spicetify-apps"
+$branch = "main"
+
+$spicetifyDir = "$env:APPDATA\spicetify"
+# Check if spicetify is using a different directory (e.g. Linux-like on Windows or custom path)
+if (!(Test-Path -Path $spicetifyDir)) {
+    $spicetifyDir = "$HOME\.spicetify"
 }
 
-# Get the latest STATS release download URL
-$latestRelease = (Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases") | Where-Object {
-      $_.tag_name -match "stats-v[0-9]+\.[0-9]+\.[0-9]+"
-    } | Select-Object -First 1;
-$latestReleaseDownloadUrl = (Invoke-RestMethod -Uri $latestRelease.url).assets[0].browser_download_url
+$customAppsDir = "$spicetifyDir\CustomApps"
+$extensionsDir = "$spicetifyDir\Extensions"
+$statsDir = "$customAppsDir\stats"
 
-# Download the zip file
-Invoke-WebRequest -Uri $latestReleaseDownloadUrl -OutFile $zipFile
+Write-Host "Downloading and Installing Fixed Spicetify Stats..." -ForegroundColor Cyan
 
-# Unzip the file
-Expand-Archive -Path $zipFile -DestinationPath $tempDir -Force
+# Create folders
+If (!(Test-Path -Path $statsDir)) { New-Item -ItemType Directory -Path $statsDir -Force }
+If (!(Test-Path -Path $extensionsDir)) { New-Item -ItemType Directory -Path $extensionsDir -Force }
 
-# Move the unzipped folder to the correct location
-if (Test-Path -Path "$statsAppDir\*") {
-  Remove-Item -Path "$statsAppDir\*" -Recurse -Force
-  Write-Host "warning " -ForegroundColor DarkYellow -NoNewline
-  Write-Host "`"$statsAppDir`" Pre-existing file/s were found and deleted."
+# Download files from GitHub 'dist' folder
+$baseUrl = "https://raw.githubusercontent.com/$githubUser/$repoName/$branch/projects/stats/dist"
+
+$files = @("index.js", "style.css", "manifest.json", "cache.js", "debug.js", "extension.js")
+
+foreach ($file in $files) {
+    Write-Host "Downloading $file..."
+    Invoke-WebRequest -Uri "$baseUrl/$file" -OutFile "$statsDir\$file" -ErrorAction SilentlyContinue
 }
 
-Move-Item -Path "$tempDir\*" -Destination $statsAppDir -Force
+# Install extension
+Write-Host "Installing extension..."
+Copy-Item -Path "$statsDir\extension.js" -Destination "$extensionsDir\stats_extension.js" -Force
 
-# Apply Spicetify configuration
+# Apply Spicetify config
+Write-Host "Applying Spicetify configuration..."
 spicetify config custom_apps stats
+# Check if extension is already enabled
+$exts = spicetify config extensions
+if ($exts -notmatch "stats_extension.js") {
+    spicetify config extensions stats_extension.js
+}
+
 spicetify apply
 
-# Clean up
-Remove-Item -Path $zipFile, $tempDir -Recurse -Force
-
-Write-Host "success " -ForegroundColor DarkGreen -NoNewline
-Write-Host "Installation complete. Enjoy your new stats app!"
+Write-Host "Success! Stats installed and applied." -ForegroundColor Green

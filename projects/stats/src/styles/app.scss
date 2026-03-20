@@ -1,10 +1,17 @@
 #stats-app {
+    --stats-track-grid-template: [index] var(--tracklist-index-column-width, 16px) [first] minmax(72px, var(--col1, 6fr)) [var1] minmax(72px, var(--col2, 4fr)) [var2] minmax(72px, var(--col3, 3fr)) [last] minmax(64px, var(--col4, 1fr));
+
+    .stats-gridInlineSection {
+        position: relative;
+    }
+
     .stats-gridInline {
         --grid-gap: 24px;
         grid-template-columns: repeat(10, 180px) !important;
         overflow-x: hidden;
         scroll-behavior: smooth;
         margin-top: 5px;
+        padding-inline: 2px;
         transform: none !important;
         will-change: auto !important;
     }
@@ -12,18 +19,15 @@
     .grid:nth-child(2) {
         margin-top: 24px;
     }
-
-
-
-    [data-scroll="both"] {
+    .stats-gridInlineSection[data-scroll="both"] .stats-gridInline {
         mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
     }
 
-    [data-scroll="end"] {
+    .stats-gridInlineSection[data-scroll="end"] .stats-gridInline {
         mask-image: linear-gradient(to right, transparent, black 10%);
     }
 
-    [data-scroll="start"] {
+    .stats-gridInlineSection[data-scroll="start"] .stats-gridInline {
         mask-image: linear-gradient(to right, black 90%, transparent);
     }
 
@@ -31,6 +35,12 @@
         display: flex;
         gap: 24px;
         align-items: center;
+        flex-wrap: wrap;
+
+        >* {
+            flex: 1 1 160px;
+            min-width: 0;
+        }
     }
 
     .stats-trackPageTitle {
@@ -40,18 +50,52 @@
     }
 
     .stats-scrollButton {
+        position: absolute;
+        top: calc(50% - 28px);
+        z-index: 2;
         width: 40px;
-        border-radius: 8px;
-        border: none;
+        height: 40px;
+        border-radius: 999px;
+        border: 1px solid rgba(var(--spice-rgb-selected-row), 0.18);
         padding: 0;
-        margin-right: 5px;
-        background-color: var(--spice-player);
-        color: var(--spice-subtext);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(var(--spice-rgb-player), 0.94);
+        color: var(--spice-text);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+        transition: opacity 120ms ease, transform 120ms ease, background-color 120ms ease, border-color 120ms ease;
 
         &:hover {
             background-color: var(--spice-card);
-            color: var(--spice-text);
+            border-color: rgba(var(--spice-rgb-selected-row), 0.28);
         }
+    }
+
+    .stats-scrollButton--left {
+        left: 8px;
+    }
+
+    .stats-scrollButton--right {
+        right: 8px;
+    }
+
+    .stats-scrollChevron {
+        width: 16px;
+        height: 16px;
+        display: block;
+    }
+
+    .stats-scrollChevron--right {
+        transform: scaleX(-1);
+    }
+
+    .stats-gridInlineSection[data-scroll="start"] .stats-scrollButton--left,
+    .stats-gridInlineSection[data-scroll="end"] .stats-scrollButton--right {
+        opacity: 0;
+        pointer-events: none;
+        transform: scale(0.92);
     }
 
     .stats-tracklistHeader>div {
@@ -117,6 +161,44 @@
         fill: currentColor;
     }
 
+    .main-trackList-rowSectionEnd {
+        display: grid;
+        grid-template-columns: 16px minmax(44px, auto) 16px;
+        align-items: center;
+        justify-content: end;
+        gap: 12px;
+        min-width: 112px;
+        padding-inline-end: 8px;
+        box-sizing: border-box;
+    }
+
+    .main-trackList-trackListHeader .main-trackList-rowSectionEnd {
+        grid-template-columns: 16px minmax(44px, auto) 16px;
+        justify-content: center;
+    }
+
+    .main-trackList-trackListHeader .main-trackList-durationHeader {
+        grid-column: 2;
+        justify-self: center;
+    }
+
+    .main-trackList-rowDuration {
+        min-width: 40px;
+        text-align: center;
+    }
+
+    .main-trackList-rowHeartButton,
+    .main-trackList-rowMoreButton,
+    .main-trackList-durationHeader {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        padding: 0;
+        line-height: 1;
+    }
+
     .main-trackList-rowPlayPauseIcon,
     .main-trackList-durationHeader {
         fill: currentColor;
@@ -124,6 +206,14 @@
 
     .main-trackList-rowBadges {
         color: var(--spice-text);
+    }
+
+    @media (max-width: 1200px) {
+        --stats-track-grid-template: [index] var(--tracklist-index-column-width, 16px) [first] minmax(120px, 1fr) [last] minmax(112px, auto);
+
+        .main-trackList-trackListRowGrid .main-trackList-rowSectionVariable {
+            display: none;
+        }
     }
 
     .extend-button {
@@ -143,6 +233,166 @@
     .main-card-cardContainer {
         width: 100%;
         height: 100%;
+    }
+
+    .stats-loading-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+        font-size: 24px;
+        color: var(--spice-subtext);
+    }
+
+    .stats-debugConsole {
+        position: fixed;
+        right: 24px;
+        bottom: 100px;
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+    }
+
+    .stats-debugConsole-toggle,
+    .stats-debugConsole-clear {
+        border: 1px solid rgba(var(--spice-rgb-selected-row), 0.3);
+        background: rgba(var(--spice-rgb-player), 0.95);
+        color: var(--spice-text);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        backdrop-filter: blur(12px);
+    }
+
+    .stats-debugConsole-panel {
+        width: min(520px, calc(100vw - 48px));
+        max-height: min(70vh, 680px);
+        overflow: hidden;
+        border-radius: 16px;
+        border: 1px solid rgba(var(--spice-rgb-selected-row), 0.25);
+        background: rgba(var(--spice-rgb-player), 0.97);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stats-debugConsole-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(var(--spice-rgb-selected-row), 0.15);
+
+        h3,
+        p {
+            margin: 0;
+        }
+
+        p {
+            color: var(--spice-subtext);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+    }
+
+    .stats-debugConsole-section {
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(var(--spice-rgb-selected-row), 0.12);
+    }
+
+    .stats-debugConsole-sectionTitle {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--spice-subtext);
+        margin-bottom: 10px;
+    }
+
+    .stats-debugConsole-empty {
+        color: var(--spice-subtext);
+        font-size: 13px;
+    }
+
+    .stats-debugConsole-retry {
+        border-radius: 12px;
+        padding: 10px 12px;
+        background: rgba(var(--spice-rgb-main), 0.65);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 13px;
+    }
+
+    .stats-debugConsole-retry+.stats-debugConsole-retry {
+        margin-top: 8px;
+    }
+
+    .stats-debugConsole-retryTitle {
+        font-weight: 700;
+    }
+
+    .stats-debugConsole-retryMessage {
+        color: var(--spice-subtext);
+    }
+
+    .stats-debugConsole-logList {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 300px;
+        overflow: auto;
+        padding-right: 4px;
+    }
+
+    .stats-debugConsole-log {
+        border-radius: 12px;
+        padding: 10px 12px;
+        background: rgba(var(--spice-rgb-main), 0.65);
+        font-family: ui-monospace, SFMono-Regular, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .stats-debugConsole-log.warn {
+        border-left: 3px solid #f59e0b;
+    }
+
+    .stats-debugConsole-log.error {
+        border-left: 3px solid #ef4444;
+    }
+
+    .stats-debugConsole-log.info {
+        border-left: 3px solid #38bdf8;
+    }
+
+    .stats-debugConsole-logHeader {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--spice-subtext);
+        margin-bottom: 6px;
+    }
+
+    .stats-debugConsole-level {
+        font-weight: 700;
+    }
+
+    .stats-debugConsole-message {
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .stats-debugConsole-meta {
+        margin: 8px 0 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        color: var(--spice-subtext);
+        font-size: 11px;
     }
 
 }

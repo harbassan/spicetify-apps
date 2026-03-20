@@ -2,11 +2,36 @@ import React from "react";
 import PlaylistPage from "../pages/playlist";
 import { version as STATS_VERSION } from "../../package.json";
 import ConfigWrapper from "@shared/config/config_wrapper";
+import { beginExternalOAuth, setExternalToken } from "../api/spotify";
 
 // contruct global class for stats methods
 class SpicetifyStats {
 	ConfigWrapper = new ConfigWrapper(
 		[
+			{
+				name: "Spotify OAuth Login",
+				key: "oauth-login",
+				type: "button",
+				def: false,
+				buttonLabel: "Login with Spotify",
+				desc: "Opens a Spotify login popup. Approve the app and the token is saved automatically.",
+				sectionHeader: "Rate Limit Bypass",
+				callback: () => {
+					void beginExternalOAuth();
+				},
+			},
+			{
+				name: "OAuth Callback URL",
+				key: "oauth-token",
+				type: "text",
+				def: null,
+				placeholder: "Paste the full callback URL here",
+				desc: "Paste once after login. The app stores refresh token and renews access automatically.",
+				callback: (value) => {
+					if (typeof value !== "string" || !value.trim()) return;
+					void setExternalToken(value);
+				},
+			},
 			{
 				name: "Last.fm Api Key",
 				key: "api-key",

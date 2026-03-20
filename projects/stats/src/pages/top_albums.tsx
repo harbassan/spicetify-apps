@@ -8,8 +8,8 @@ import SettingsButton from "@shared/components/settings_button";
 import type { SpotifyRange } from "../types/spotify";
 import * as lastFM from "../api/lastfm";
 import { convertAlbum } from "../utils/converter";
-import { useQuery } from "@shared/types/react_query";
-import useStatus from "@shared/status/useStatus";
+import { useQuery } from "../hooks/use_query";
+import useStatus from "../hooks/use_status";
 import { DropdownOptions } from "./top_artists";
 import { cacher, invalidator } from "../extensions/cache";
 
@@ -26,9 +26,10 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const { status, error, data, refetch } = useQuery({
 		queryKey: ["top-albums", activeOption.id],
 		queryFn: cacher(() => getTopAlbums(activeOption.id as SpotifyRange, configWrapper.config)),
+		retry: false,
 	});
 
-	const Status = useStatus(status, error);
+	const Status = useStatus(status, error, refetch);
 
 	const props = {
 		lhs: ["Top Albums"],
@@ -46,6 +47,7 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const albumCards = topAlbums.map((album, index) => {
 		return (
 			<SpotifyCard
+				key={`${album.uri}-${index}`}
 				type={"album"}
 				provider={album.type}
 				uri={album.uri}
@@ -64,4 +66,4 @@ const AlbumsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	);
 };
 
-export default React.memo(AlbumsPage);
+export default AlbumsPage;

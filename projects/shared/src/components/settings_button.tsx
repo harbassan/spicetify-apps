@@ -18,18 +18,18 @@ function SettingsIcon(): React.ReactElement<SVGElement> {
 }
 
 function SettingsButton(props: SettingsButtonProps): React.ReactElement<HTMLButtonElement> {
-    const { TooltipWrapper, ButtonTertiary } = Spicetify.ReactComponent;
     const { configWrapper } = props;
 
     return (
-        <TooltipWrapper label="Settings" renderInline={true} placement="top">
-            <ButtonTertiary
-                buttonSize="sm"
-                onClick={configWrapper.launchModal}
-                aria-label="Settings"
-                iconOnly={SettingsIcon}
-            />
-        </TooltipWrapper>
+        <button
+            className="stats-controlButton"
+            type="button"
+            onClick={configWrapper.launchModal}
+            aria-label="Settings"
+            title="Settings"
+        >
+            <SettingsIcon />
+        </button>
     );
 }
 

@@ -25,6 +25,12 @@ interface MenuItemProps {
 interface SortMenuItemProps extends MenuItemProps {
 	isReversed: boolean;
 }
+
+function getOptionLabel(option: Option | undefined): string {
+	if (!option) return "";
+	return typeof option.name === "string" ? option.name : String(option.name);
+}
+
 const SortMenuItem = (props: SortMenuItemProps) => {
 	const { ReactComponent } = Spicetify;
 	const { option, isActive, isReversed, switchCallback } = props;
@@ -41,18 +47,20 @@ const SortMenuItem = (props: SortMenuItemProps) => {
 			trailingIcon={isActive ? isReversed ? <DownArrow /> : <UpArrow /> : undefined}
 			style={isActive ? activeStyle : undefined}
 		>
-			{option.name}
+			{getOptionLabel(option)}
 		</ReactComponent.MenuItem>
 	);
 };
 
 const SortDropdownMenu = (props: SortDropdownMenuProps) => {
-	const { ContextMenu, Menu, TextComponent } = Spicetify.ReactComponent;
+	const { ContextMenu, Menu } = Spicetify.ReactComponent;
 	const { options, activeOption, isReversed, switchCallback } = props;
+	const activeOptionLabel = getOptionLabel(activeOption);
 
 	const optionItems = options.map((option) => {
 		return (
 			<SortMenuItem
+				key={option.id}
 				option={option}
 				isActive={option === activeOption}
 				isReversed={isReversed}
@@ -68,10 +76,10 @@ const SortDropdownMenu = (props: SortDropdownMenuProps) => {
 	return (
 		<ContextMenu menu={<MenuWrapper />} trigger="click">
 			<button className="x-sortBox-sortDropdown" type="button" role="combobox" aria-expanded="false">
-				<TextComponent variant="mesto" semanticColor="textSubdued">
-					{activeOption.name}
+				<span className="main-type-mesto" style={{ color: "var(--spice-subtext)" }}>
+					{activeOptionLabel}
 					{isReversed ? <DownArrow /> : <UpArrow />}
-				</TextComponent>
+				</span>
 				<svg
 					role="img"
 					height="16"

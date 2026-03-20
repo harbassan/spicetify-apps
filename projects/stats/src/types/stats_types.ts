@@ -8,9 +8,12 @@ export interface Config {
 	"use-lastfm": boolean;
 	"show-artists": boolean;
 	"show-tracks": boolean;
+	"show-albums": boolean;
 	"show-genres": boolean;
 	"show-library": boolean;
 	"show-charts": boolean;
+	"show-debug-console": boolean;
+	"oauth-token": string | null;
 }
 
 export interface ConfigWrapper {

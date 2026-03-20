@@ -5,10 +5,8 @@ import type {
 	useInfiniteQuery as useInfiniteQueryT,
 } from "@tanstack/react-query";
 
-
-export const ReactQuery = Spicetify.ReactQuery;
-
-export const useQuery: typeof useQueryT = (...args) => ReactQuery.useQuery(...args);
-export const useInfiniteQuery: typeof useInfiniteQueryT = (...args) => ReactQuery.useInfiniteQuery(...args);
-export const getQueryClient = () => ReactQuery.QueryClient as QueryClientT;
-export const QueryClientProvider: typeof QueryClientProviderT = (...args) => ReactQuery.QueryClientProvider(...args);
+// Accessing Spicetify modules via getters to ensure they are ready
+export const useQuery: typeof useQueryT = (...args) => (window.Spicetify.ReactQuery as any).useQuery(...args);
+export const useInfiniteQuery: typeof useInfiniteQueryT = (...args) => (window.Spicetify.ReactQuery as any).useInfiniteQuery(...args);
+export const getQueryClient = () => (window.Spicetify.ReactQuery as any).QueryClient as QueryClientT;
+export const QueryClientProvider: typeof QueryClientProviderT = (...args) => (window.Spicetify.ReactQuery as any).QueryClientProvider(...args);

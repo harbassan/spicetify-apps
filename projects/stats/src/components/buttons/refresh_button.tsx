@@ -18,13 +18,18 @@ function RefreshIcon(): React.ReactElement<SVGElement> {
 }
 
 function RefreshButton(props: RefreshButtonProps): React.ReactElement<HTMLButtonElement> {
-	const { ButtonTertiary, TooltipWrapper } = Spicetify.ReactComponent;
 	const { callback } = props;
 
 	return (
-		<TooltipWrapper label={"Refresh"} renderInline={true} placement="top">
-			<ButtonTertiary buttonSize="sm" onClick={callback} aria-label="Refresh" iconOnly={RefreshIcon} />
-		</TooltipWrapper>
+		<button
+			className="stats-controlButton"
+			type="button"
+			onClick={callback}
+			aria-label="Refresh"
+			title="Refresh"
+		>
+			<RefreshIcon />
+		</button>
 	);
 }
 

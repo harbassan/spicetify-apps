@@ -37,6 +37,12 @@ interface SliderInputProps {
     callback: (e: any) => void;
 }
 
+interface ButtonInputProps {
+    storageKey: string;
+    label: string;
+    callback: () => void;
+}
+
 const TextInput = (props: TextInputProps) => {
     const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         props.callback(event.target.value);
@@ -143,6 +149,20 @@ const SliderInput = (props: SliderInputProps) => {
     );
 };
 
+const ButtonInput = (props: ButtonInputProps) => {
+    return (
+        <button
+            type="button"
+            id={`button:${props.storageKey}`}
+            className="text-input"
+            style={{ cursor: "pointer", width: "auto", minWidth: "160px" }}
+            onClick={props.callback}
+        >
+            {props.label}
+        </button>
+    );
+};
+
 const TooltipIcon = () => {
     return (
         <svg
@@ -164,18 +184,9 @@ const ConfigRow = (props: { name: string; desc?: string; children: React.ReactEl
             <label className="col description">
                 {props.name}
                 {props.desc && (
-                    <Spicetify.ReactComponent.TooltipWrapper
-                        label={<div dangerouslySetInnerHTML={{ __html: props.desc }} />}
-                        renderInline={true}
-                        showDelay={10}
-                        placement="top"
-                        labelClassName="tooltip"
-                        disabled={false}
-                    >
-                        <div className="tooltip-icon">
-                            <TooltipIcon />
-                        </div>
-                    </Spicetify.ReactComponent.TooltipWrapper>
+                    <div title={props.desc} className="tooltip-icon">
+                        <TooltipIcon />
+                    </div>
                 )}
             </label>
             <div className="col action">{props.children}</div>
@@ -231,6 +242,14 @@ const ConfigModal = (props: ConfigModalProps) => {
                             max={modalRow.max}
                             step={modalRow.step}
                             callback={updateItem}
+                        />
+                    );
+                case "button":
+                    return (
+                        <ButtonInput
+                            storageKey={key}
+                            label={modalRow.buttonLabel || modalRow.name}
+                            callback={() => modalRow.callback?.(true)}
                         />
                     );
                 default:

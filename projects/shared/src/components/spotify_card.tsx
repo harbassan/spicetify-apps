@@ -1,4 +1,4 @@
-import React from "react";
+const React = window.Spicetify.React;
 
 interface SpotifyCardProps {
 	type: "artist" | "album" | "lastfm" | "playlist";
@@ -18,62 +18,61 @@ interface SpotifyCardProps {
  */
 function SpotifyCard(props: SpotifyCardProps): React.ReactElement<HTMLDivElement> {
 	// @ts-ignore
-	const { Cards, TextComponent, ArtistMenu, AlbumMenu, PlaylistMenu, ContextMenu } = Spicetify.ReactComponent;
-	const { FeatureCard: Card, CardImage } = Cards;
+	const { Cards } = Spicetify.ReactComponent;
+	const { FeatureCard: Card } = Cards;
 	const { type, header, uri, imageUrl, subheader, artistUri, badge, provider = "spotify" } = props;
+	const isSpotifyProvider = provider === "spotify";
+	const safeHeader = typeof header === "string" ? header : String(header ?? "");
+	const safeSubheader = typeof subheader === "string" ? subheader : String(subheader ?? "");
 
-	const Menu = () => {
-		switch (type) {
-			case "artist":
-				return <ArtistMenu uri={uri} />;
-			case "album":
-				return <AlbumMenu uri={uri} artistUri={artistUri} canRemove={true} />;
-			case "playlist":
-				return <PlaylistMenu uri={uri} />;
-			default:
-				return <></>;
+	const openItem = () => {
+		if (!isSpotifyProvider) {
+			window.open(uri, "_blank");
+			return;
 		}
+
+		Spicetify.Platform.History.push(`/${type}/${uri.split(":").at(-1)}`);
 	};
 
-	let lastfmProps = {};
-
-	if (provider === "lastfm") {
-		lastfmProps = {
-			onClick: () => window.open(uri, "_blank"),
-			isPlayable: false,
-			delegateNavigation: true,
-		};
-	};
+	const nativeCard = (
+		<Card
+			featureIdentifier={type}
+			headerText={safeHeader}
+			renderCardImage={() => (
+				<div className={`stats-spotifyCard-imageFrame${type === "artist" ? " is-artist" : ""}`}>
+					{imageUrl ? <img className="stats-spotifyCard-image" src={imageUrl} alt={safeHeader} /> : null}
+				</div>
+			)}
+			renderSubHeaderContent={() => (
+				<div className="main-type-mesto stats-spotifyCard-subheader">
+					{safeSubheader}
+				</div>
+			)}
+			uri={uri}
+		/>
+	);
 
 	return (
-		<ContextMenu menu={Menu()} trigger="right-click">
-			<div style={{ position: "relative" }}>
-				<Card
-					featureIdentifier={type}
-					headerText={header}
-					renderCardImage={() => (
-						<CardImage
-							images={[
-								{
-									height: 640,
-									url: imageUrl,
-									width: 640,
-								},
-							]}
-							isCircular={type === "artist"}
-						/>
-					)}
-					renderSubHeaderContent={() => (
-						<TextComponent as="div" variant="mesto" semanticColor="textSubdued">
-							{subheader}
-						</TextComponent>
-					)}
-					uri={uri}
-					{...lastfmProps}
-				/>
-				{badge && <div className="badge">{badge}</div>}
-			</div>
-		</ContextMenu>
+		<div className={`stats-spotifyCard stats-spotifyCard--${type}`} style={{ position: "relative" }}>
+			{isSpotifyProvider ? (
+				nativeCard
+			) : (
+				<button
+					className="stats-spotifyCard-fallback"
+					type="button"
+					onClick={openItem}
+				>
+					<div className={`stats-spotifyCard-imageFrame${type === "artist" ? " is-artist" : ""}`}>
+						{imageUrl ? <img className="stats-spotifyCard-image" src={imageUrl} alt={safeHeader} /> : null}
+					</div>
+					<div className="stats-spotifyCard-copy">
+						<div className="stats-spotifyCard-title">{safeHeader}</div>
+						<div className="stats-spotifyCard-subheader">{safeSubheader}</div>
+					</div>
+				</button>
+			)}
+			{badge && <div className="badge">{badge}</div>}
+		</div>
 	);
 }
 

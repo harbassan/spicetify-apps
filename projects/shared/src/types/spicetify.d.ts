@@ -1843,14 +1843,6 @@ declare namespace Spicetify {
 		const PlaylistMenu: any;
 		const TrackMenu: any;
 		/**
-		 * Component to display tooltip when hovering over element
-		 * Useful for accessibility
-		 *
-		 * Props:
-		 * @see Spicetify.ReactComponent.TooltipProps
-		 */
-		const TooltipWrapper: any;
-		/**
 		 * Component to render Spotify-style icon
 		 * @since Spotify `1.1.95`
 		 *

@@ -9,8 +9,8 @@ import Shelf from "../components/shelf";
 import type { ConfigWrapper } from "../types/stats_types";
 import RefreshButton from "../components/buttons/refresh_button";
 import SettingsButton from "@shared/components/settings_button";
-import { useQuery } from "@shared/types/react_query";
-import useStatus from "@shared/status/useStatus";
+import { useQuery } from "../hooks/use_query";
+import useStatus from "../hooks/use_status";
 import { parseStat, parseTracks } from "../utils/track_helper";
 import { cacher, invalidator } from "../extensions/cache";
 import { getFullPlaylist, getRootlist } from "../api/platform";
@@ -35,6 +35,7 @@ const LibraryPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const { status, error, data, refetch } = useQuery({
 		queryKey: ["library", activeOption.id],
 		queryFn: cacher(() => getLibrary(activeOption.id as "owned" | "all")),
+		retry: false,
 	});
 
 	const props = {
@@ -46,7 +47,7 @@ const LibraryPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 		],
 	};
 
-	const Status = useStatus(status, error);
+	const Status = useStatus(status, error, refetch);
 
 	if (Status) return <PageContainer {...props}>{Status}</PageContainer>;
 
@@ -59,6 +60,7 @@ const LibraryPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const artistCards = analysis.artists.contents.slice(0, 10).map((artist) => {
 		return (
 			<SpotifyCard
+				key={artist.uri}
 				type="artist"
 				provider={artist.type}
 				uri={artist.uri}
@@ -72,6 +74,7 @@ const LibraryPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const albumCards = analysis.albums.contents.slice(0, 10).map((album) => {
 		return (
 			<SpotifyCard
+				key={album.uri}
 				type="album"
 				provider={album.type}
 				uri={album.uri}
@@ -109,4 +112,4 @@ const LibraryPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	);
 };
 
-export default React.memo(LibraryPage);
+export default LibraryPage;
