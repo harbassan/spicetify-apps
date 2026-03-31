@@ -8,7 +8,6 @@ import AddButton from "../components/add_button";
 import type { ConfigWrapper } from "../types/library_types";
 import LoadMoreCard from "../components/load_more_card";
 import TextInputDialog from "../components/text_input_dialog";
-import LeadingIcon from "../components/leading_icon";
 import { useInfiniteQuery } from "@shared/types/react_query";
 import type { FolderItem, GetContentsResponse, PlaylistItem, UpdateEvent } from "../types/platform";
 import useStatus from "@shared/status/useStatus";
@@ -17,11 +16,8 @@ import useSortDropdownMenu from "@shared/dropdown/useSortDropdownMenu";
 import BackButton from "../components/back_button";
 import CustomCard from "../components/custom_card";
 
-const AddMenu = ({ folder }: { folder?: string }) => {
-	const { MenuItem, Menu } = Spicetify.ReactComponent;
+const getAddMenuItems = (folder?: string) => {
 	const { RootlistAPI } = Spicetify.Platform;
-	const { SVGIcons } = Spicetify;
-
 	const insertLocation = folder ? { uri: folder } : "start";
 
 	const createFolder = () => {
@@ -48,16 +44,10 @@ const AddMenu = ({ folder }: { folder?: string }) => {
 		});
 	};
 
-	return (
-		<Menu>
-			<MenuItem onClick={createFolder} leadingIcon={<LeadingIcon path={SVGIcons["playlist-folder"]} />}>
-				Create Folder
-			</MenuItem>
-			<MenuItem onClick={createPlaylist} leadingIcon={<LeadingIcon path={SVGIcons.playlist} />}>
-				Create Playlist
-			</MenuItem>
-		</Menu>
-	);
+	return [
+		{ label: "Create Folder", iconPath: Spicetify.SVGIcons["playlist-folder"], onClick: createFolder },
+		{ label: "Create Playlist", iconPath: Spicetify.SVGIcons.playlist, onClick: createPlaylist },
+	];
 };
 
 function isValidRootlistItem(item: PlaylistItem | FolderItem) {
@@ -86,12 +76,33 @@ const flattenOptions = [
 	{ id: "true", name: "Flattened" },
 ];
 
+// Module-level cache: URIs whose images have already been fetched or attempted.
+// Persists across re-renders and page navigations within the session.
+// Bounded to prevent unbounded memory growth over long sessions.
+const MAX_CACHE_SIZE = 2000;
+const imageCache: Record<string, string | null> = {};
+const imageCacheKeys: string[] = [];
+
+function addToImageCache(uri: string, url: string | null) {
+	if (!(uri in imageCache)) {
+		imageCacheKeys.push(uri);
+		if (imageCacheKeys.length > MAX_CACHE_SIZE) {
+			const oldest = imageCacheKeys.shift()!;
+			delete imageCache[oldest];
+		}
+	}
+	imageCache[uri] = url;
+}
+
 const PlaylistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const [sortDropdown, sortOption, isReversed] = useSortDropdownMenu(dropdownOptions, "library:playlists-sort");
 	const [filterDropdown, filterOption] = useDropdownMenu(filterOptions);
 	const [flattenDropdown, flattenOption] = useDropdownMenu(flattenOptions);
 	const [textFilter, setTextFilter] = React.useState("");
 	const [images, setImages] = React.useState({ ...FolderImageWrapper.getFolderImages() });
+	const [playlistImages, setPlaylistImages] = React.useState<Record<string, string>>(
+		Object.fromEntries(Object.entries(imageCache).filter((e): e is [string, string] => e[1] !== null))
+	);
 
 	const folder = Spicetify.Platform.History.location.pathname.split("/")[3];
 
@@ -124,6 +135,92 @@ const PlaylistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 		retry: false,
 	});
 
+	// Fetch playlist cover images using hybrid approach:
+	// 1. Bulk fetch from RootlistAPI (fast, covers already-resolved images)
+	// 2. Per-playlist PlaylistAPI.getMetadata fallback for remaining items
+	// Uses module-level imageCache to avoid re-fetching on data changes.
+	useEffect(() => {
+		if (status !== "success" || !data) return;
+
+		const items = data.pages.flatMap((page) => page.items ?? []);
+		const missingImages = items.filter(
+			(item): item is PlaylistItem =>
+				item.type === "playlist" &&
+				!item.images?.[0]?.url &&
+				!(item.uri in imageCache)
+		);
+
+		if (missingImages.length === 0) return;
+
+		let cancelled = false;
+		const BATCH_SIZE = 10;
+		const BATCH_DELAY = 50;
+
+		const fetchImages = async () => {
+			const imageMap: Record<string, string> = {};
+			// Track attempted URIs locally — only commit to imageCache
+			// atomically at the end to avoid poisoning on cancellation.
+			const attemptedUris = new Set<string>();
+			const missingUris = new Set(missingImages.map((i) => i.uri));
+
+			// Phase 1: Bulk fetch from RootlistAPI — resolves most images in one call
+			try {
+				const res = await Spicetify.Platform.RootlistAPI.getContents({ flatten: true });
+				for (const item of res.items ?? []) {
+					if (cancelled) return;
+					if (item.type === "playlist" && missingUris.has(item.uri) && item.images?.[0]?.url) {
+						imageMap[item.uri] = item.images[0].url;
+						attemptedUris.add(item.uri);
+					}
+				}
+			} catch { /* ignore — fall through to per-playlist fetch */ }
+
+			if (cancelled) return;
+
+			// Phase 2: Per-playlist fallback for items still missing images
+			const stillMissing = missingImages.filter(
+				(item) => !attemptedUris.has(item.uri)
+			);
+
+			for (let i = 0; i < stillMissing.length; i += BATCH_SIZE) {
+				if (cancelled) return;
+				const batch = stillMissing.slice(i, i + BATCH_SIZE);
+				await Promise.allSettled(
+					batch.map((item) =>
+						Spicetify.Platform.PlaylistAPI.getMetadata(item.uri)
+							.then((meta: { images?: Array<{ url: string }> }) => {
+								attemptedUris.add(item.uri);
+								if (meta?.images?.[0]?.url) {
+									imageMap[item.uri] = meta.images[0].url;
+								}
+							})
+							.catch(() => {
+								attemptedUris.add(item.uri);
+							})
+					)
+				);
+				if (i + BATCH_SIZE < stillMissing.length) {
+					await new Promise((r) => setTimeout(r, BATCH_DELAY));
+				}
+			}
+
+			if (!cancelled) {
+				// Commit all attempted URIs — positive (string URL) or null (no image found)
+				for (const uri of attemptedUris) addToImageCache(uri, imageMap[uri] ?? null);
+				if (attemptedUris.size > 0) {
+					// Derive state directly from imageCache so playlistImages stays bounded
+					// by MAX_CACHE_SIZE and stays consistent with imageCache after evictions.
+					setPlaylistImages(
+						Object.fromEntries(Object.entries(imageCache).filter((e): e is [string, string] => e[1] !== null))
+					);
+				}
+			}
+		};
+
+		fetchImages();
+		return () => { cancelled = true; };
+	}, [status, data]);
+
 	useEffect(() => {
 		const update = (e: UpdateEvent) => refetch();
 		const updateImages = (e: CustomEvent | Event) => "detail" in e && setImages({ ...e.detail });
@@ -143,7 +240,7 @@ const PlaylistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 			data?.pages[0].openedFolderName || "Playlists",
 		],
 		rhs: [
-			<AddButton Menu={<AddMenu folder={folder} />} />,
+			<AddButton menuItems={getAddMenuItems(folder)} />,
 			sortDropdown,
 			filterDropdown,
 			flattenDropdown,
@@ -156,11 +253,12 @@ const PlaylistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 
 	const contents = data as NonNullable<typeof data>;
 
-	const items = contents.pages.flatMap((page) => page.items);
+	const items = contents.pages.flatMap((page) => page.items ?? []);
 
 	const rootlistCards = items.filter(isValidRootlistItem).map((item) => (
 		item.type === "folder" ?
 			<CustomCard
+				key={item.uri}
 				type={item.type}
 				uri={item.uri}
 				header={item.name}
@@ -170,21 +268,33 @@ const PlaylistsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 				imageUrl={images[item.uri]}
 				badge={item.pinned ? <PinIcon /> : undefined}
 			/> :
-			<SpotifyCard
-				type={item.type}
-				// NOTE: spotify returns the wrong uri for the local files playlist
-				uri={item.uri === "spotify:local-files" ? "spotify:collection:local-files" : item.uri}
+		item.uri === "spotify:local-files" ?
+			<CustomCard
+				key={item.uri}
+				type="localfiles"
+				uri="spotify:collection:local-files"
 				header={item.name}
 				subheader={item.owner?.name || "System Playlist"}
-				imageUrl={item.images?.[0]?.url}
+				badge={item.pinned ? <PinIcon /> : undefined}
+			/> :
+			<SpotifyCard
+				key={item.uri}
+				type={item.type}
+				uri={item.uri}
+				header={item.name}
+				subheader={item.owner?.name || "System Playlist"}
+				imageUrl={playlistImages[item.uri] || item.images?.[0]?.url}
 				badge={item.pinned ? <PinIcon /> : undefined}
 			/>
 	));
 
-	if (hasNextPage) rootlistCards.push(<LoadMoreCard callback={fetchNextPage} />);
+	if (hasNextPage) rootlistCards.push(<LoadMoreCard key="load-more" callback={fetchNextPage} />);
 
 	return (
 		<PageContainer {...props}>
+			{configWrapper.config["show-item-count"] ? (
+				<div className="library-item-count">{items.length} items</div>
+			) : null}
 			<div className={"main-gridContainer-gridContainer grid"}>{rootlistCards}</div>
 		</PageContainer>
 	);

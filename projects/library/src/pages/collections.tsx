@@ -7,7 +7,6 @@ import AddButton from "../components/add_button";
 import type { ConfigWrapper } from "../types/library_types";
 import LoadMoreCard from "../components/load_more_card";
 import TextInputDialog from "../components/text_input_dialog";
-import LeadingIcon from "../components/leading_icon";
 import { useInfiniteQuery } from "@shared/types/react_query";
 import useStatus from "@shared/status/useStatus";
 import useSortDropdownMenu from "@shared/dropdown/useSortDropdownMenu";
@@ -15,10 +14,7 @@ import BackButton from "../components/back_button";
 import CustomCard from "../components/custom_card";
 import { CollectionChild } from "../extensions/collections_wrapper";
 
-const AddMenu = ({ collection }: { collection?: string }) => {
-	const { MenuItem, Menu } = Spicetify.ReactComponent;
-	const { SVGIcons } = Spicetify;
-
+const getAddMenuItems = (collection?: string) => {
 	const createCollection = () => {
 		const onSave = (value: string) => {
 			CollectionsWrapper.createCollection(value || "New Collection", collection);
@@ -53,21 +49,14 @@ const AddMenu = ({ collection }: { collection?: string }) => {
 		});
 	};
 
-	return (
-		<Menu>
-			<MenuItem onClick={createCollection} leadingIcon={<LeadingIcon path={SVGIcons["playlist-folder"]} />}>
-				Create Collection
-			</MenuItem>
-			<MenuItem onClick={createDiscogCollection} leadingIcon={<LeadingIcon path={SVGIcons.artist} />}>
-				Create Discog Collection
-			</MenuItem>
-			{collection && (
-				<MenuItem onClick={addAlbum} leadingIcon={<LeadingIcon path={SVGIcons.album} />}>
-					Add Album
-				</MenuItem>
-			)}
-		</Menu>
-	);
+	const items = [
+		{ label: "Create Collection", iconPath: Spicetify.SVGIcons["playlist-folder"], onClick: createCollection },
+		{ label: "Create Discog Collection", iconPath: Spicetify.SVGIcons.artist, onClick: createDiscogCollection },
+	];
+	if (collection) {
+		items.push({ label: "Add Album", iconPath: Spicetify.SVGIcons.album, onClick: addAlbum });
+	}
+	return items;
 };
 
 function isValidCollectionItem(item: CollectionChild) {
@@ -132,7 +121,7 @@ const CollectionsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) =>
 			data?.pages[0].openedCollectionName || "Collections"
 		],
 		rhs: [
-			<AddButton Menu={<AddMenu collection={collection} />} />,
+			<AddButton menuItems={getAddMenuItems(collection)} />,
 			sortDropdown,
 			<SearchBar setSearch={setTextFilter} placeholder="Collections" />,
 			<SettingsButton configWrapper={configWrapper} />,
@@ -145,29 +134,51 @@ const CollectionsPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) =>
 
 	const items = contents.pages.flatMap((page) => page.items);
 
-	// TODO: fix the typing to explictly allow localalbums
-	const rootlistCards = items.filter(isValidCollectionItem).map((item) => (
-		item.type === "album" ?
-			<SpotifyCard
-				type={item.type}
+	const rootlistCards = items.filter(isValidCollectionItem).map((item) => {
+		if (item.type === "album") {
+			return (
+				<SpotifyCard
+					key={item.uri}
+					type={item.type}
+					uri={item.uri}
+					header={item.name}
+					subheader={item.artists?.[0]?.name}
+					imageUrl={item.images?.[0]?.url}
+				/>
+			);
+		}
+		if (item.type === "collection") {
+			return (
+				<CustomCard
+					key={item.uri}
+					type="collection"
+					uri={item.uri}
+					header={item.name}
+					subheader={`${item.items.length} Albums`}
+					imageUrl={item.image}
+				/>
+			);
+		}
+		// localalbum
+		return (
+			<CustomCard
+				key={item.uri}
+				type="localalbum"
 				uri={item.uri}
 				header={item.name}
 				subheader={item.artists?.[0]?.name}
 				imageUrl={item.images?.[0]?.url}
-			/> :
-			<CustomCard
-				type={item.type || "localalbum"}
-				uri={item.uri}
-				header={item.name}
-				subheader={item.type ? `${item.items.length} Albums` : item.artists?.[0]?.name}
-				imageUrl={item.type ? item.image : item.images?.[0]?.url}
 			/>
-	));
+		);
+	});
 
-	if (hasNextPage) rootlistCards.push(<LoadMoreCard callback={fetchNextPage} />);
+	if (hasNextPage) rootlistCards.push(<LoadMoreCard key="load-more" callback={fetchNextPage} />);
 
 	return (
 		<PageContainer {...props}>
+			{configWrapper.config["show-item-count"] ? (
+				<div className="library-item-count">{items.length} items</div>
+			) : null}
 			<div className={"main-gridContainer-gridContainer grid"}>{rootlistCards}</div>
 		</PageContainer>
 	);

@@ -1,26 +1,27 @@
 import React from "react";
-import ReactDOM from "react-dom";
 
 function NavigationBar({ links, selected, storekey }: { links: string[], selected: string, storekey: string }) {
-    // @ts-ignore
-    const { Chip } = Spicetify.ReactComponent;
-
     function navigate(page: string) {
         Spicetify.Platform.History.push(`/${storekey.split(":")[0]}/${page}`);
         Spicetify.LocalStorage.set(storekey, page);
     }
 
-    return ReactDOM.createPortal(
-        <div style={{ paddingTop: "8px", pointerEvents: "auto" }}>
-            <div className="navbar-container">
-                <div className="u_wTfCtgm9HvxrphUxKd">
-                    {links.map(link =>
-                        <Chip aria-label={link} selected={selected === link} selectedColorSet="invertedLight" onClick={() => navigate(link)}>{link}</Chip>
-                    )}
-                </div>
+    return (
+        <div className="stats-nav-shell">
+            <div className="navbar-container stats-nav-inline">
+                {links.map((link) => (
+                    <button
+                        key={link}
+                        type="button"
+                        className={selected === link ? "stats-nav-chip is-active" : "stats-nav-chip"}
+                        aria-pressed={selected === link}
+                        onClick={() => navigate(link)}
+                    >
+                        {link}
+                    </button>
+                ))}
             </div>
-        </div>,
-        document.querySelector<HTMLDivElement>(".main-topBar-topbarContentWrapper")!
+        </div>
     );
 };
 

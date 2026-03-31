@@ -1,11 +1,25 @@
 :root {
     --library-card-size: 180px;
-    --library-searchbar-size: 200px;
+    --library-searchbar-size: 140px;
 }
 
 #library-app {
-    .header-right .x-filterBox-expandedOrHasFilter .x-filterBox-filterInput {
-        width: var(--library-searchbar-size);
+    .header-right .x-filterBox-expandedOrHasFilter {
+        flex-shrink: 1;
+        min-width: 0;
+
+        .x-filterBox-overlay {
+            pointer-events: none;
+        }
+
+        .x-filterBox-filterInput {
+            width: var(--library-searchbar-size);
+            transition: width 0.2s ease;
+        }
+
+        &:focus-within .x-filterBox-filterInput {
+            width: calc(var(--library-searchbar-size) + 30px);
+        }
     }
 
     .grid {
@@ -29,14 +43,18 @@
             margin: 0 auto;
         }
 
-        &:hover {
-            cursor: pointer;
-        }
-
         display: flex;
         gap: 10px;
         flex-direction: column;
         justify-content: center;
+    }
+
+    button.load-more-card {
+        border: none;
+        font: inherit;
+        cursor: pointer;
+        width: 100%;
+        text-align: left;
     }
 
     .x-filterBox-searchIcon {
@@ -71,5 +89,363 @@
 
     button {
         align-self: end;
+    }
+}
+
+.library-addmenu-dropdown {
+    background: var(--spice-player);
+    border: 1px solid rgba(var(--spice-rgb-selected-row), 0.25);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    min-width: 180px;
+    overflow: hidden;
+    padding: 4px;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 4px);
+    z-index: 100;
+}
+
+.library-addmenu-item {
+    align-items: center;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    color: var(--spice-text);
+    cursor: pointer;
+    display: flex;
+    font-size: 0.875rem;
+    gap: 10px;
+    padding: 8px 10px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.library-addmenu-item:hover {
+    background: rgba(var(--spice-rgb-selected-row), 0.15);
+}
+
+.library-addmenu-icon {
+    display: flex;
+    flex-shrink: 0;
+}
+
+.stats-debugConsole {
+    bottom: 24px;
+    position: fixed;
+    right: 24px;
+    width: min(420px, calc(100vw - 32px));
+    z-index: 50;
+}
+
+.stats-debugConsole-toggle,
+.stats-debugConsole-clear {
+    background: var(--spice-player);
+    border: 1px solid rgba(var(--spice-rgb-selected-row), 0.35);
+    border-radius: 999px;
+    color: var(--spice-text);
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 8px 14px;
+}
+
+.stats-debugConsole.closed {
+    width: auto;
+}
+
+.stats-debugConsole.closed .stats-debugConsole-toggle {
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24);
+}
+
+.stats-debugConsole.open .stats-debugConsole-toggle {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    width: 100%;
+}
+
+.stats-debugConsole-headerButtons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.stats-debugConsole-close {
+    align-items: center;
+    background: transparent;
+    border: 1px solid rgba(var(--spice-rgb-selected-row), 0.35);
+    border-radius: 50%;
+    color: var(--spice-text);
+    cursor: pointer;
+    display: flex;
+    font-size: 1rem;
+    height: 32px;
+    justify-content: center;
+    line-height: 1;
+    width: 32px;
+}
+
+.stats-debugConsole-close:hover {
+    background: rgba(var(--spice-rgb-selected-row), 0.2);
+}
+
+.stats-debugConsole-panel {
+    background: var(--spice-main);
+    border: 1px solid rgba(var(--spice-rgb-selected-row), 0.25);
+    border-radius: 18px;
+    box-shadow: 0 24px 50px rgba(0, 0, 0, 0.32);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: 70vh;
+    overflow: auto;
+    padding: 16px;
+}
+
+.stats-debugConsole-header,
+.stats-debugConsole-logHeader {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.stats-debugConsole-header h3,
+.stats-debugConsole-header p {
+    margin: 0;
+}
+
+.stats-debugConsole-header p,
+.stats-debugConsole-empty,
+.stats-debugConsole-message,
+.stats-debugConsole-meta {
+    color: var(--spice-subtext);
+}
+
+.stats-debugConsole-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.stats-debugConsole-sectionTitle,
+.stats-debugConsole-level {
+    color: var(--spice-text);
+    font-weight: 700;
+}
+
+.stats-debugConsole-log {
+    background: var(--spice-player);
+    border: 1px solid rgba(var(--spice-rgb-selected-row), 0.16);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px;
+}
+
+.stats-debugConsole-log.warn {
+    border-color: rgba(var(--spice-rgb-selected-row), 0.35);
+}
+
+.stats-debugConsole-log.error {
+    border-color: rgba(var(--spice-rgb-selected-row), 0.55);
+}
+
+.stats-debugConsole-logList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.stats-debugConsole-meta {
+    font-size: 0.75rem;
+    margin: 0;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.library-item-count {
+    display: block;
+    padding: 0 0 8px 0;
+    font-size: 0.875rem;
+    color: var(--spice-subtext);
+    font-weight: 400;
+}
+
+.library-backButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--spice-text);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+        color: var(--spice-button);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--spice-button);
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+}
+
+// Reorder modal
+.reorder-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.reorder-modal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px 0;
+}
+
+.reorder-modal-row {
+    align-items: center;
+    background: var(--spice-player);
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: grab;
+    display: flex;
+    gap: 10px;
+    padding: 8px 12px;
+    transition: background 0.1s;
+    user-select: none;
+
+    &:hover {
+        background: rgba(var(--spice-rgb-selected-row), 0.1);
+    }
+
+    &:active {
+        cursor: grabbing;
+        opacity: 0.4;
+    }
+}
+
+.reorder-drop-target {
+    border-top-color: var(--spice-button);
+}
+
+.reorder-modal-drag-handle {
+    color: var(--spice-subtext);
+    flex-shrink: 0;
+    width: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.reorder-modal-image {
+    border-radius: 4px;
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+.reorder-modal-name {
+    color: var(--spice-text);
+    font-size: 0.875rem;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.reorder-modal-artist {
+    color: var(--spice-subtext);
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.reorder-modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.reorder-modal-save,
+.reorder-modal-reset {
+    background: var(--spice-player);
+    border: 1px solid rgba(var(--spice-rgb-selected-row), 0.25);
+    border-radius: 8px;
+    color: var(--spice-text);
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 8px 16px;
+
+    &:hover {
+        background: rgba(var(--spice-rgb-selected-row), 0.15);
+    }
+}
+
+.reorder-modal-save {
+    background: var(--spice-button);
+    color: var(--spice-player);
+    border-color: transparent;
+
+    &:hover {
+        opacity: 0.9;
+    }
+}
+
+// Save icon button injected into PopupModal title bar
+.reorder-modal-header-save {
+    align-items: center;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    color: var(--spice-button);
+    cursor: pointer;
+    display: flex;
+    height: 32px;
+    justify-content: center;
+    margin-left: auto;
+    width: 32px;
+
+    &:hover {
+        color: var(--spice-text);
+        transform: scale(1.1);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--spice-button);
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+}
+
+// Normalize close button in Reorder Albums modal to match save button size
+.GenericModal:has(.reorder-modal) .main-trackCreditsModal-closeBtn {
+    height: 32px;
+    min-height: 32px;
+    min-width: 32px;
+    padding: 0;
+    width: 32px;
+}
+
+// Reorder button in albums header
+.library-reorder-button {
+    align-items: center;
+    background: transparent;
+    border: 1px solid rgba(var(--spice-rgb-selected-row), 0.25);
+    border-radius: 8px;
+    color: var(--spice-text);
+    cursor: pointer;
+    display: flex;
+    height: 32px;
+    justify-content: center;
+    padding: 0 10px;
+
+    &:hover {
+        background: rgba(var(--spice-rgb-selected-row), 0.1);
     }
 }

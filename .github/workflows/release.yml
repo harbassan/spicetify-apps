@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "stats-v*"
+      - "library-v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Parse tag
+        id: parse
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          if [[ "$TAG" =~ ^(stats|library)-v(.+)$ ]]; then
+            echo "app=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+            echo "version=${BASH_REMATCH[2]}" >> "$GITHUB_OUTPUT"
+            echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::Tag '$TAG' does not match expected pattern '{app}-v{version}'"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        working-directory: projects/${{ steps.parse.outputs.app }}
+        run: npm run build-local
+
+      - name: Verify build output
+        run: |
+          APP="${{ steps.parse.outputs.app }}"
+          if [ ! -d "projects/$APP/dist" ] || [ -z "$(ls -A projects/$APP/dist)" ]; then
+            echo "::error::Build output missing for $APP"
+            exit 1
+          fi
+
+      - name: Create release zip
+        run: |
+          APP="${{ steps.parse.outputs.app }}"
+          mkdir -p /tmp/zip-staging/"$APP"
+          cp -r projects/"$APP"/dist/* /tmp/zip-staging/"$APP"/
+          cd /tmp/zip-staging
+          zip -r "$GITHUB_WORKSPACE/spicetify-${APP}.release.zip" "$APP"/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.parse.outputs.tag }}
+          name: "${{ steps.parse.outputs.app }} v${{ steps.parse.outputs.version }}"
+          files: spicetify-${{ steps.parse.outputs.app }}.release.zip
+          draft: false
+          prerelease: false

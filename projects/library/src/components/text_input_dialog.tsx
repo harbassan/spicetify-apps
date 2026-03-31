@@ -11,9 +11,16 @@ const TextInputDialog = (props: { def?: string; placeholder: string; onSave: (va
 		onSave(value);
 	};
 
+	const onKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === "Escape") {
+			e.stopPropagation();
+			Spicetify.PopupModal.hide();
+		}
+	};
+
 	return (
 		<>
-			<form className="text-input-form" onSubmit={onSubmit}>
+			<form className="text-input-form" onSubmit={onSubmit} onKeyDown={onKeyDown}>
 				<label className={"text-input-wrapper"}>
 					<input
 						className={"text-input"}
@@ -21,6 +28,7 @@ const TextInputDialog = (props: { def?: string; placeholder: string; onSave: (va
 						value={value}
 						placeholder={placeholder}
 						onChange={(e) => setValue(e.target.value)}
+						autoFocus
 					/>
 				</label>
 				<button type="submit" data-encore-id="buttonPrimary" className="Button-sc-qlcn5g-0 Button-small-buttonPrimary">

@@ -1,4 +1,3 @@
-import { DownArrow, UpArrow } from "../icons/arrows";
 import React from "react";
 
 interface Option {
@@ -6,85 +5,72 @@ interface Option {
 	name: string;
 }
 
-interface DropdownMenuProps {
+interface SortDropdownMenuProps {
 	options: Option[];
 	activeOption: Option;
+	isReversed: boolean;
+	showReverseButton?: boolean;
 	switchCallback: (option: Option) => void;
 }
 
-interface SortDropdownMenuProps extends DropdownMenuProps {
-	isReversed: boolean;
-}
+const SortDropdownMenu = ({ options, activeOption, isReversed, showReverseButton = true, switchCallback }: SortDropdownMenuProps) => {
+	const measureRef = React.useRef<HTMLSpanElement>(null);
+	const [selectWidth, setSelectWidth] = React.useState<number | undefined>(undefined);
 
-interface MenuItemProps {
-	option: Option;
-	isActive: boolean;
-	switchCallback: (option: Option) => void;
-}
-
-interface SortMenuItemProps extends MenuItemProps {
-	isReversed: boolean;
-}
-const SortMenuItem = (props: SortMenuItemProps) => {
-	const { ReactComponent } = Spicetify;
-	const { option, isActive, isReversed, switchCallback } = props;
-
-	const activeStyle = {
-		backgroundColor: "rgba(var(--spice-rgb-selected-row),.1)",
-	};
+	React.useLayoutEffect(() => {
+		if (measureRef.current) {
+			// 16px right padding + 12px left padding + 2px border
+			setSelectWidth(measureRef.current.scrollWidth + 30);
+		}
+	}, [activeOption.id]);
 
 	return (
-		<ReactComponent.MenuItem
-			trigger="click"
-			onClick={() => switchCallback(option)}
-			data-checked={isActive}
-			trailingIcon={isActive ? isReversed ? <DownArrow /> : <UpArrow /> : undefined}
-			style={isActive ? activeStyle : undefined}
-		>
-			{option.name}
-		</ReactComponent.MenuItem>
-	);
-};
-
-const SortDropdownMenu = (props: SortDropdownMenuProps) => {
-	const { ContextMenu, Menu, TextComponent } = Spicetify.ReactComponent;
-	const { options, activeOption, isReversed, switchCallback } = props;
-
-	const optionItems = options.map((option) => {
-		return (
-			<SortMenuItem
-				option={option}
-				isActive={option === activeOption}
-				isReversed={isReversed}
-				switchCallback={switchCallback}
-			/>
-		);
-	});
-
-	const MenuWrapper = (props: Spicetify.ReactComponent.MenuProps) => {
-		return <Menu {...props}>{optionItems}</Menu>;
-	};
-
-	return (
-		<ContextMenu menu={<MenuWrapper />} trigger="click">
-			<button className="x-sortBox-sortDropdown" type="button" role="combobox" aria-expanded="false">
-				<TextComponent variant="mesto" semanticColor="textSubdued">
+		<div className="stats-native-select-wrapper">
+			<label className="stats-native-select-wrapper">
+				<span className="stats-native-select-label">Sort</span>
+				<span className="stats-native-select-measure" ref={measureRef} aria-hidden="true">
 					{activeOption.name}
-					{isReversed ? <DownArrow /> : <UpArrow />}
-				</TextComponent>
-				<svg
-					role="img"
-					height="16"
-					width="16"
-					aria-hidden="true"
-					className="Svg-img-16 Svg-img-16-icon Svg-img-icon Svg-img-icon-small"
-					viewBox="0 0 16 16"
-					data-encore-id="icon"
+				</span>
+				<select
+					className="stats-native-select"
+					aria-label="Sort option"
+					value={activeOption.id}
+					style={selectWidth ? { width: `${selectWidth}px` } : undefined}
+					onChange={(event) => {
+						const option = options.find((item) => item.id === event.target.value);
+						if (option) switchCallback(option);
+					}}
 				>
-					<path d="m14 6-6 6-6-6h12z"></path>
-				</svg>
-			</button>
-		</ContextMenu>
+					{options.map((option) => (
+						<option key={option.id} value={option.id}>
+							{option.name}
+						</option>
+					))}
+				</select>
+			</label>
+			{showReverseButton && (
+				<button
+					className="stats-icon-button"
+					type="button"
+					aria-label="Reverse sort order"
+					aria-pressed={isReversed}
+					onClick={() => switchCallback(activeOption)}
+				>
+					<svg
+						className="stats-icon-button-svg"
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 16 16"
+						aria-hidden="true"
+					>
+						{isReversed ? (
+							<path d="M.998 7.19A.749.749 0 0 0 .47 8.47L7.99 16l7.522-7.53a.75.75 0 1 0-1.06-1.06L8.74 13.13V.75a.75.75 0 1 0-1.498 0v12.38L1.528 7.41a.749.749 0 0 0-.53-.22z" />
+						) : (
+							<path d="M.998 8.81A.749.749 0 0 1 .47 7.53L7.99 0l7.522 7.53a.75.75 0 1 1-1.06 1.06L8.74 2.87v12.38a.75.75 0 1 1-1.498 0V2.87L1.528 8.59a.751.751 0 0 1-.53.22z" />
+						)}
+					</svg>
+				</button>
+			)}
+		</div>
 	);
 };
 

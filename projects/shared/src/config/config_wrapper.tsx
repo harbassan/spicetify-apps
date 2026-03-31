@@ -14,7 +14,9 @@ class ConfigWrapper {
                 `${key}:config:${modalStructureRow.key}`,
                 modalStructureRow.def
             );
-            modalStructureRow.callback?.(value);
+            if (modalStructureRow.initializeCallback !== false) {
+                modalStructureRow.callback?.(value);
+            }
             return { [modalStructureRow.key]: value };
         });
 

@@ -14,10 +14,12 @@ type SharedProps = {
     def: any;
     sectionHeader?: string;
     callback?: (value: any) => void;
+    initializeCallback?: boolean;
 };
 
 type ModalStructureRowProps = SharedProps &
     (
+        | { type: "display"; displayValue?: (config: ConfigProps) => string }
         | { type: "toggle" /* other props for toggle */ }
         | { type: "text"; placeholder?: string /* other props for text */ }
         | { type: "dropdown"; options: string[] /* other props for dropdown */ }

@@ -1,16 +1,38 @@
+interface SpicetifyStatsGlobal {
+	ConfigWrapper: {
+		Config: Config & Record<string, unknown>;
+		launchModal: (callback?: (config: Config) => void) => void;
+	};
+}
+
 declare global {
-	var SpicetifyStats: any;
+	var SpicetifyStats: SpicetifyStatsGlobal;
 }
 
 export interface Config {
+	"oauth-client-id": string | null;
+	"use-oauth": boolean;
+	"oauth-callback": string | null;
+	"oauth-disconnect": boolean;
 	"api-key": string | null;
 	"lastfm-user": string | null;
+	"use-direct-fetch": boolean;
+	"show-debug-console": boolean;
 	"use-lastfm": boolean;
+	"lastfm-only": boolean;
+	"use-musicbrainz-genres": boolean;
 	"show-artists": boolean;
 	"show-tracks": boolean;
+	"show-albums": boolean;
 	"show-genres": boolean;
 	"show-library": boolean;
 	"show-charts": boolean;
+	"auto-load-playlist-appearances": boolean;
+	"auto-load-lastfm-top-tracks": boolean;
+	"auto-load-user-top-tracks": boolean;
+	"prefer-spotify-links": boolean;
+	"show-artist-stats-button": boolean;
+	"artist-stats-button-order": number;
 }
 
 export interface ConfigWrapper {
@@ -27,7 +49,7 @@ export interface LastFMMinifiedArtist {
 	name: string;
 	playcount: number;
 	uri: string;
-	image: undefined;
+	image?: string;
 	type: "lastfm";
 }
 
@@ -70,6 +92,7 @@ export interface LastFMMinifiedTrack {
 	uri: string;
 	playcount: number;
 	duration_ms: number;
+	image?: string;
 	artists: {
 		name: string;
 		uri: string;

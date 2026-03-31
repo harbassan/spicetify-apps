@@ -39,10 +39,121 @@
     font-size: 12px;
 }
 
-.page-header {
-    align-content: space-between;
+.stats-plain-card-wrapper {
+    position: relative;
+}
+
+.stats-plain-card {
+    background: var(--spice-card);
+    border-radius: 12px;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: 100%;
+    min-height: 252px;
+    padding: 12px;
+    text-decoration: none;
+    transition: background-color 120ms ease;
+}
+
+button.stats-plain-card {
+    border: none;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    width: 100%;
+}
+
+.stats-plain-card:hover {
+    background: var(--spice-player);
+}
+
+.stats-plain-card-image {
+    aspect-ratio: 1 / 1;
+    background: rgba(var(--spice-rgb-selected-row), 0.12);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+.stats-plain-card-image.is-circular {
+    border-radius: 999px;
+}
+
+.stats-plain-card-image img,
+.stats-plain-card-imageFallback {
+    display: block;
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.stats-plain-card-image img {
+    inset: 0;
+    position: absolute;
+    transition: opacity 0.15s ease;
+}
+
+.stats-plain-card-imageFallback {
+    background: linear-gradient(135deg, rgba(var(--spice-rgb-selected-row), 0.18), rgba(var(--spice-rgb-selected-row), 0.05));
     align-items: center;
     display: flex;
+    justify-content: center;
+    color: var(--spice-text);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    transition: opacity 0.15s ease;
+}
+
+.stats-folder-icon {
+    background: linear-gradient(135deg, rgba(30, 44, 107, 0.55), rgba(30, 44, 107, 0.25));
+    color: #1db954;
+}
+
+.stats-localfiles-icon {
+    background: linear-gradient(135deg, rgba(180, 120, 50, 0.45), rgba(180, 120, 50, 0.18));
+    color: #e8a445;
+}
+
+.stats-plain-card-imageFallbackLabel {
+    opacity: 0.8;
+}
+
+.stats-plain-card-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.stats-plain-card-title,
+.stats-plain-card-subtitle,
+.stats-plain-card-meta {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.stats-plain-card-title {
+    color: var(--spice-text);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.stats-plain-card-subtitle,
+.stats-plain-card-meta {
+    color: var(--spice-subtext);
+    font-size: 0.85rem;
+}
+
+.page-header {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
     justify-content: space-between;
     margin: 16px 0;
 
@@ -50,11 +161,15 @@
     .header-left {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
         gap: 8px;
     }
 
     .header-right {
         justify-content: flex-end;
+        flex-shrink: 1;
+        min-width: 0;
+        margin-left: auto;
     }
 
     .header-left {
@@ -86,6 +201,67 @@
     }
 }
 
+.stats-native-select-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.stats-native-select-label {
+    color: var(--spice-subtext);
+    font-size: 0.875rem;
+}
+
+.stats-native-select {
+    appearance: none;
+    background: var(--spice-player);
+    border: 1px solid rgba(var(--spice-rgb-selected-row), 0.35);
+    border-radius: 999px;
+    color: var(--spice-text);
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 8px 16px 8px 12px;
+    transition: width 0.15s ease;
+}
+
+// Hidden span used to measure the selected option's text width
+.stats-native-select-measure {
+    font-size: 0.875rem;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+    position: absolute;
+    visibility: hidden;
+    white-space: nowrap;
+}
+
+.stats-icon-button {
+    align-items: center;
+    background: var(--spice-player);
+    border: 1px solid rgba(var(--spice-rgb-selected-row), 0.35);
+    border-radius: 999px;
+    color: var(--spice-subtext);
+    cursor: pointer;
+    display: inline-flex;
+    height: 36px;
+    justify-content: center;
+    padding: 0;
+    width: 36px;
+}
+
+.stats-icon-button:hover,
+.stats-native-select:hover {
+    border-color: rgba(var(--spice-rgb-selected-row), 0.6);
+    color: var(--spice-text);
+}
+
+.stats-icon-button-svg {
+    fill: currentColor;
+    height: 16px;
+    width: 16px;
+}
+
 // make sure the popup modal close button is always clickable
 .main-trackCreditsModal-closeBtn {
     -webkit-app-region: no-drag;
@@ -100,6 +276,79 @@
     padding: 0 var(--content-spacing);
 }
 
+.stats-nav-shell {
+    margin-top: 0;
+}
+
+.stats-nav-inline {
+    gap: 8px;
+    height: auto;
+    min-height: 48px;
+    padding-block: 8px;
+    flex-wrap: wrap;
+}
+
+.stats-nav-chip {
+    background: var(--spice-player);
+    border: 1px solid rgba(var(--spice-rgb-selected-row), 0.28);
+    border-radius: 999px;
+    color: var(--spice-subtext);
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 8px 14px;
+}
+
+.stats-nav-chip.is-active,
+.stats-nav-chip:hover {
+    background: var(--spice-card);
+    border-color: rgba(var(--spice-rgb-selected-row), 0.6);
+    color: var(--spice-text);
+}
+
+.stats-page-title {
+    color: var(--spice-text);
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+}
+
+// Spotify's fixed top bar overlays the app scroll area and intercepts pointer
+// events across its entire ~64px height.  Let clicks pass through the empty
+// regions so our navbar underneath remains clickable, then re-enable pointer
+// events on the actual interactive widgets inside the top bar.
+// Scoped to only apply when one of our custom apps is mounted.
+body:has(#library-app), body:has(#stats-app) {
+    header.main-topBar-container {
+        background: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        box-shadow: none !important;
+        pointer-events: none;
+
+        // Kill the scroll-driven background on Spotify's inner background div
+        // and any pseudo-elements used for the fade-in overlay.
+        &::before,
+        &::after,
+        > div:not([class*="topbarContent"]):not([class*="ActionBar"]) {
+            background: transparent !important;
+            background-color: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            box-shadow: none !important;
+        }
+
+        button,
+        a,
+        [role="button"],
+        [tabindex]:not([tabindex="-1"]),
+        input,
+        select {
+            pointer-events: auto;
+        }
+    }
+}
+
 #library-app > :first-child, #stats-app > :first-child {
-    margin-top: 64px;
+    margin-top: 16px;
 }

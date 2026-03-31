@@ -6,16 +6,10 @@ interface StatCardProps {
 }
 
 function StatCard({ label, value }: StatCardProps) {
-	const { TextComponent } = Spicetify.ReactComponent;
-
 	return (
-		<div className="main-card-card">
-			<TextComponent as="div" semanticColor="textBase" variant="alto">
-				{value}
-			</TextComponent>
-			<TextComponent as="div" semanticColor="textBase" variant="balladBold">
-				{label}
-			</TextComponent>
+		<div className="main-card-card stats-statCard">
+			<div className="stats-statCardValue">{value}</div>
+			<div className="stats-statCardLabel">{label}</div>
 		</div>
 	);
 }

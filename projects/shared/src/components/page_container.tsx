@@ -3,17 +3,16 @@ import React from "react";
 interface PageContainerProps {
     lhs: React.ReactNode[];
     rhs?: React.ReactNode[];
-    children: React.ReactElement | React.ReactElement[];
+    children: React.ReactNode;
 }
 
 const PageContainer = (props: PageContainerProps) => {
     const { rhs, lhs, children } = props;
-    const { TextComponent } = Spicetify.ReactComponent;
 
     function parseNodes(nodes: React.ReactNode[]) {
-        return nodes.map(node => typeof node === "string"
-            ? <TextComponent children={node} as="h1" variant="canon" semanticColor="textBase" />
-            : node
+        return nodes.map((node, index) => typeof node === "string"
+            ? <h1 key={node} className="stats-page-title">{node}</h1>
+            : <React.Fragment key={index}>{node}</React.Fragment>
         );
     }
     return (

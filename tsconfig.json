@@ -12,7 +12,6 @@
       "ES2022",
       "DOM"
     ],
-    "baseUrl": ".",
     "paths": {
       "@shared/*": ["./projects/shared/src/*"]
     },

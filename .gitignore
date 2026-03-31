@@ -142,3 +142,47 @@ out
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/node
+
+# ignore build from https://github.com/harbassan/spicetify-apps/issues/242
+stats-from-issue-242/
+
+# Local VSCode settings
+.vscode/settings.json
+.vscode/mcp.json
+
+# Build output / dist artifacts
+dist/
+*.dist.js
+
+# Claude AI related files
+claudekit/
+.claude/
+.mcp.json
+docs/Claude Code Paths.md
+
+# GitHub Copilot agent files
+.github/instructions/superpowers.md
+.github/skills/address-review/SKILL.md
+.github/agents/typescript-pro.md
+.github/agents/code-reviewer.md
+
+# scratch files
+docs/untitty.txt
+docs/squanch-pad.md
+
+# Release artifacts (built by CI)
+releases/
+projects/*/dist/
+
+# PR description
+docs/PR-desc.md
+
+# Planning docs
+docs/Spicetify Apps Code Review.md
+docs/superpowers/plans/Upcoming events.md
+docs/superpowers/plans/completed/
+docs/superpowers/plans/Add context menu to all tabs of both the.md
+docs/superpowers/plans/add listeners by city to Artists Stats m.md
+docs/superpowers/plans/Clickable Genres.md
+docs/superpowers/plans/top-scrobbles.md
+docs/superpowers/plans/Upcoming events.md

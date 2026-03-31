@@ -18,6 +18,12 @@ export interface TrackChartResponse {
 	tracks: TopTracks;
 }
 
+export interface ArtistTopTagsResponse {
+	toptags?: {
+		tag?: Tag[];
+	};
+}
+
 interface ResponseAttr {
 	user?: string;
 	totalPages: string;
@@ -85,6 +91,12 @@ interface Image {
 	"#text": string;
 }
 
+export interface Tag {
+	count: number | string;
+	name: string;
+	url?: string;
+}
+
 enum Size {
 	Extralarge = "extralarge",
 	Large = "large",
@@ -96,3 +108,32 @@ interface Streamable {
 	fulltrack: string;
 	"#text": string;
 }
+
+export type ArtistInfoResponse = {
+	artist?: {
+		stats?: {
+			listeners?: string;
+			playcount?: string;
+			userplaycount?: string;
+		};
+		tags?: {
+			tag?: { name: string; url: string }[];
+		};
+		bio?: {
+			summary?: string;
+		};
+	};
+};
+
+export type ArtistTopTracksResponse = {
+	toptracks?: {
+		track?: {
+			name: string;
+			playcount: string;
+			listeners: string;
+			url: string;
+			artist: { name: string; url: string };
+			image?: { "#text": string }[];
+		}[];
+	};
+};

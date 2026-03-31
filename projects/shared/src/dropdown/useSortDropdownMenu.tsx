@@ -15,17 +15,19 @@ type ReturnType = [
 	setAvailableOptions: React.Dispatch<React.SetStateAction<OptionProps[]>>,
 ];
 
-const useSortDropdownMenu = (options: OptionProps[], storageVariable?: string) => {
+const useSortDropdownMenu = (options: OptionProps[], storageVariable?: string, hideReverseForOptionIds?: string[]) => {
 	const initialOptionID = storageVariable && Spicetify.LocalStorage.get(`${storageVariable}:active-option`);
 	const initialOption = initialOptionID && options.find((e) => e.id === initialOptionID);
 	const [activeOption, setActiveOption] = useState(initialOption || options[0]);
 	const [isReversed, setIsReversed] = useState(false);
 	const [availableOptions, setAvailableOptions] = useState(options);
+	const showReverseButton = !hideReverseForOptionIds?.includes(activeOption.id);
 	const dropdown = (
 		<SortDropdownMenu
 			options={availableOptions}
 			isReversed={isReversed}
 			activeOption={activeOption}
+			showReverseButton={showReverseButton}
 			switchCallback={(option: OptionProps) => {
 				setIsReversed((prev) => option.id === activeOption.id ? !prev : prev);
 				setActiveOption(option);

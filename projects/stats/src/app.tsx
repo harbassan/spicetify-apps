@@ -6,10 +6,13 @@ import GenresPage from "./pages/top_genres";
 import LibraryPage from "./pages/library";
 import ChartsPage from "./pages/charts";
 import AlbumsPage from "./pages/top_albums";
+import DebugConsole from "./components/debug_console";
+import { statsDebug } from "./extensions/debug";
 
 import { version } from "../package.json";
 
 import NavigationBar from "@shared/components/navigation/navigation_bar"
+import checkForUpdates from "@shared/updates/check_for_updates"
 
 import "./styles/app.scss";
 import "../../shared/src/config/config_modal.scss";
@@ -17,20 +20,6 @@ import "../../shared/src/shared.scss";
 
 import { ConfigWrapper } from "./types/stats_types";
 
-
-const checkForUpdates = (setNewUpdate: (a: boolean) => void) => {
-	fetch("https://api.github.com/repos/harbassan/spicetify-apps/releases")
-		.then((res) => res.json())
-		.then(
-			(result) => {
-				const releases = result.filter((release: any) => release.name.startsWith("stats"));
-				setNewUpdate(releases[0].name.slice(7) !== version);
-			},
-			(error) => {
-				console.log("Failed to check for updates", error);
-			},
-		);
-};
 
 const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const pages: Record<string, React.ReactElement> = {
@@ -51,7 +40,7 @@ const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapper }) =>
 	const activePage = Spicetify.Platform.History.location.pathname.split("/")[2];
 
 	React.useEffect(() => {
-		checkForUpdates(setNewUpdate);
+		checkForUpdates(setNewUpdate, "stats", version);
 	}, []);
 
 	React.useEffect(() => {
@@ -78,7 +67,7 @@ const NavbarContainer = ({ configWrapper }: { configWrapper: ConfigWrapper }) =>
 };
 
 const waitForReady = async (callback: () => void) => {
-	if (Spicetify.Platform && Spicetify.Platform.RootlistAPI && Spicetify.ReactQuery && SpicetifyStats) {
+	if (Spicetify.Platform && Spicetify.Platform.RootlistAPI && SpicetifyStats) {
 		callback();
 	} else {
 		setTimeout(() => waitForReady(callback), 1000);
@@ -88,6 +77,12 @@ const waitForReady = async (callback: () => void) => {
 const App = () => {
 	const [config, setConfig] = React.useState({} as ConfigWrapper["config"]);
 	const [ready, setReady] = React.useState(false);
+
+	// Sync debug logging with config — must be above the early return
+	// so hooks are always called in the same order (React rules of hooks)
+	React.useEffect(() => {
+		statsDebug.setEnabled(Boolean(config["show-debug-console"]));
+	}, [config["show-debug-console"]]);
 
 	// otherwise app crashes if its first page on spotify load
 	if (!ready) {
@@ -110,6 +105,7 @@ const App = () => {
 	return (
 		<div id="stats-app">
 			<NavbarContainer configWrapper={configWrapper} />
+			{config["show-debug-console"] && <DebugConsole />}
 		</div>
 	);
 

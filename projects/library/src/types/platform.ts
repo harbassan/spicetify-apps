@@ -38,7 +38,7 @@ export interface ArtistItem extends Item {
 }
 
 export interface AlbumItem extends Item {
-	type: "album";
+	type: "album" | "localalbum";
 	artists: Artist[];
 	isPremiumOnly: boolean;
 }

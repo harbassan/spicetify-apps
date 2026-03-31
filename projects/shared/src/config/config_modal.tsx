@@ -101,46 +101,25 @@ const ToggleInput = (props: ToggleInputProps) => {
 
 const SliderInput = (props: SliderInputProps) => {
     const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log("hello");
         props.callback(parseFloat(e.target.value));
     };
 
-    const percentage = ((props.value - props.min) / (props.max - props.min)) * 100;
-
     return (
-        <div className="playback-progressbar playback-progressbar-isInteractive">
-            <div className="progress-bar" style={{
-                position: 'relative',
-                height: '24px',
-                "--progress-bar-transform": `${percentage}%`,
-            } as React.CSSProperties}>
-                {/* hidden input */}
-                <input
-                    type="range"
-                    min={props.min}
-                    max={props.max}
-                    step={props.step}
-                    value={props.value}
-                    onChange={handleSliderChange}
-                    style={{
-                        position: "absolute",
-                        zIndex: 2,
-                        width: '100%',
-                        height: '100%',
-                        opacity: 0,
-                        cursor: 'pointer',
-                    }}
-                />
-                <div className="x-progressBar-progressBarBg">
-                    <div className="x-progressBar-sliderArea">
-                        <div className="x-progressBar-fillColor"></div>
-                    </div>
-                    {/* thumb */}
-                    <div className="progress-bar__slider" />
-                </div>
-            </div>
-        </div>
+        <input
+            type="range"
+            min={props.min}
+            max={props.max}
+            step={props.step}
+            value={props.value}
+            onChange={handleSliderChange}
+            style={{ width: "100%", cursor: "pointer" }}
+            aria-label={`Configuration slider for ${props.storageKey}`}
+        />
     );
+};
+
+const DisplayValue = (props: { value: string }) => {
+    return <div className="config-display-value">{props.value}</div>;
 };
 
 const TooltipIcon = () => {
@@ -209,10 +188,12 @@ const ConfigModal = (props: ConfigModalProps) => {
 
         const Element = () => {
             switch (modalRow.type) {
+                case "display":
+                    return <DisplayValue value={modalRow.displayValue?.(modalConfig) ?? String(currentValue ?? "")} />;
                 case "toggle":
                     return <ToggleInput storageKey={key} value={currentValue} callback={updateItem} />;
                 case "text":
-                    return <TextInput storageKey={key} value={currentValue} callback={updateItem} />;
+                    return <TextInput storageKey={key} value={currentValue} callback={updateItem} placeholder={modalRow.placeholder} />;
                 case "dropdown":
                     return (
                         <Dropdown

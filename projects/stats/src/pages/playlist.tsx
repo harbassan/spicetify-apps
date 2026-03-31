@@ -6,41 +6,24 @@ import Shelf from "../components/shelf";
 import useStatus from "@shared/status/useStatus";
 import { parseStat, parseTracks } from "../utils/track_helper";
 import { getFullPlaylist } from "../api/platform";
+import { usePopupQuery } from "../utils/usePopupQuery";
 
 const getPlaylist = async (uri: string) => {
 	const contents = await getFullPlaylist(uri);
 	return parseTracks(contents);
 };
 
-// ? my shitty useQuery replacement because react-query is not working within the popup
-const useQueryShitty = <T,>(callback: () => Promise<T>) => {
-	const [error, setError] = React.useState<null | Error>(null);
-	const [data, setData] = React.useState<null | T>(null);
-	const [status, setStatus] = React.useState<"pending" | "error" | "success">("pending");
-
-	React.useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const data = await callback();
-				setData(data);
-				setStatus("success");
-			} catch (e) {
-				console.log(e);
-				setError(e as Error);
-				setStatus("error");
-			}
-		};
-
-		fetchData();
-	}, [callback]);
-
-	return { status, error, data };
+const navigateFromModal = (uri: string) => {
+	Spicetify.PopupModal.hide?.();
+	const parts = uri.split(":");
+	const path = parts.length >= 3 ? `/${parts[1]}/${parts.slice(2).join(":")}` : uri;
+	Spicetify.Platform.History.push(path);
 };
 
 const PlaylistPage = ({ uri }: { uri: string }) => {
 	const query = useCallback(() => getPlaylist(uri), [uri]);
 
-	const { status, error, data } = useQueryShitty(query);
+	const { status, error, data } = usePopupQuery(query);
 
 	const Status = useStatus(status, error);
 
@@ -49,18 +32,20 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
 	const analysis = data as NonNullable<typeof data>;
 
 	const statCards = Object.entries(analysis.analysis).map(([key, value]) => {
-		return <StatCard label={key} value={parseStat(key)(value)} />;
+		return <StatCard key={key} label={key} value={parseStat(key)(value)} />;
 	});
 
 	const artistCards = analysis.artists.contents.slice(0, 10).map((artist) => {
 		return (
 			<SpotifyCard
+				key={artist.uri}
 				type="artist"
 				provider={artist.type}
 				uri={artist.uri}
 				header={artist.name}
 				subheader={`Appears in ${artist.frequency} tracks`}
 				imageUrl={artist.image}
+				onClickOverride={artist.type !== "lastfm" ? () => navigateFromModal(artist.uri) : undefined}
 			/>
 		);
 	});
@@ -68,12 +53,14 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
 	const albumCards = analysis.albums.contents.slice(0, 10).map((album) => {
 		return (
 			<SpotifyCard
+				key={album.uri}
 				type="album"
 				provider={album.type}
 				uri={album.uri}
 				header={album.name}
 				subheader={`Appears in ${album.frequency} tracks`}
 				imageUrl={album.image}
+				onClickOverride={album.type !== "lastfm" ? () => navigateFromModal(album.uri) : undefined}
 			/>
 		);
 	});
@@ -91,12 +78,16 @@ const PlaylistPage = ({ uri }: { uri: string }) => {
 				<ChartCard data={analysis.genres} />
 				<div className={"main-gridContainer-gridContainer grid"}>{statCards}</div>
 			</Shelf>
-			{/* <Shelf title="Most Frequent Artists">
-				<InlineGrid>{artistCards}</InlineGrid>
-			</Shelf> */}
-			{/* <Shelf title="Most Frequent Albums">
-				<InlineGrid>{albumCards}</InlineGrid>
-			</Shelf> */}
+			{artistCards.length > 0 && (
+				<Shelf title="Most Frequent Artists">
+					<div className={"main-gridContainer-gridContainer grid"}>{artistCards}</div>
+				</Shelf>
+			)}
+			{albumCards.length > 0 && (
+				<Shelf title="Most Frequent Albums">
+					<div className={"main-gridContainer-gridContainer grid"}>{albumCards}</div>
+				</Shelf>
+			)}
 			<Shelf title="Release Year Distribution">
 				<ChartCard data={analysis.releaseYears} />
 			</Shelf>

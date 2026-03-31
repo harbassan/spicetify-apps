@@ -6,9 +6,11 @@ const collapseLibrary = () => {
 };
 
 const CollapseButton = () => {
-	const { ButtonTertiary } = Spicetify.ReactComponent;
-
-	return <ButtonTertiary buttonSize="sm" aria-label="Show Filters" iconOnly={LeftArrow} onClick={collapseLibrary} />;
+	return (
+		<button className="stats-icon-button" type="button" aria-label="Show Filters" onClick={collapseLibrary}>
+			<LeftArrow />
+		</button>
+	);
 };
 
 export default CollapseButton;

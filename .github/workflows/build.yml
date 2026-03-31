@@ -1,0 +1,40 @@
+name: Build Validation
+
+on:
+  push:
+    branches: ["**"]
+    tags-ignore:
+      - "**"
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [stats, library]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        working-directory: projects/${{ matrix.app }}
+        run: npm run build-local
+
+      - name: Verify build output
+        run: |
+          if [ ! -d "projects/${{ matrix.app }}/dist" ] || [ -z "$(ls -A projects/${{ matrix.app }}/dist)" ]; then
+            echo "::error::Build output missing for ${{ matrix.app }}"
+            exit 1
+          fi
+          echo "Build output for ${{ matrix.app }}:"
+          ls -la "projects/${{ matrix.app }}/dist/"

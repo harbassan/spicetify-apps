@@ -14,34 +14,36 @@ import useStatus from "@shared/status/useStatus";
 import { parseStat, parseTracks } from "../utils/track_helper";
 import { cacher, invalidator } from "../extensions/cache";
 import { getFullPlaylist, getRootlist } from "../api/platform";
+import { getConfigCacheKey } from "../utils/config_cache";
 
 const DropdownOptions = [
 	{ id: "owned", name: "My Playlists" },
 	{ id: "all", name: "All Playlists" },
 ];
 
-const getLibrary = async (type: "owned" | "all") => {
+const getLibrary = async (type: "owned" | "all", config: ConfigWrapper["config"]) => {
 	let playlists = await getRootlist();
 	if (type === "owned") playlists = playlists.filter((p) => p.isOwnedBySelf);
 	if (playlists.length === 0) throw new Error("You have no playlists saved");
 	const contents = await Promise.all(playlists.map((p) => getFullPlaylist(p.uri)));
-	const analysis = await parseTracks(contents.flat());
+	const analysis = await parseTracks(contents.flat(), config);
 	return { ...analysis, playlists: playlists.length };
 };
 
 const LibraryPage = ({ configWrapper }: { configWrapper: ConfigWrapper }) => {
 	const [dropdown, activeOption] = useDropdownMenu(DropdownOptions, "stats:library");
+	const cacheKey = getConfigCacheKey(configWrapper.config, { includeMusicBrainz: true });
 
 	const { status, error, data, refetch } = useQuery({
-		queryKey: ["library", activeOption.id],
-		queryFn: cacher(() => getLibrary(activeOption.id as "owned" | "all")),
+		queryKey: ["library", activeOption.id, cacheKey],
+		queryFn: cacher(() => getLibrary(activeOption.id as "owned" | "all", configWrapper.config)),
 	});
 
 	const props = {
 		lhs: ["Library Analysis"],
 		rhs: [
 			dropdown,
-			<RefreshButton callback={() => invalidator(["library", activeOption.id], refetch)} />,
+			<RefreshButton callback={() => invalidator(["library", activeOption.id, cacheKey], refetch)} />,
 			<SettingsButton configWrapper={configWrapper} />,
 		],
 	};
